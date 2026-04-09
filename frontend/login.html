@@ -3,1116 +3,1717 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="DENY">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline';">
-<title>ConstruPRO — Acesso</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>ConstruPRO — Gestão de Construtoras</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
   :root {
-    --bg:      #0d0f12;
-    --bg2:     #13161b;
-    --bg3:     #1a1e25;
-    --bg4:     #222730;
-    --border:  #2a2f3a;
+    --bg: #0d0f12;
+    --bg2: #13161b;
+    --bg3: #1a1e25;
+    --bg4: #222730;
+    --border: #2a2f3a;
     --border2: #343b4a;
-    --text:    #e8eaf0;
-    --text2:   #8b92a5;
-    --text3:   #5a6075;
-    --accent:  #f0a500;
+    --text: #e8eaf0;
+    --text2: #8b92a5;
+    --text3: #5a6075;
+    --accent: #f0a500;
     --accent2: #c87e00;
-    --green:   #22c55e;
-    --red:     #ef4444;
-    --blue:    #3b82f6;
-    --radius:  8px;
-    --radius2: 14px;
-    --font:   'DM Sans', sans-serif;
-    --mono:   'DM Mono', monospace;
+    --green: #22c55e;
+    --green2: #166534;
+    --red: #ef4444;
+    --red2: #7f1d1d;
+    --blue: #3b82f6;
+    --blue2: #1e3a6e;
+    --purple: #a78bfa;
+    --radius: 8px;
+    --radius2: 12px;
+    --sidebar: 220px;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
   }
 
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; height:100vh; overflow:hidden; display:flex; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 14px;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+  /* SIDEBAR */
+  #sidebar {
+    width:var(--sidebar); min-width:var(--sidebar); background:var(--bg2); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; height:100vh; overflow-y:auto;
   }
-
-  /* ── BACKGROUND GRID ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(240,165,0,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240,165,0,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+  .logo { padding:20px 18px 16px; border-bottom:1px solid var(--border); }
+  .logo-mark { font-size:18px; font-weight:600; color:var(--accent); letter-spacing:-0.5px; }
+  .logo-sub { font-size:10px; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+  .nav-section { padding:16px 0 4px; }
+  .nav-label { font-size:9px; color:var(--text3); letter-spacing:1.8px; text-transform:uppercase; padding:0 18px 8px; }
+  .nav-item {
+    display:flex; align-items:center; gap:10px; padding:9px 18px; cursor:pointer;
+    color:var(--text2); font-size:13px; font-weight:400; transition:all 0.15s; border-left:2px solid transparent;
   }
+  .nav-item:hover { color:var(--text); background:var(--bg3); }
+  .nav-item.active { color:var(--accent); background:rgba(240,165,0,0.07); border-left-color:var(--accent); }
+  .nav-icon { width:16px; height:16px; opacity:0.7; flex-shrink:0; }
+  .nav-item.active .nav-icon { opacity:1; }
+  .sidebar-footer { margin-top:auto; padding:14px 18px; border-top:1px solid var(--border); }
+  .user-pill { display:flex; align-items:center; gap:10px; }
+  .user-avatar { width:30px; height:30px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#000; }
+  .user-name { font-size:12px; color:var(--text2); }
 
-  /* ── GLOW ORBS ── */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(90px);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.18;
+  /* MAIN */
+  #main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+  #topbar {
+    height:52px; background:var(--bg2); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; padding:0 24px; gap:12px;
   }
-  .orb-1 { width:500px; height:500px; background:#f0a500; top:-180px; left:-180px; animation: drift 14s ease-in-out infinite alternate; }
-  .orb-2 { width:400px; height:400px; background:#3b82f6; bottom:-160px; right:-160px; animation: drift 18s ease-in-out infinite alternate-reverse; }
-
-  @keyframes drift { 0%{transform:translate(0,0);} 100%{transform:translate(40px,30px);} }
-
-  /* ── SHELL ── */
-  .shell {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    width: 100%;
-    max-width: 960px;
-    min-height: 580px;
-    border-radius: var(--radius2);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6);
-    animation: fadeUp .5s ease both;
-  }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
-
-  /* ── SIDE PANEL ── */
-  .side {
-    width: 340px;
-    min-width: 340px;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    padding: 44px 36px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-  }
-
-  .brand { display:flex; flex-direction:column; gap:4px; }
-  .brand-mark { font-size:22px; font-weight:600; color:var(--accent); letter-spacing:-0.5px; }
-  .brand-sub  { font-size:10px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
-
-  .side-headline {
-    font-size:24px; font-weight:300; color:var(--text); line-height:1.35;
-    letter-spacing:-0.3px;
-  }
-  .side-headline strong { font-weight:600; color:var(--accent); }
-
-  .feature-list { display:flex; flex-direction:column; gap:14px; }
-  .feature-item { display:flex; align-items:flex-start; gap:12px; }
-  .feature-icon {
-    width:28px; height:28px; min-width:28px;
-    background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.2);
-    border-radius:6px; display:flex; align-items:center; justify-content:center;
-    font-size:13px;
-  }
-  .feature-text { font-size:12px; color:var(--text2); line-height:1.5; }
-  .feature-text strong { color:var(--text); display:block; font-size:13px; margin-bottom:1px; }
-
-  .side-footer { margin-top:auto; font-size:11px; color:var(--text3); line-height:1.6; }
-  .side-footer a { color:var(--text2); text-decoration:none; }
-  .side-footer a:hover { color:var(--accent); }
-
-  /* ── FORM PANEL ── */
-  .panel {
-    flex: 1;
-    background: var(--bg);
-    padding: 44px 48px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* TABS */
-  .tabs { display:flex; gap:2px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:3px; width:fit-content; margin-bottom:32px; }
-  .tab-btn {
-    padding:7px 20px; border-radius:6px; font-size:12px; font-weight:500;
-    cursor:pointer; color:var(--text3); transition:all 0.15s; font-family:var(--font);
-    background:transparent; border:none;
-  }
-  .tab-btn.active { background:var(--bg3); color:var(--text); border:1px solid var(--border2); }
-
-  /* FORM SECTIONS */
-  .form-section { display:none; flex-direction:column; flex:1; }
-  .form-section.active { display:flex; }
-
-  .form-title { font-size:20px; font-weight:500; color:var(--text); margin-bottom:6px; letter-spacing:-0.3px; }
-  .form-desc  { font-size:13px; color:var(--text2); margin-bottom:28px; }
-
-  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px 18px; }
-  .form-group { display:flex; flex-direction:column; gap:5px; }
-  .form-group.full { grid-column:1/-1; }
-
-  label { font-size:10px; color:var(--text3); letter-spacing:0.8px; text-transform:uppercase; font-weight:500; }
-
-  .input-wrap { position:relative; display:flex; align-items:center; }
-  .input-wrap svg { position:absolute; left:12px; pointer-events:none; opacity:0.4; }
-
-  input, select {
-    width:100%; background:var(--bg2); border:1px solid var(--border2); color:var(--text);
-    border-radius:var(--radius); padding:9px 12px 9px 38px; font-size:13px;
-    font-family:var(--font); outline:none; transition:border-color 0.15s, box-shadow 0.15s;
-    -webkit-appearance:none; appearance:none;
-  }
-  input.no-icon, select.no-icon { padding-left:12px; }
-  input:focus, select:focus {
-    border-color:var(--accent);
-    box-shadow:0 0 0 3px rgba(240,165,0,0.12);
-  }
-  input.invalid { border-color:var(--red); box-shadow:0 0 0 3px rgba(239,68,68,0.1); }
-  input::placeholder { color:var(--text3); }
-
-  .show-pw {
-    position:absolute; right:10px; cursor:pointer; background:none; border:none;
-    color:var(--text3); font-size:11px; font-family:var(--mono); letter-spacing:0.5px; padding:4px 6px;
-  }
-  .show-pw:hover { color:var(--text); }
-
-  /* PASSWORD STRENGTH */
-  .pw-strength { margin-top:6px; }
-  .pw-bar { height:3px; border-radius:2px; background:var(--bg4); overflow:hidden; }
-  .pw-fill { height:100%; border-radius:2px; width:0%; transition:width .3s,background .3s; }
-  .pw-label { font-size:10px; color:var(--text3); margin-top:4px; min-height:14px; }
-
-  /* TERMS */
-  .check-row { display:flex; align-items:flex-start; gap:10px; padding:4px 0; }
-  .check-row input[type=checkbox] { width:15px; height:15px; min-width:15px; accent-color:var(--accent); margin-top:1px; padding:0; border:none; background:none; box-shadow:none; }
-  .check-row label { text-transform:none; letter-spacing:0; font-size:12px; color:var(--text2); line-height:1.5; cursor:pointer; }
-  .check-row label a { color:var(--accent); text-decoration:none; }
-  .check-row label a:hover { text-decoration:underline; }
-
-  /* PLAN SELECTOR */
-  .plan-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-  .plan-card {
-    border:1px solid var(--border2); border-radius:var(--radius); padding:12px 14px;
-    cursor:pointer; transition:all .15s; position:relative;
-  }
-  .plan-card:hover { border-color:var(--accent); background:rgba(240,165,0,0.04); }
-  .plan-card.selected { border-color:var(--accent); background:rgba(240,165,0,0.08); }
-  .plan-card input[type=radio] { display:none; }
-  .plan-name  { font-size:12px; font-weight:600; color:var(--text); }
-  .plan-price { font-size:18px; font-weight:500; color:var(--accent); margin:4px 0; }
-  .plan-price span { font-size:11px; color:var(--text3); font-weight:400; }
-  .plan-desc  { font-size:11px; color:var(--text3); line-height:1.4; }
-  .plan-badge {
-    position:absolute; top:-1px; right:-1px; background:var(--accent); color:#000;
-    font-size:9px; font-weight:700; padding:2px 7px; border-radius:0 var(--radius) 0 6px; letter-spacing:.5px;
-  }
-
-  /* STEP INDICATOR */
-  .steps { display:flex; align-items:center; gap:8px; margin-bottom:24px; }
-  .step-dot {
-    width:28px; height:28px; border-radius:50%; background:var(--bg2);
-    border:1px solid var(--border2); display:flex; align-items:center; justify-content:center;
-    font-size:11px; font-weight:600; color:var(--text3); transition:all .2s;
-  }
-  .step-dot.done  { background:var(--green); border-color:var(--green); color:#000; }
-  .step-dot.active{ background:var(--accent); border-color:var(--accent); color:#000; }
-  .step-line { flex:1; height:1px; background:var(--border); }
-  .step-line.done { background:var(--green); }
-  .step-label { font-size:10px; color:var(--text3); margin-left:4px; }
-
-  /* ALERTS */
-  .alert {
-    display:none; padding:10px 14px; border-radius:var(--radius);
-    font-size:12px; margin-bottom:16px; align-items:center; gap:10px;
-  }
-  .alert.show { display:flex; }
-  .alert-error   { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.25); color:#fca5a5; }
-  .alert-success { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.25); color:#86efac; }
-  .alert-info    { background:rgba(59,130,246,.1); border:1px solid rgba(59,130,246,.25); color:#93c5fd; }
-
-  /* BUTTONS */
-  .btn {
-    display:inline-flex; align-items:center; justify-content:center; gap:8px;
-    padding:10px 20px; border-radius:var(--radius); font-size:13px; font-weight:500;
-    cursor:pointer; border:none; font-family:var(--font); transition:all .15s; width:100%;
+  .topbar-title { font-size:15px; font-weight:500; color:var(--text); flex:1; }
+  .topbar-badge { background:var(--bg4); border:1px solid var(--border2); color:var(--text2); font-size:11px; padding:3px 10px; border-radius:20px; }
+  .btn { 
+    display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:var(--radius);
+    font-size:12px; font-weight:500; cursor:pointer; border:none; font-family:var(--font); transition:all 0.15s;
   }
   .btn-primary { background:var(--accent); color:#000; }
   .btn-primary:hover { background:var(--accent2); }
-  .btn-primary:disabled { opacity:.5; cursor:not-allowed; }
   .btn-outline { background:transparent; border:1px solid var(--border2); color:var(--text2); }
-  .btn-outline:hover { background:var(--bg3); color:var(--text); }
-  .btn-sm { width:auto; padding:7px 16px; font-size:12px; }
+  .btn-outline:hover { background:var(--bg4); color:var(--text); }
+  .btn-danger { background:transparent; border:1px solid var(--red2); color:var(--red); }
+  .btn-success { background:rgba(34,197,94,0.1); border:1px solid var(--green2); color:var(--green); }
 
-  .btn-row { display:flex; gap:10px; margin-top:24px; }
+  #content { flex:1; overflow-y:auto; padding:24px; }
 
-  /* SPINNER */
-  .spinner {
-    width:14px; height:14px; border:2px solid rgba(0,0,0,.3);
-    border-top-color:#000; border-radius:50%;
-    animation:spin .6s linear infinite; display:none;
+  /* CARDS */
+  .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  .kpi-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:18px;
   }
-  .btn-primary.loading .spinner { display:block; }
-  .btn-primary.loading .btn-text { display:none; }
-  @keyframes spin { to{transform:rotate(360deg);} }
+  .kpi-label { font-size:11px; color:var(--text3); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:8px; }
+  .kpi-value { font-size:24px; font-weight:500; color:var(--text); font-variant-numeric:tabular-nums; }
+  .kpi-value.green { color:var(--green); }
+  .kpi-value.amber { color:var(--accent); }
+  .kpi-value.red { color:var(--red); }
+  .kpi-change { font-size:11px; color:var(--text3); margin-top:6px; }
 
-  /* DIVIDER */
-  .divider { display:flex; align-items:center; gap:12px; margin:20px 0; }
-  .divider-line { flex:1; height:1px; background:var(--border); }
-  .divider-text  { font-size:11px; color:var(--text3); }
+  /* TABLES */
+  .table-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); overflow:hidden; margin-bottom:20px; }
+  .table-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .table-title { font-size:13px; font-weight:500; color:var(--text); }
+  .table-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; padding:10px 16px; font-size:10px; color:var(--text3); letter-spacing:1.2px; text-transform:uppercase; border-bottom:1px solid var(--border); font-weight:500; }
+  td { padding:11px 16px; font-size:13px; color:var(--text2); border-bottom:1px solid var(--border); }
+  tr:last-child td { border-bottom:none; }
+  tr:hover td { background:var(--bg3); }
+  td .strong { color:var(--text); font-weight:500; }
 
-  /* RATE LIMIT UI */
-  .cooldown-bar { height:3px; border-radius:2px; background:var(--bg4); overflow:hidden; margin-top:8px; }
-  .cooldown-fill { height:100%; border-radius:2px; background:var(--red); transition:width 1s linear; }
+  /* BADGES */
+  .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:500; }
+  .badge-green { background:rgba(34,197,94,0.12); color:var(--green); }
+  .badge-amber { background:rgba(240,165,0,0.12); color:var(--accent); }
+  .badge-red { background:rgba(239,68,68,0.12); color:var(--red); }
+  .badge-blue { background:rgba(59,130,246,0.12); color:var(--blue); }
+  .badge-gray { background:var(--bg4); color:var(--text3); }
 
-  /* CAPTCHA PLACEHOLDER */
-  .captcha-box {
-    border:1px solid var(--border2); border-radius:var(--radius); padding:14px 16px;
-    display:flex; align-items:center; gap:12px; background:var(--bg2);
+  /* FORMS */
+  .form-overlay {
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100;
+    align-items:center; justify-content:center;
   }
-  .captcha-check {
-    width:20px; height:20px; border:2px solid var(--border2); border-radius:4px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    transition:all .15s; flex-shrink:0;
+  .form-overlay.open { display:flex; }
+  .form-box {
+    background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius2);
+    padding:24px; width:560px; max-height:85vh; overflow-y:auto;
   }
-  .captcha-check.checked { background:var(--green); border-color:var(--green); }
-  .captcha-text { font-size:12px; color:var(--text2); }
-  .captcha-logo { margin-left:auto; font-size:10px; color:var(--text3); text-align:right; }
+  .form-title { font-size:15px; font-weight:500; color:var(--text); margin-bottom:18px; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  label { font-size:11px; color:var(--text3); letter-spacing:0.5px; }
+  input, select, textarea {
+    background:var(--bg3); border:1px solid var(--border2); color:var(--text); border-radius:var(--radius);
+    padding:8px 12px; font-size:13px; font-family:var(--font); outline:none; transition:border 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+  select option { background:var(--bg3); }
+  .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
 
-  /* SESSION EXPIRED */
-  .session-banner {
-    display:none; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);
-    border-radius:var(--radius); padding:10px 14px; font-size:12px; color:#fca5a5;
-    margin-bottom:16px; align-items:center; gap:8px;
-  }
-  .session-banner.show { display:flex; }
+  /* TABS */
+  .tabs { display:flex; gap:2px; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:3px; margin-bottom:20px; width:fit-content; }
+  .tab { padding:6px 16px; border-radius:6px; font-size:12px; cursor:pointer; color:var(--text3); transition:all 0.15s; }
+  .tab.active { background:var(--bg2); color:var(--text); border:1px solid var(--border2); }
 
-  /* SUCCESS SCREEN */
-  .success-screen {
-    display:none; flex-direction:column; align-items:center; justify-content:center;
-    flex:1; text-align:center; gap:16px;
-  }
-  .success-screen.show { display:flex; }
-  .success-icon {
-    width:64px; height:64px; background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.3);
-    border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:28px; animation: popIn .4s ease;
-  }
-  @keyframes popIn { from{transform:scale(0.5);opacity:0;} to{transform:scale(1);opacity:1;} }
-  .success-title { font-size:20px; font-weight:500; color:var(--text); }
-  .success-desc  { font-size:13px; color:var(--text2); max-width:320px; line-height:1.6; }
+  /* PROGRESS BAR */
+  .progress-bar { height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; border-radius:3px; background:var(--accent); transition:width 0.3s; }
+  .progress-fill.green { background:var(--green); }
+  .progress-fill.red { background:var(--red); }
 
-  /* RESPONSIVE */
-  @media (max-width:720px) {
-    .shell { flex-direction:column; max-width:440px; min-height:auto; }
-    .side  { width:100%; min-width:auto; border-right:none; border-bottom:1px solid var(--border); padding:28px 24px; }
-    .side-headline { font-size:18px; }
-    .feature-list { display:none; }
-    .panel { padding:28px 24px; }
-    .form-grid { grid-template-columns:1fr; }
-    .plan-grid { grid-template-columns:1fr; }
+  /* GRID LAYOUTS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+  /* CHART BARS */
+  .mini-chart { display:flex; align-items:flex-end; gap:4px; height:60px; }
+  .bar-col { flex:1; background:rgba(240,165,0,0.15); border-radius:3px 3px 0 0; border-top:2px solid var(--accent); min-height:4px; transition:height 0.3s; }
+  .bar-col.green { background:rgba(34,197,94,0.15); border-top-color:var(--green); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+  /* DETAIL PANEL */
+  .detail-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:20px; }
+  .detail-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border); font-size:13px; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-label { color:var(--text3); }
+  .detail-value { color:var(--text); font-weight:500; font-variant-numeric:tabular-nums; }
+
+  /* OBRA CARD */
+  .obra-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+  .obra-card {
+    background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:16px; cursor:pointer; transition:all 0.15s;
+  }
+  .obra-card:hover { border-color:var(--border2); background:var(--bg3); }
+  .obra-card.selected { border-color:var(--accent); }
+  .obra-name { font-size:13px; font-weight:500; color:var(--text); margin-bottom:4px; }
+  .obra-client { font-size:11px; color:var(--text3); margin-bottom:12px; }
+  .obra-stats { display:flex; justify-content:space-between; margin-bottom:10px; }
+  .obra-stat-val { font-size:16px; font-weight:500; color:var(--accent); }
+  .obra-stat-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; }
+
+  /* FOLHA RESUMO */
+  .folha-box { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; }
+  .folha-item { display:flex; justify-content:space-between; padding:5px 0; font-size:12px; }
+  .folha-item.total { border-top:1px solid var(--border2); margin-top:6px; padding-top:10px; font-weight:500; font-size:13px; color:var(--text); }
+  .folha-deduct { color:var(--red); }
+  .folha-plus { color:var(--green); }
+
+  /* NOTIFICATION DOT */
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--red); }
+  .dot.green { background:var(--green); }
+  .dot.amber { background:var(--accent); }
+
+  /* SEARCH BAR */
+  .search-bar { position:relative; }
+  .search-bar input { padding-left:32px; width:220px; }
+  .search-icon { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text3); }
+
+  /* ANIMACAO ENTRADA */
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .page { animation:fadeIn 0.2s ease; }
+
+  .section-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:12px; }
+
+  /* PRINT / PDF */
+  @media print {
+    #sidebar, #topbar { display:none; }
+    #content { padding:0; overflow:visible; }
+    body { height:auto; overflow:visible; }
+    .table-card { border:1px solid #ccc; }
   }
 </style>
 </head>
 <body>
 
-<div class="orb orb-1"></div>
-<div class="orb orb-2"></div>
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">ConstruPRO</div>
+    <div class="logo-sub">Gestão Completa</div>
+  </div>
 
-<div class="shell">
-
-  <!-- ── SIDE PANEL ── -->
-  <div class="side">
-    <div class="brand">
-      <div class="brand-mark">ConstruPRO</div>
-      <div class="brand-sub">Gestão de Construtoras</div>
-    </div>
-
-    <div class="side-headline">
-      Seu painel de obras, <strong>inteligente e seguro.</strong>
-    </div>
-
-    <div class="feature-list">
-      <div class="feature-item">
-        <div class="feature-icon">🏗️</div>
-        <div class="feature-text">
-          <strong>Gestão de Obras</strong>
-          Controle medições, avanço físico e contratos em tempo real.
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">💰</div>
-        <div class="feature-text">
-          <strong>Financeiro & DRE</strong>
-          Faturamento, folha CLT e fluxo de caixa integrados.
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">🦺</div>
-        <div class="feature-text">
-          <strong>Segurança & EPI</strong>
-          Controle de estoque de EPIs com alertas automáticos.
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">🔒</div>
-        <div class="feature-text">
-          <strong>Dados isolados por empresa</strong>
-          Cada empresa acessa apenas seu próprio ambiente.
-        </div>
-      </div>
-    </div>
-
-    <div class="side-footer">
-      Dados criptografados · LGPD compliant<br>
-      <a href="#">Política de Privacidade</a> · <a href="#">Termos de Uso</a>
+  <div class="nav-section">
+    <div class="nav-label">Visão Geral</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.5"/></svg>
+      Dashboard
     </div>
   </div>
 
-  <!-- ── FORM PANEL ── -->
-  <div class="panel">
-
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('login')" id="tab-login">Entrar</button>
-      <button class="tab-btn"        onclick="switchTab('register')" id="tab-register">Criar Conta</button>
+  <div class="nav-section">
+    <div class="nav-label">Operações</div>
+    <div class="nav-item" onclick="navigate('obras')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.5"/></svg>
+      Obras
     </div>
-
-    <!-- ════ LOGIN SECTION ════ -->
-    <div class="form-section active" id="section-login">
-
-      <div class="session-banner" id="session-banner">
-        <span>⚠️</span> Sua sessão expirou. Faça login novamente.
-      </div>
-
-      <div class="form-title">Acesso à sua conta</div>
-      <div class="form-desc">Entre com o e-mail e senha cadastrados pela sua empresa.</div>
-
-      <div class="alert alert-error" id="login-error"></div>
-
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div class="form-group">
-          <label for="login-email">E-mail corporativo</label>
-          <div class="input-wrap">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            <input type="email" id="login-email" placeholder="contato@construtora.com.br" autocomplete="email" maxlength="254">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="login-password">Senha</label>
-          <div class="input-wrap">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="login-password" placeholder="••••••••••••" autocomplete="current-password" maxlength="128">
-            <button class="show-pw" type="button" onclick="togglePw('login-password',this)">VER</button>
-          </div>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-          <label class="check-row" style="cursor:pointer;gap:8px;">
-            <input type="checkbox" id="remember-me" style="width:14px;height:14px;padding:0;border:none;background:none;box-shadow:none;">
-            <span style="font-size:12px;color:var(--text2);text-transform:none;letter-spacing:0;">Lembrar dispositivo</span>
-          </label>
-          <button onclick="switchTab('forgot')" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--font);">Esqueci minha senha</button>
-        </div>
-
-        <div id="cooldown-wrap" style="display:none;">
-          <div style="font-size:11px;color:var(--red);margin-bottom:4px;" id="cooldown-text"></div>
-          <div class="cooldown-bar"><div class="cooldown-fill" id="cooldown-fill"></div></div>
-        </div>
-
-        <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
-          <span class="btn-text">Entrar na plataforma</span>
-          <div class="spinner"></div>
-        </button>
-      </div>
-
-      <div class="divider"><div class="divider-line"></div><span class="divider-text">ou acesse com</span><div class="divider-line"></div></div>
-
-      <div style="display:flex;gap:10px;">
-        <button class="btn btn-outline" onclick="alert('SSO configurado pelo administrador da empresa.')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-          SSO Empresarial
-        </button>
-        <button class="btn btn-outline" style="flex-shrink:0;width:auto;padding:10px 16px;" title="Autenticação por QR Code">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/></svg>
-        </button>
-      </div>
-
+    <div class="nav-item" onclick="navigate('medicoes')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="1.5"/></svg>
+      Medições
     </div>
+    <div class="nav-item" onclick="navigate('faturamento')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" stroke-width="1.5"/><path d="M9 4h6v4H9z" stroke-width="1.5"/></svg>
+      Faturamento
+    </div>
+  </div>
 
-    <!-- ════ FORGOT PASSWORD ════ -->
-    <div class="form-section" id="section-forgot">
-      <div class="form-title">Redefinir senha</div>
-      <div class="form-desc">Informe o e-mail da conta. Enviaremos um link seguro (válido por 15 minutos).</div>
+  <div class="nav-section">
+    <div class="nav-label">Pessoas</div>
+    <div class="nav-item" onclick="navigate('colaboradores')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.5"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85" stroke-width="1.5"/></svg>
+      Colaboradores
+    </div>
+    <div class="nav-item" onclick="navigate('folha')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" stroke-width="1.5"/><path d="M2 10h20" stroke-width="1.5"/></svg>
+      Folha de Pagamento
+    </div>
+    <div class="nav-item" onclick="navigate('epis')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke-width="1.5"/></svg>
+      EPIs
+    </div>
+  </div>
 
-      <div class="alert alert-success" id="forgot-success"></div>
-      <div class="alert alert-error"   id="forgot-error"></div>
+  <div class="nav-section">
+    <div class="nav-label">Financeiro</div>
+    <div class="nav-item" onclick="navigate('financeiro')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/></svg>
+      Financeiro
+    </div>
+    <div class="nav-item" onclick="navigate('relatorios')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-width="1.5"/></svg>
+      Relatórios / PDF
+    </div>
+  </div>
 
-      <div class="form-group" style="margin-bottom:16px;">
-        <label for="forgot-email">E-mail corporativo</label>
-        <div class="input-wrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <input type="email" id="forgot-email" placeholder="contato@construtora.com.br" autocomplete="email">
-        </div>
-      </div>
-
-      <div class="btn-row" style="margin-top:0;">
-        <button class="btn btn-outline btn-sm" onclick="switchTab('login')">← Voltar</button>
-        <button class="btn btn-primary" id="forgot-btn" onclick="doForgot()">
-          <span class="btn-text">Enviar link de redefinição</span>
-          <div class="spinner"></div>
-        </button>
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="user-avatar">AD</div>
+      <div>
+        <div class="user-name" style="color:var(--text);font-weight:500">Admin</div>
+        <div class="user-name">construpro.com</div>
       </div>
     </div>
+  </div>
+</aside>
 
-    <!-- ════ REGISTER SECTION — STEP 1 ════ -->
-    <div class="form-section" id="section-register">
-
-      <div class="steps" id="register-steps">
-        <div class="step-dot active" id="step1-dot">1</div>
-        <div class="step-line" id="step-line-1"></div>
-        <div class="step-dot" id="step2-dot">2</div>
-        <div class="step-line" id="step-line-2"></div>
-        <div class="step-dot" id="step3-dot">3</div>
-        <span class="step-label" id="step-label">Dados da Empresa</span>
-      </div>
-
-      <!-- STEP 1: DADOS DA EMPRESA -->
-      <div id="reg-step1">
-        <div class="form-title">Dados da Empresa</div>
-        <div class="form-desc">Informações da construtora que será cadastrada na plataforma.</div>
-        <div class="alert alert-error" id="reg-error-1"></div>
-
-        <div class="form-grid">
-          <div class="form-group full">
-            <label for="r-razao">Razão Social *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-              <input type="text" id="r-razao" placeholder="Construtora Exemplo Ltda" maxlength="200" oninput="previewSlug()">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-cnpj">CNPJ *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <input type="text" id="r-cnpj" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-ie">Inscrição Estadual</label>
-            <input type="text" class="no-icon" id="r-ie" placeholder="Opcional" maxlength="20">
-          </div>
-          <div class="form-group">
-            <label for="r-telefone">Telefone *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              <input type="text" id="r-telefone" placeholder="(11) 99999-9999" maxlength="15" oninput="maskPhone(this)">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-setor">Setor *</label>
-            <select id="r-setor" class="no-icon">
-              <option value="">Selecione</option>
-              <option value="residencial">Residencial</option>
-              <option value="comercial">Comercial</option>
-              <option value="industrial">Industrial</option>
-              <option value="infraestrutura">Infraestrutura</option>
-              <option value="incorporadora">Incorporadora</option>
-              <option value="misto">Misto</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="r-porte">Porte da Empresa *</label>
-            <select id="r-porte" class="no-icon">
-              <option value="">Selecione</option>
-              <option value="mei">MEI</option>
-              <option value="me">ME (até 20 func.)</option>
-              <option value="epp">EPP (20–99 func.)</option>
-              <option value="medio">Médio Porte (100–499)</option>
-              <option value="grande">Grande Porte (500+)</option>
-            </select>
-          </div>
-          <div class="form-group full">
-            <label for="r-endereco">Endereço da Sede *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <input type="text" id="r-endereco" placeholder="Rua, número, bairro, cidade — UF" maxlength="200">
-            </div>
-          </div>
-          <div class="form-group full" style="margin-top:2px;">
-            <label>Subdomínio na plataforma</label>
-            <div style="display:flex;align-items:center;gap:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;">
-              <span style="padding:9px 12px;font-size:13px;color:var(--text3);border-right:1px solid var(--border2);white-space:nowrap;font-family:var(--mono);">construPRO /</span>
-              <input type="text" id="r-slug" placeholder="minha-empresa" maxlength="40" style="border:none;border-radius:0;background:var(--bg2);padding:9px 12px;" oninput="sanitizeSlug(this)">
-            </div>
-            <div style="font-size:10px;color:var(--text3);margin-top:4px;" id="slug-preview"></div>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="goStep(2)">
-            <span class="btn-text">Continuar →</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 2: ADMIN DA EMPRESA -->
-      <div id="reg-step2" style="display:none;">
-        <div class="form-title">Administrador da Conta</div>
-        <div class="form-desc">Responsável técnico pelo acesso à plataforma.</div>
-        <div class="alert alert-error" id="reg-error-2"></div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="r-nome">Nome *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" id="r-nome" placeholder="João da Silva" maxlength="100">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-cargo">Cargo *</label>
-            <input type="text" class="no-icon" id="r-cargo" placeholder="Diretor / Gerente TI" maxlength="80">
-          </div>
-          <div class="form-group full">
-            <label for="r-email">E-mail corporativo *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="r-email" placeholder="admin@construtora.com.br" maxlength="254" autocomplete="email">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-pw">Senha *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="r-pw" placeholder="Mínimo 12 caracteres" maxlength="128" oninput="checkStrength(this)">
-              <button class="show-pw" type="button" onclick="togglePw('r-pw',this)">VER</button>
-            </div>
-            <div class="pw-strength">
-              <div class="pw-bar"><div class="pw-fill" id="pw-fill"></div></div>
-              <div class="pw-label" id="pw-label">—</div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="r-pw2">Confirmar Senha *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="r-pw2" placeholder="Repita a senha" maxlength="128">
-              <button class="show-pw" type="button" onclick="togglePw('r-pw2',this)">VER</button>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-top:14px;font-size:11px;color:var(--text3);line-height:1.7;">
-          🔐 <strong style="color:var(--text2);">Requisitos de senha:</strong> mínimo 12 caracteres · letras maiúsculas e minúsculas · números · caractere especial (!@#$%^&*)
-        </div>
-
-        <div class="btn-row">
-          <button class="btn btn-outline btn-sm" onclick="goStep(1)">← Voltar</button>
-          <button class="btn btn-primary" onclick="goStep(3)">
-            <span class="btn-text">Continuar →</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- STEP 3: PLANO + CONFIRMAÇÃO -->
-      <div id="reg-step3" style="display:none;">
-        <div class="form-title">Escolha o Plano</div>
-        <div class="form-desc">14 dias grátis em qualquer plano. Sem cartão de crédito.</div>
-        <div class="alert alert-error" id="reg-error-3"></div>
-
-        <div class="plan-grid" style="margin-bottom:16px;">
-          <label class="plan-card" onclick="selectPlan(this,'starter')">
-            <input type="radio" name="plan" value="starter">
-            <div class="plan-name">Starter</div>
-            <div class="plan-price">R$ 197<span>/mês</span></div>
-            <div class="plan-desc">Até 5 obras · 2 usuários · PDFs básicos</div>
-          </label>
-          <label class="plan-card selected" onclick="selectPlan(this,'pro')">
-            <input type="radio" name="plan" value="pro" checked>
-            <div class="plan-badge">POPULAR</div>
-            <div class="plan-name">Pro</div>
-            <div class="plan-price">R$ 497<span>/mês</span></div>
-            <div class="plan-desc">Obras ilimitadas · 10 usuários · Todos módulos</div>
-          </label>
-          <label class="plan-card" onclick="selectPlan(this,'enterprise')">
-            <input type="radio" name="plan" value="enterprise">
-            <div class="plan-name">Enterprise</div>
-            <div class="plan-price">Custom</div>
-            <div class="plan-desc">Usuários ilimitados · SSO · SLA 99.9%</div>
-          </label>
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <div class="captcha-box" id="captcha-box">
-            <div class="captcha-check" id="captcha-check" onclick="toggleCaptcha()"></div>
-            <div class="captcha-text">Não sou um robô</div>
-            <div class="captcha-logo">🔒<br><span style="font-size:9px;">Verificação<br>Segura</span></div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-          <div class="check-row">
-            <input type="checkbox" id="terms1">
-            <label for="terms1">Aceito os <a href="#" onclick="return false;">Termos de Uso</a> e a <a href="#" onclick="return false;">Política de Privacidade</a> (LGPD)</label>
-          </div>
-          <div class="check-row">
-            <input type="checkbox" id="terms2">
-            <label for="terms2">Confirmo que tenho poderes para representar a empresa cadastrada e que os dados são verídicos</label>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn btn-outline btn-sm" onclick="goStep(2)">← Voltar</button>
-          <button class="btn btn-primary" id="register-btn" onclick="doRegister()">
-            <span class="btn-text">✓ Criar conta gratuitamente</span>
-            <div class="spinner"></div>
-          </button>
-        </div>
-      </div>
-
+<!-- MAIN CONTENT -->
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-badge" id="empresa-badge">Empresa: Construtora Alfa LTDA</div>
+    <div style="display:flex;gap:8px;margin-left:12px;">
+      <button class="btn btn-outline" onclick="navigate('relatorios')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke-width="2"/></svg>
+        Exportar PDF
+      </button>
     </div>
+  </div>
+  <div id="content"></div>
+</div>
 
-    <!-- ════ SUCCESS SCREEN ════ -->
-    <div class="success-screen" id="success-screen">
-      <div class="success-icon">✓</div>
-      <div class="success-title">Conta criada!</div>
-      <div class="success-desc" id="success-desc">
-        Enviamos um e-mail de verificação para <strong id="success-email"></strong>. Confirme para ativar sua conta e acessar o painel.
-      </div>
-      <button class="btn btn-outline" style="width:220px;margin-top:8px;" onclick="switchTab('login')">← Ir para o Login</button>
-    </div>
-
-  </div><!-- /panel -->
-</div><!-- /shell -->
+<!-- FORM OVERLAY -->
+<div class="form-overlay" id="form-overlay">
+  <div class="form-box" id="form-box"></div>
+</div>
 
 <script>
-// ─────────────────────────────────────────────────────────
-//  CONFIGURAÇÃO
-// ─────────────────────────────────────────────────────────
-const API_BASE = '/api'; // Substitua pela URL do Worker: https://construpr.SEU-SUBDOMINIO.workers.dev
+// ═══════════════════════════════════════════════════════════
+//  ESTADO GLOBAL DA APLICAÇÃO
+// ═══════════════════════════════════════════════════════════
+const APP = {
+  currentPage: 'dashboard',
+  empresa: { nome: 'Construtora Alfa LTDA', cnpj: '12.345.678/0001-99', regime: 'Lucro Presumido' },
+  obras: [
+    { id:1, nome:'Residencial Vista Verde', cliente:'João Matos SA', contrato:'R$ 2.800.000', inicio:'2024-03-01', prevFim:'2025-02-28', status:'Em andamento', avanco:62, medicoes:8, faturado:1540000, despesas:890000 },
+    { id:2, nome:'Galpão Industrial Norte', cliente:'LogTech LTDA', contrato:'R$ 980.000', inicio:'2024-06-10', prevFim:'2024-12-30', status:'Concluída', avanco:100, medicoes:5, faturado:980000, despesas:560000 },
+    { id:3, nome:'Condomínio Parque Sul', cliente:'Inv. Parque Sul', contrato:'R$ 5.200.000', inicio:'2024-09-01', prevFim:'2026-08-31', status:'Em andamento', avanco:18, medicoes:3, faturado:936000, despesas:480000 },
+  ],
+  medicoes: [
+    { id:1, obraId:1, numero:'MED-001', data:'2024-03-31', valor:320000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:2, obraId:1, numero:'MED-002', data:'2024-04-30', valor:310000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:3, obraId:1, numero:'MED-003', data:'2024-05-31', valor:280000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:4, obraId:1, numero:'MED-004', data:'2024-06-30', valor:210000, status:'Faturada', responsavel:'Eng. Ana Paula' },
+    { id:5, obraId:2, numero:'MED-001', data:'2024-06-30', valor:196000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:6, obraId:3, numero:'MED-001', data:'2024-09-30', valor:312000, status:'Faturada', responsavel:'Eng. João Ferreira' },
+  ],
+  faturamentos: [
+    { id:1, obraId:1, numero:'NF-0142', data:'2024-04-05', valor:320000, vencimento:'2024-05-05', status:'Recebida', formaPgto:'TED' },
+    { id:2, obraId:1, numero:'NF-0155', data:'2024-05-07', valor:310000, vencimento:'2024-06-07', status:'Recebida', formaPgto:'TED' },
+    { id:3, obraId:1, numero:'NF-0168', data:'2024-06-06', valor:280000, vencimento:'2024-07-06', status:'Vencida', formaPgto:'TED' },
+    { id:4, obraId:2, numero:'NF-0173', data:'2024-07-10', valor:196000, vencimento:'2024-08-10', status:'Recebida', formaPgto:'Boleto' },
+    { id:5, obraId:3, numero:'NF-0190', data:'2024-10-05', valor:312000, vencimento:'2024-11-05', status:'Pendente', formaPgto:'TED' },
+  ],
+  colaboradores: [
+    { id:1, nome:'Carlos Eduardo Lima', cpf:'123.456.789-00', cargo:'Engenheiro Civil', tipo:'CLT', salario:8500, obraId:1, admissao:'2022-05-10', status:'Ativo' },
+    { id:2, nome:'Marcos Antonio Silva', cpf:'234.567.890-11', cargo:'Mestre de Obras', tipo:'CLT', salario:4800, obraId:1, admissao:'2021-03-15', status:'Ativo' },
+    { id:3, nome:'João Pedro Costa', cpf:'345.678.901-22', cargo:'Pedreiro Oficial', tipo:'CLT', salario:2800, obraId:1, admissao:'2023-01-20', status:'Ativo' },
+    { id:4, nome:'Ana Paula Ferreira', cpf:'456.789.012-33', cargo:'Engenheira Civil', tipo:'CLT', salario:7200, obraId:3, admissao:'2023-07-01', status:'Ativo' },
+    { id:5, nome:'Pedro Henrique Nunes', cpf:'567.890.123-44', cargo:'Ajudante Geral', tipo:'Diarista', salario:220, obraId:1, admissao:'2024-03-01', status:'Ativo', diasTrabalhados:18 },
+    { id:6, nome:'Roberto Carlos Souza', cpf:'678.901.234-55', cargo:'Eletricista', tipo:'Diarista', salario:280, obraId:2, admissao:'2024-06-10', status:'Inativo', diasTrabalhados:22 },
+    { id:7, nome:'Luiz Fernando Mendes', cpf:'789.012.345-66', cargo:'Armador', tipo:'CLT', salario:3200, obraId:3, admissao:'2024-09-01', status:'Ativo' },
+  ],
+  epis: [
+    { id:1, nome:'Capacete de Segurança', categoria:'Proteção Craniana', estoque:48, minimo:20, validade:'2026-12-31', ca:'12345' },
+    { id:2, nome:'Botina de Segurança Bico Aço', categoria:'Proteção dos Pés', estoque:12, minimo:15, validade:'2027-06-30', ca:'23456' },
+    { id:3, nome:'Óculos de Proteção', categoria:'Proteção Ocular', estoque:35, minimo:20, validade:'2026-08-31', ca:'34567' },
+    { id:4, nome:'Luva de Raspa de Couro', categoria:'Proteção das Mãos', estoque:8, minimo:25, validade:'2026-03-31', ca:'45678' },
+    { id:5, nome:'Protetor Auricular', categoria:'Proteção Auditiva', estoque:60, minimo:30, validade:'2027-01-31', ca:'56789' },
+    { id:6, nome:'Cinto de Segurança Paraquedista', categoria:'Proteção Queda', estoque:6, minimo:8, validade:'2025-11-30', ca:'67890' },
+    { id:7, nome:'Máscara PFF2', categoria:'Proteção Respiratória', estoque:120, minimo:50, validade:'2025-12-31', ca:'78901' },
+  ],
+  entregasEPI: [
+    { id:1, epiId:1, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:2, epiId:2, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:3, epiId:1, colaboradorId:2, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:4, epiId:4, colaboradorId:3, data:'2024-03-20', quantidade:2, devolvida:false },
+    { id:5, epiId:6, colaboradorId:4, data:'2024-09-05', quantidade:1, devolvida:false },
+  ],
+  financeiro: [
+    { id:1, tipo:'Receita', descricao:'NF-0142 – Vista Verde', valor:320000, data:'2024-04-05', categoria:'Faturamento', obraId:1 },
+    { id:2, tipo:'Receita', descricao:'NF-0155 – Vista Verde', valor:310000, data:'2024-05-07', categoria:'Faturamento', obraId:1 },
+    { id:3, tipo:'Despesa', descricao:'Folha CLT – Abril', valor:38200, data:'2024-04-30', categoria:'Pessoal', obraId:1 },
+    { id:4, tipo:'Despesa', descricao:'Material – Vista Verde', valor:145000, data:'2024-04-15', categoria:'Materiais', obraId:1 },
+    { id:5, tipo:'Despesa', descricao:'Subempreiteiro elétrica', valor:42000, data:'2024-04-22', categoria:'Serviços', obraId:1 },
+    { id:6, tipo:'Receita', descricao:'NF-0173 – Galpão', valor:196000, data:'2024-07-10', categoria:'Faturamento', obraId:2 },
+    { id:7, tipo:'Despesa', descricao:'Equipamentos aluguel', valor:18500, data:'2024-07-05', categoria:'Equipamentos', obraId:2 },
+    { id:8, tipo:'Receita', descricao:'NF-0168 – Vista Verde', valor:280000, data:'2024-06-06', categoria:'Faturamento', obraId:1 },
+    { id:9, tipo:'Despesa', descricao:'Folha CLT – Junho', valor:41600, data:'2024-06-30', categoria:'Pessoal', obraId:1 },
+    { id:10, tipo:'Despesa', descricao:'ISS / Impostos', valor:29400, data:'2024-06-30', categoria:'Impostos', obraId:null },
+  ]
+};
 
-// ─────────────────────────────────────────────────────────
-//  ESTADO
-// ─────────────────────────────────────────────────────────
-let currentStep   = 1;
-let selectedPlan  = 'pro';
-let captchaOk     = false;
-let loginAttempts = 0;
-let cooldownTimer = null;
-const MAX_ATTEMPTS = 5;
-const COOLDOWN_SEC = 60;
-
-// ─────────────────────────────────────────────────────────
-//  TAB SWITCHING
-// ─────────────────────────────────────────────────────────
-function switchTab(tab) {
-  document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
-  if (tab === 'login') {
-    document.getElementById('section-login').classList.add('active');
-    document.getElementById('tab-login').classList.add('active');
-  } else if (tab === 'register') {
-    document.getElementById('section-register').classList.add('active');
-    document.getElementById('tab-register').classList.add('active');
-    goStep(1);
-  } else if (tab === 'forgot') {
-    document.getElementById('section-forgot').classList.add('active');
+// ═══════════════════════════════════════════════════════════
+//  CÁLCULOS CLT (tabelas 2024)
+// ═══════════════════════════════════════════════════════════
+function calcularINSS(salario) {
+  // Tabela INSS 2024 (progressiva)
+  const faixas = [
+    { ate: 1412.00, aliq: 0.075 },
+    { ate: 2666.68, aliq: 0.09 },
+    { ate: 4000.03, aliq: 0.12 },
+    { ate: 7786.02, aliq: 0.14 },
+  ];
+  let inss = 0, base = 0;
+  const limites = [1412.00, 2666.68, 4000.03, 7786.02];
+  const aliq = [0.075, 0.09, 0.12, 0.14];
+  for (let i = 0; i < limites.length; i++) {
+    const prev = i === 0 ? 0 : limites[i-1];
+    if (salario > prev) {
+      const tributavel = Math.min(salario, limites[i]) - prev;
+      inss += tributavel * aliq[i];
+    }
+    if (salario <= limites[i]) break;
   }
-  clearAlerts();
+  return Math.min(inss, 7786.02 * 0.14); // teto
 }
 
-// ─────────────────────────────────────────────────────────
-//  STEP NAVIGATION
-// ─────────────────────────────────────────────────────────
-function goStep(n) {
-  if (n > currentStep && !validateStep(currentStep)) return;
+function calcularIRRF(salarioBruto, inss) {
+  const baseCalculo = salarioBruto - inss;
+  // Tabela IRRF 2024
+  const faixas = [
+    { ate: 2259.20, aliq: 0, deducao: 0 },
+    { ate: 2826.65, aliq: 0.075, deducao: 169.44 },
+    { ate: 3751.05, aliq: 0.15, deducao: 381.44 },
+    { ate: 4664.68, aliq: 0.225, deducao: 662.77 },
+    { ate: Infinity, aliq: 0.275, deducao: 896.00 },
+  ];
+  for (const f of faixas) {
+    if (baseCalculo <= f.ate) {
+      const irrf = baseCalculo * f.aliq - f.deducao;
+      return Math.max(0, irrf);
+    }
+  }
+  return 0;
+}
 
-  currentStep = n;
-  [1,2,3].forEach(i => {
-    const el = document.getElementById('reg-step' + i);
-    if (el) el.style.display = i === n ? 'block' : 'none';
+function calcularFGTS(salario) { return salario * 0.08; }
+
+function calcularProvisao13(salario) { return salario / 12; }
+
+function calcularProvisaoFerias(salario) { return (salario / 12) * (1 + 1/3); }
+
+function calcularLiquidoCLT(salario) {
+  const inss = calcularINSS(salario);
+  const irrf = calcularIRRF(salario, inss);
+  const fgts = calcularFGTS(salario);
+  const prov13 = calcularProvisao13(salario);
+  const provFerias = calcularProvisaoFerias(salario);
+  const liquido = salario - inss - irrf;
+  const custoTotal = salario + fgts + prov13 + provFerias;
+  return { inss, irrf, fgts, prov13, provFerias, liquido, custoTotal };
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILITÁRIOS
+// ═══════════════════════════════════════════════════════════
+const fmt = (n) => new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(n);
+const fmtN = (n) => new Intl.NumberFormat('pt-BR').format(n);
+const fmtDate = (d) => new Date(d+'T00:00:00').toLocaleDateString('pt-BR');
+
+function getObra(id) { return APP.obras.find(o => o.id === id); }
+function getColaborador(id) { return APP.colaboradores.find(c => c.id === id); }
+function getEPI(id) { return APP.epis.find(e => e.id === id); }
+
+// ═══════════════════════════════════════════════════════════
+//  ROTEADOR
+// ═══════════════════════════════════════════════════════════
+const pageTitles = {
+  dashboard:'Dashboard', obras:'Obras', medicoes:'Medições',
+  faturamento:'Faturamento', colaboradores:'Colaboradores',
+  folha:'Folha de Pagamento', epis:'Controle de EPIs',
+  financeiro:'Financeiro', relatorios:'Relatórios & Exportação'
+};
+
+function navigate(page) {
+  APP.currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const items = document.querySelectorAll('.nav-item');
+  items.forEach(el => { if (el.getAttribute('onclick')?.includes(`'${page}'`)) el.classList.add('active'); });
+  document.getElementById('page-title').textContent = pageTitles[page] || page;
+  renderPage(page);
+}
+
+function renderPage(page) {
+  const el = document.getElementById('content');
+  const pages = { dashboard:renderDashboard, obras:renderObras, medicoes:renderMedicoes, faturamento:renderFaturamento, colaboradores:renderColaboradores, folha:renderFolha, epis:renderEPIs, financeiro:renderFinanceiro, relatorios:renderRelatorios };
+  el.innerHTML = `<div class="page">${(pages[page] || (() => '<p>Em desenvolvimento</p>'))()}</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  const totalFaturado = APP.faturamentos.filter(f => f.status==='Recebida').reduce((a,b) => a+b.valor,0);
+  const totalPendente = APP.faturamentos.filter(f => f.status==='Pendente'||f.status==='Vencida').reduce((a,b) => a+b.valor,0);
+  const totalDespesas = APP.financeiro.filter(f => f.tipo==='Despesa').reduce((a,b) => a+b.valor,0);
+  const obrasAtivas = APP.obras.filter(o => o.status==='Em andamento').length;
+
+  // mini chart data
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'];
+  const receitasMes = [0,0,320000,630000,310000,280000,196000,0,312000,0];
+  const maxR = Math.max(...receitasMes) || 1;
+
+  const barsRec = receitasMes.map((v,i) => `<div class="bar-col green" style="height:${Math.round((v/maxR)*56)+4}px" title="${meses[i]}: ${fmt(v)}"></div>`).join('');
+  const barsAtv = APP.obras.map(o => `<div class="bar-col" style="height:${Math.round(o.avanco*0.54)+4}px" title="${o.nome}: ${o.avanco}%"></div>`).join('');
+
+  return `
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Receitas Recebidas</div>
+      <div class="kpi-value green">${fmt(totalFaturado)}</div>
+      <div class="kpi-change">▲ Confirmadas no período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">A Receber / Vencido</div>
+      <div class="kpi-value amber">${fmt(totalPendente)}</div>
+      <div class="kpi-change">⚠ Verificar vencimentos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Despesas</div>
+      <div class="kpi-value red">${fmt(totalDespesas)}</div>
+      <div class="kpi-change">Consolidado período</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Obras em Andamento</div>
+      <div class="kpi-value">${obrasAtivas}</div>
+      <div class="kpi-change">${APP.obras.length} obras no total</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:20px">
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Receitas por mês</div>
+          <div class="table-sub">Valores faturados e recebidos</div>
+        </div>
+      </div>
+      <div style="padding:18px 18px 14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          ${meses.map((m,i) => `<span style="font-size:9px;color:var(--text3);width:${100/meses.length}%;text-align:center">${m}</span>`).join('')}
+        </div>
+        <div class="mini-chart" style="height:60px">${barsRec}</div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Avanço das obras</div>
+          <div class="table-sub">% físico concluído</div>
+        </div>
+      </div>
+      <div style="padding:18px">
+        ${APP.obras.map(o => `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;color:var(--text)">${o.nome.substring(0,28)}...</span>
+              <span style="font-size:12px;color:var(--accent);font-weight:500">${o.avanco}%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Últimas Medições</div></div>
+      <table>
+        <thead><tr><th>Obra</th><th>Nº</th><th>Valor</th><th>Status</th></tr></thead>
+        <tbody>
+          ${APP.medicoes.slice(-5).reverse().map(m => {
+            const obra = getObra(m.obraId);
+            return `<tr>
+              <td><span class="strong">${obra?.nome?.substring(0,18)||'—'}...</span></td>
+              <td>${m.numero}</td>
+              <td style="color:var(--accent);font-family:var(--mono)">${fmt(m.valor)}</td>
+              <td><span class="badge ${m.status==='Aprovada'?'badge-green':'badge-blue'}">${m.status}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Alertas de EPIs</div></div>
+      <table>
+        <thead><tr><th>EPI</th><th>Estoque</th><th>Mínimo</th><th>Status</th></tr></thead>
+        <tbody>
+          ${APP.epis.filter(e => e.estoque < e.minimo*1.3).map(e => `<tr>
+            <td><span class="strong">${e.nome.substring(0,20)}</span></td>
+            <td style="font-family:var(--mono)">${e.estoque}</td>
+            <td style="font-family:var(--mono)">${e.minimo}</td>
+            <td><span class="badge ${e.estoque < e.minimo ? 'badge-red':'badge-amber'}">${e.estoque < e.minimo ? 'Crítico':'Baixo'}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OBRAS
+// ═══════════════════════════════════════════════════════════
+function renderObras() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Gestão de Obras</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.obras.length} obras cadastradas · ${APP.obras.filter(o=>o.status==='Em andamento').length} em execução</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormObra()">+ Nova Obra</button>
+  </div>
+
+  <div class="obra-grid">
+    ${APP.obras.map(o => `
+    <div class="obra-card" onclick="verDetalheObra(${o.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <span class="badge ${o.status==='Em andamento'?'badge-green':'badge-gray'}">${o.status}</span>
+        <span style="font-size:11px;color:var(--text3)">${o.avanco}% concluído</span>
+      </div>
+      <div class="obra-name">${o.nome}</div>
+      <div class="obra-client">${o.cliente}</div>
+      <div class="progress-bar" style="margin-bottom:14px">
+        <div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div>
+      </div>
+      <div class="obra-stats">
+        <div>
+          <div class="obra-stat-val">${fmt(o.faturado)}</div>
+          <div class="obra-stat-label">Faturado</div>
+        </div>
+        <div>
+          <div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas)}</div>
+          <div class="obra-stat-label">Despesas</div>
+        </div>
+        <div>
+          <div class="obra-stat-val" style="color:var(--green)">${fmt(o.faturado - o.despesas)}</div>
+          <div class="obra-stat-label">Resultado</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+        <span>Contrato: <span style="color:var(--text)">${o.contrato}</span></span>
+        <span>${o.medicoes} medições</span>
+      </div>
+    </div>
+    `).join('')}
+  </div>
+
+  <div class="table-card" id="detalhe-obra-panel" style="display:none">
+    <div class="table-header">
+      <div class="table-title" id="detalhe-obra-title">Detalhes da Obra</div>
+      <button class="btn btn-outline" onclick="document.getElementById('detalhe-obra-panel').style.display='none'">Fechar</button>
+    </div>
+    <div id="detalhe-obra-body" style="padding:20px"></div>
+  </div>`;
+}
+
+function verDetalheObra(id) {
+  const o = getObra(id);
+  if (!o) return;
+  const medicoes = APP.medicoes.filter(m => m.obraId === id);
+  const colabs = APP.colaboradores.filter(c => c.obraId === id);
+  const panel = document.getElementById('detalhe-obra-panel');
+  document.getElementById('detalhe-obra-title').textContent = o.nome;
+  document.getElementById('detalhe-obra-body').innerHTML = `
+    <div class="three-col" style="margin-bottom:20px">
+      <div class="folha-box">
+        <div class="folha-item"><span class="detail-label">Cliente</span><span style="color:var(--text)">${o.cliente}</span></div>
+        <div class="folha-item"><span class="detail-label">Contrato</span><span style="color:var(--accent)">${o.contrato}</span></div>
+        <div class="folha-item"><span class="detail-label">Início</span><span>${fmtDate(o.inicio)}</span></div>
+        <div class="folha-item"><span class="detail-label">Prev. Fim</span><span>${fmtDate(o.prevFim)}</span></div>
+        <div class="folha-item"><span class="detail-label">Avanço</span><span>${o.avanco}%</span></div>
+      </div>
+      <div class="folha-box">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">FINANCEIRO DA OBRA</div>
+        <div class="folha-item"><span>Faturado</span><span style="color:var(--green)">${fmt(o.faturado)}</span></div>
+        <div class="folha-item"><span>Despesas</span><span style="color:var(--red)">${fmt(o.despesas)}</span></div>
+        <div class="folha-item total"><span>Resultado</span><span style="color:${o.faturado-o.despesas>0?'var(--green)':'var(--red)'}">${fmt(o.faturado - o.despesas)}</span></div>
+        <div class="folha-item"><span style="font-size:11px;color:var(--text3)">Margem</span><span style="font-size:11px;color:var(--accent)">${((o.faturado-o.despesas)/o.faturado*100).toFixed(1)}%</span></div>
+      </div>
+      <div class="folha-box">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:8px">EQUIPE</div>
+        ${colabs.map(c => `<div class="folha-item"><span>${c.nome.split(' ')[0]} ${c.nome.split(' ').pop()}</span><span class="badge ${c.tipo==='CLT'?'badge-blue':'badge-amber'}">${c.tipo}</span></div>`).join('')}
+        ${colabs.length===0?'<div style="color:var(--text3);font-size:12px">Nenhum colaborador</div>':''}
+      </div>
+    </div>
+    <div>
+      <div class="section-title">Medições</div>
+      <table>
+        <thead><tr><th>Nº</th><th>Data</th><th>Valor</th><th>Status</th><th>Responsável</th></tr></thead>
+        <tbody>
+          ${medicoes.map(m => `<tr>
+            <td><span class="strong">${m.numero}</span></td>
+            <td>${fmtDate(m.data)}</td>
+            <td style="font-family:var(--mono);color:var(--accent)">${fmt(m.valor)}</td>
+            <td><span class="badge ${m.status==='Aprovada'?'badge-green':m.status==='Faturada'?'badge-blue':'badge-amber'}">${m.status}</span></td>
+            <td>${m.responsavel}</td>
+          </tr>`).join('')}
+          ${medicoes.length===0?`<tr><td colspan="5" style="text-align:center;color:var(--text3)">Nenhuma medição</td></tr>`:''}
+        </tbody>
+      </table>
+    </div>`;
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openFormObra() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Nova Obra</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome da Obra</label><input placeholder="Ex: Residencial Vista Verde" id="f-nome"></div>
+      <div class="form-group"><label>Cliente / Contratante</label><input placeholder="Nome do cliente" id="f-cliente"></div>
+      <div class="form-group"><label>Valor do Contrato (R$)</label><input type="number" placeholder="0.00" id="f-contrato"></div>
+      <div class="form-group"><label>Data de Início</label><input type="date" id="f-inicio"></div>
+      <div class="form-group"><label>Previsão de Conclusão</label><input type="date" id="f-fim"></div>
+      <div class="form-group full"><label>Observações</label><textarea rows="3" placeholder="Informações adicionais..." id="f-obs"></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarObra()">Salvar Obra</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarObra() {
+  const nome = document.getElementById('f-nome').value;
+  const cliente = document.getElementById('f-cliente').value;
+  const contrato = parseFloat(document.getElementById('f-contrato').value) || 0;
+  const inicio = document.getElementById('f-inicio').value;
+  const fim = document.getElementById('f-fim').value;
+  if (!nome || !cliente) { alert('Preencha nome e cliente.'); return; }
+  APP.obras.push({
+    id: APP.obras.length+1, nome, cliente, contrato:`R$ ${fmtN(contrato)}`,
+    inicio, prevFim:fim, status:'Em andamento', avanco:0, medicoes:0, faturado:0, despesas:0
+  });
+  closeForm(); navigate('obras');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MEDIÇÕES
+// ═══════════════════════════════════════════════════════════
+function renderMedicoes() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Medições</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">Controle de medições por obra</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormMedicao()">+ Nova Medição</button>
+  </div>
+
+  ${APP.obras.map(obra => {
+    const meds = APP.medicoes.filter(m => m.obraId === obra.id);
+    const total = meds.reduce((a,b) => a+b.valor,0);
+    if (meds.length === 0) return '';
+    return `
+    <div class="table-card" style="margin-bottom:16px">
+      <div class="table-header">
+        <div>
+          <div class="table-title">${obra.nome}</div>
+          <div class="table-sub">${meds.length} medições · Total medido: ${fmt(total)}</div>
+        </div>
+        <span class="badge ${obra.status==='Em andamento'?'badge-green':'badge-gray'}">${obra.status}</span>
+      </div>
+      <table>
+        <thead><tr><th>Nº Medição</th><th>Data</th><th>Valor</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${meds.map(m => `<tr>
+            <td><span class="strong">${m.numero}</span></td>
+            <td>${fmtDate(m.data)}</td>
+            <td style="font-family:var(--mono);color:var(--accent);font-weight:500">${fmt(m.valor)}</td>
+            <td>${m.responsavel}</td>
+            <td><span class="badge ${m.status==='Aprovada'?'badge-green':m.status==='Faturada'?'badge-blue':'badge-amber'}">${m.status}</span></td>
+            <td><button class="btn btn-outline" style="padding:4px 8px;font-size:11px" onclick="alterarStatusMedicao(${m.id})">Alterar status</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }).join('')}`;
+}
+
+function alterarStatusMedicao(id) {
+  const m = APP.medicoes.find(x => x.id===id);
+  if (!m) return;
+  const ops = ['Pendente','Em análise','Aprovada','Faturada'];
+  const cur = ops.indexOf(m.status);
+  m.status = ops[(cur+1) % ops.length];
+  navigate('medicoes');
+}
+
+function openFormMedicao() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Nova Medição</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Obra</label>
+        <select id="f-obra">${APP.obras.map(o => `<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Nº da Medição</label><input placeholder="MED-00X" id="f-numero"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" placeholder="0.00" id="f-valor"></div>
+      <div class="form-group"><label>Responsável</label><input placeholder="Eng. Nome" id="f-resp"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMedicao()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarMedicao() {
+  const obraId = parseInt(document.getElementById('f-obra').value);
+  const numero = document.getElementById('f-numero').value;
+  const data = document.getElementById('f-data').value;
+  const valor = parseFloat(document.getElementById('f-valor').value)||0;
+  const responsavel = document.getElementById('f-resp').value;
+  if (!numero || !data || valor<=0) { alert('Preencha todos os campos.'); return; }
+  APP.medicoes.push({ id:APP.medicoes.length+1, obraId, numero, data, valor, status:'Pendente', responsavel });
+  const obra = getObra(obraId);
+  if (obra) obra.medicoes++;
+  closeForm(); navigate('medicoes');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FATURAMENTO
+// ═══════════════════════════════════════════════════════════
+function renderFaturamento() {
+  const totalRecebido = APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
+  const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente').reduce((a,b)=>a+b.valor,0);
+  const totalVencido = APP.faturamentos.filter(f=>f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Faturamento</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">Notas fiscais e controle de recebimentos</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormFatura()">+ Nova NF</button>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Recebido</div>
+      <div class="kpi-value green">${fmt(totalRecebido)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">A Receber</div>
+      <div class="kpi-value amber">${fmt(totalPendente)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Vencido</div>
+      <div class="kpi-value red">${fmt(totalVencido)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Geral</div>
+      <div class="kpi-value">${fmt(totalRecebido+totalPendente+totalVencido)}</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title">Notas Fiscais Emitidas</div></div>
+    <table>
+      <thead><tr><th>NF</th><th>Obra</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Status</th><th>Ação</th></tr></thead>
+      <tbody>
+        ${APP.faturamentos.map(f => {
+          const obra = getObra(f.obraId);
+          return `<tr>
+            <td><span class="strong">${f.numero}</span></td>
+            <td>${obra?.nome?.substring(0,22)||'—'}...</td>
+            <td>${fmtDate(f.data)}</td>
+            <td>${fmtDate(f.vencimento)}</td>
+            <td style="font-family:var(--mono);color:var(--accent);font-weight:500">${fmt(f.valor)}</td>
+            <td>${f.formaPgto}</td>
+            <td><span class="badge ${f.status==='Recebida'?'badge-green':f.status==='Pendente'?'badge-amber':'badge-red'}">${f.status}</span></td>
+            <td>
+              ${f.status!=='Recebida' ? `<button class="btn btn-success" style="padding:4px 8px;font-size:11px" onclick="marcarRecebida(${f.id})">✓ Recebida</button>` : '—'}
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function marcarRecebida(id) {
+  const f = APP.faturamentos.find(x => x.id===id);
+  if (f) { f.status='Recebida'; navigate('faturamento'); }
+}
+
+function openFormFatura() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Nova Nota Fiscal</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Obra</label>
+        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Número NF</label><input placeholder="NF-0XXX" id="f-nf"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor"></div>
+      <div class="form-group"><label>Data Emissão</label><input type="date" id="f-emissao"></div>
+      <div class="form-group"><label>Vencimento</label><input type="date" id="f-venc"></div>
+      <div class="form-group"><label>Forma de Pagamento</label>
+        <select id="f-forma"><option>TED</option><option>Boleto</option><option>Cheque</option><option>PIX</option></select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarFatura()">Emitir NF</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarFatura() {
+  const obraId = parseInt(document.getElementById('f-obra').value);
+  const numero = document.getElementById('f-nf').value;
+  const valor = parseFloat(document.getElementById('f-valor').value)||0;
+  const data = document.getElementById('f-emissao').value;
+  const vencimento = document.getElementById('f-venc').value;
+  const formaPgto = document.getElementById('f-forma').value;
+  if (!numero || valor<=0) { alert('Preencha todos os campos.'); return; }
+  APP.faturamentos.push({ id:APP.faturamentos.length+1, obraId, numero, data, vencimento, valor, formaPgto, status:'Pendente' });
+  const obra = getObra(obraId);
+  if (obra) obra.faturado += valor;
+  closeForm(); navigate('faturamento');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COLABORADORES
+// ═══════════════════════════════════════════════════════════
+function renderColaboradores() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Colaboradores</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.colaboradores.filter(c=>c.status==='Ativo').length} ativos · ${APP.colaboradores.filter(c=>c.tipo==='CLT').length} CLT · ${APP.colaboradores.filter(c=>c.tipo==='Diarista').length} diaristas</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormColaborador()">+ Novo Colaborador</button>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Regime</th><th>Obra</th><th>Salário Base</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody>
+        ${APP.colaboradores.map(c => {
+          const obra = getObra(c.obraId);
+          return `<tr>
+            <td><span class="strong">${c.nome}</span></td>
+            <td style="font-family:var(--mono);font-size:12px">${c.cpf}</td>
+            <td>${c.cargo}</td>
+            <td><span class="badge ${c.tipo==='CLT'?'badge-blue':'badge-amber'}">${c.tipo}</span></td>
+            <td>${obra?.nome?.substring(0,18)||'—'}...</td>
+            <td style="font-family:var(--mono);color:var(--accent)">${c.tipo==='Diarista'?fmt(c.salario)+'/dia':fmt(c.salario)}</td>
+            <td><span class="badge ${c.status==='Ativo'?'badge-green':'badge-gray'}">${c.status}</span></td>
+            <td>
+              <button class="btn btn-outline" style="padding:4px 8px;font-size:11px" onclick="verFichaColaborador(${c.id})">Ficha</button>
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+  <div id="ficha-panel"></div>`;
+}
+
+function verFichaColaborador(id) {
+  const c = getColaborador(id);
+  if (!c) return;
+  const obra = getObra(c.obraId);
+  let fichaHTML = '';
+  if (c.tipo === 'CLT') {
+    const calc = calcularLiquidoCLT(c.salario);
+    fichaHTML = `
+      <div class="three-col">
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Dados Pessoais</div>
+          <div class="folha-item"><span>Nome</span><span style="color:var(--text)">${c.nome}</span></div>
+          <div class="folha-item"><span>CPF</span><span style="font-family:var(--mono)">${c.cpf}</span></div>
+          <div class="folha-item"><span>Cargo</span><span>${c.cargo}</span></div>
+          <div class="folha-item"><span>Admissão</span><span>${fmtDate(c.admissao)}</span></div>
+          <div class="folha-item"><span>Obra</span><span>${obra?.nome?.substring(0,20)||'—'}</span></div>
+        </div>
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Holerite Mensal</div>
+          <div class="folha-item"><span>Salário Bruto</span><span class="folha-plus">${fmt(c.salario)}</span></div>
+          <div class="folha-item"><span>INSS (desconto)</span><span class="folha-deduct">- ${fmt(calc.inss)}</span></div>
+          <div class="folha-item"><span>IRRF (desconto)</span><span class="folha-deduct">- ${fmt(calc.irrf)}</span></div>
+          <div class="folha-item total"><span>Salário Líquido</span><span style="color:var(--green)">${fmt(calc.liquido)}</span></div>
+        </div>
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Encargos do Empregador</div>
+          <div class="folha-item"><span>FGTS (8%)</span><span class="folha-deduct">${fmt(calc.fgts)}</span></div>
+          <div class="folha-item"><span>Provisão 13º</span><span class="folha-deduct">${fmt(calc.prov13)}</span></div>
+          <div class="folha-item"><span>Provisão Férias</span><span class="folha-deduct">${fmt(calc.provFerias)}</span></div>
+          <div class="folha-item total"><span>Custo Total Mensal</span><span style="color:var(--red)">${fmt(calc.custoTotal)}</span></div>
+        </div>
+      </div>`;
+  } else {
+    const totalMes = c.salario * (c.diasTrabalhados || 0);
+    fichaHTML = `
+      <div class="two-col">
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">DADOS DO DIARISTA</div>
+          <div class="folha-item"><span>Nome</span><span style="color:var(--text)">${c.nome}</span></div>
+          <div class="folha-item"><span>CPF</span><span style="font-family:var(--mono)">${c.cpf}</span></div>
+          <div class="folha-item"><span>Diária</span><span style="color:var(--accent)">${fmt(c.salario)}</span></div>
+          <div class="folha-item"><span>Dias trabalhados</span><span>${c.diasTrabalhados || 0}</span></div>
+          <div class="folha-item total"><span>Total a Receber</span><span style="color:var(--green)">${fmt(totalMes)}</span></div>
+        </div>
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px">OBSERVAÇÕES</div>
+          <div style="color:var(--text3);font-size:12px;line-height:1.8">
+            Regime: Diarista (PJ/Avulso)<br>
+            Não há incidência de FGTS,<br>
+            INSS patronal ou IRRF retido<br>
+            pelo empregador no regime<br>
+            de diária avulsa.
+          </div>
+        </div>
+      </div>`;
+  }
+  document.getElementById('ficha-panel').innerHTML = `
+    <div class="table-card" style="margin-top:16px">
+      <div class="table-header">
+        <div class="table-title">Ficha: ${c.nome}</div>
+        <button class="btn btn-outline" onclick="document.getElementById('ficha-panel').innerHTML=''">Fechar</button>
+      </div>
+      <div style="padding:20px">${fichaHTML}</div>
+    </div>`;
+}
+
+function openFormColaborador() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Novo Colaborador</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome Completo</label><input placeholder="Nome completo" id="f-nome"></div>
+      <div class="form-group"><label>CPF</label><input placeholder="000.000.000-00" id="f-cpf"></div>
+      <div class="form-group"><label>Cargo / Função</label><input placeholder="Ex: Pedreiro Oficial" id="f-cargo"></div>
+      <div class="form-group"><label>Regime de Contratação</label>
+        <select id="f-tipo" onchange="toggleDiarista()"><option value="CLT">CLT</option><option value="Diarista">Diarista</option></select></div>
+      <div class="form-group" id="g-salario"><label id="l-salario">Salário Mensal (R$)</label><input type="number" placeholder="0.00" id="f-salario"></div>
+      <div class="form-group" id="g-dias" style="display:none"><label>Dias Trabalhados/mês</label><input type="number" placeholder="22" id="f-dias"></div>
+      <div class="form-group"><label>Data de Admissão</label><input type="date" id="f-admissao"></div>
+      <div class="form-group"><label>Obra</label>
+        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarColaborador()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function toggleDiarista() {
+  const tipo = document.getElementById('f-tipo').value;
+  document.getElementById('l-salario').textContent = tipo==='Diarista' ? 'Valor da Diária (R$)' : 'Salário Mensal (R$)';
+  document.getElementById('g-dias').style.display = tipo==='Diarista' ? 'flex' : 'none';
+}
+
+function salvarColaborador() {
+  const nome = document.getElementById('f-nome').value;
+  const cpf = document.getElementById('f-cpf').value;
+  const cargo = document.getElementById('f-cargo').value;
+  const tipo = document.getElementById('f-tipo').value;
+  const salario = parseFloat(document.getElementById('f-salario').value)||0;
+  const admissao = document.getElementById('f-admissao').value;
+  const obraId = parseInt(document.getElementById('f-obra').value);
+  const dias = parseInt(document.getElementById('f-dias')?.value)||0;
+  if (!nome || !cpf || salario<=0) { alert('Preencha os campos obrigatórios.'); return; }
+  const novo = { id:APP.colaboradores.length+1, nome, cpf, cargo, tipo, salario, obraId, admissao, status:'Ativo' };
+  if (tipo==='Diarista') novo.diasTrabalhados = dias;
+  APP.colaboradores.push(novo);
+  closeForm(); navigate('colaboradores');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FOLHA DE PAGAMENTO
+// ═══════════════════════════════════════════════════════════
+function renderFolha() {
+  const clts = APP.colaboradores.filter(c => c.tipo==='CLT' && c.status==='Ativo');
+  const diaristas = APP.colaboradores.filter(c => c.tipo==='Diarista' && c.status==='Ativo');
+
+  const totaisGerais = clts.reduce((acc, c) => {
+    const calc = calcularLiquidoCLT(c.salario);
+    return {
+      bruto: acc.bruto + c.salario,
+      inss: acc.inss + calc.inss,
+      irrf: acc.irrf + calc.irrf,
+      liquido: acc.liquido + calc.liquido,
+      fgts: acc.fgts + calc.fgts,
+      prov13: acc.prov13 + calc.prov13,
+      provFerias: acc.provFerias + calc.provFerias,
+      custo: acc.custo + calc.custoTotal,
+    };
+  }, { bruto:0, inss:0, irrf:0, liquido:0, fgts:0, prov13:0, provFerias:0, custo:0 });
+
+  const totalDiaristas = diaristas.reduce((a,c) => a + c.salario*(c.diasTrabalhados||0), 0);
+
+  return `
+  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Folha de Pagamento</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">Cálculos automáticos com tabelas INSS e IRRF 2024</div>
+
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Bruto CLT</div>
+      <div class="kpi-value">${fmt(totaisGerais.bruto)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Líquido CLT</div>
+      <div class="kpi-value green">${fmt(totaisGerais.liquido)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Diaristas</div>
+      <div class="kpi-value amber">${fmt(totalDiaristas)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Custo Total Empresa</div>
+      <div class="kpi-value red">${fmt(totaisGerais.custo + totalDiaristas)}</div>
+    </div>
+  </div>
+
+  <div class="table-card" style="margin-bottom:16px">
+    <div class="table-header">
+      <div>
+        <div class="table-title">Folha CLT — Competência ${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</div>
+        <div class="table-sub">Cálculo progressivo INSS + IRRF conforme tabelas vigentes 2024</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Colaborador</th><th>Cargo</th><th>Obra</th>
+          <th>Bruto</th><th>INSS</th><th>IRRF</th>
+          <th>Líquido</th><th>FGTS</th><th>Custo Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${clts.map(c => {
+          const calc = calcularLiquidoCLT(c.salario);
+          const obra = getObra(c.obraId);
+          return `<tr>
+            <td><span class="strong">${c.nome}</span></td>
+            <td>${c.cargo}</td>
+            <td style="font-size:11px">${obra?.nome?.substring(0,16)||'—'}...</td>
+            <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
+            <td style="font-family:var(--mono);color:var(--red)">- ${fmt(calc.inss)}</td>
+            <td style="font-family:var(--mono);color:var(--red)">- ${fmt(calc.irrf)}</td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(calc.liquido)}</td>
+            <td style="font-family:var(--mono);color:var(--text3)">${fmt(calc.fgts)}</td>
+            <td style="font-family:var(--mono);color:var(--accent);font-weight:500">${fmt(calc.custoTotal)}</td>
+          </tr>`;
+        }).join('')}
+        <tr style="background:var(--bg3)">
+          <td colspan="3" style="font-weight:500;color:var(--text)">TOTAIS</td>
+          <td style="font-family:var(--mono);font-weight:500">${fmt(totaisGerais.bruto)}</td>
+          <td style="font-family:var(--mono);color:var(--red);font-weight:500">- ${fmt(totaisGerais.inss)}</td>
+          <td style="font-family:var(--mono);color:var(--red);font-weight:500">- ${fmt(totaisGerais.irrf)}</td>
+          <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(totaisGerais.liquido)}</td>
+          <td style="font-family:var(--mono);font-weight:500">${fmt(totaisGerais.fgts)}</td>
+          <td style="font-family:var(--mono);color:var(--accent);font-weight:500">${fmt(totaisGerais.custo)}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Diaristas do mês</div></div>
+      <table>
+        <thead><tr><th>Nome</th><th>Dias</th><th>Diária</th><th>Total</th></tr></thead>
+        <tbody>
+          ${diaristas.map(c => `<tr>
+            <td><span class="strong">${c.nome.split(' ').slice(0,2).join(' ')}</span></td>
+            <td style="font-family:var(--mono)">${c.diasTrabalhados||0}</td>
+            <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(c.salario*(c.diasTrabalhados||0))}</td>
+          </tr>`).join('')}
+          <tr style="background:var(--bg3)">
+            <td colspan="3" style="font-weight:500;color:var(--text)">Total Diaristas</td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(totalDiaristas)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Provisões do mês</div></div>
+      <div style="padding:16px">
+        <div class="folha-box">
+          <div class="folha-item"><span>Provisão 13º (CLT)</span><span style="color:var(--accent)">${fmt(totaisGerais.prov13)}</span></div>
+          <div class="folha-item"><span>Provisão Férias + 1/3</span><span style="color:var(--accent)">${fmt(totaisGerais.provFerias)}</span></div>
+          <div class="folha-item"><span>FGTS s/ provisões</span><span style="color:var(--text3)">${fmt((totaisGerais.prov13+totaisGerais.provFerias)*0.08)}</span></div>
+          <div class="folha-item total"><span>Total Provisões</span><span style="color:var(--red)">${fmt(totaisGerais.prov13 + totaisGerais.provFerias)}</span></div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(240,165,0,0.06);border:1px solid rgba(240,165,0,0.2);border-radius:var(--radius)">
+          <div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:6px">▲ CUSTO TOTAL DA EMPRESA</div>
+          <div style="font-size:22px;font-weight:500;color:var(--text);font-family:var(--mono)">${fmt(totaisGerais.custo + totalDiaristas)}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:4px">CLT + Diaristas + Encargos + Provisões</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EPIs
+// ═══════════════════════════════════════════════════════════
+function renderEPIs() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Controle de EPIs</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">Estoque, entrega e rastreabilidade por colaborador</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="openFormEntregaEPI()">Registrar Entrega</button>
+      <button class="btn btn-primary" onclick="openFormEPI()">+ Novo EPI</button>
+    </div>
+  </div>
+
+  <div class="table-card" style="margin-bottom:16px">
+    <div class="table-header"><div class="table-title">Estoque de EPIs</div></div>
+    <table>
+      <thead><tr><th>EPI</th><th>Categoria</th><th>CA</th><th>Estoque</th><th>Mínimo</th><th>Validade</th><th>Status</th></tr></thead>
+      <tbody>
+        ${APP.epis.map(e => {
+          const pct = (e.estoque / e.minimo * 100);
+          let status = 'OK'; let badge = 'badge-green';
+          if (e.estoque < e.minimo) { status='Crítico'; badge='badge-red'; }
+          else if (e.estoque < e.minimo * 1.3) { status='Baixo'; badge='badge-amber'; }
+          return `<tr>
+            <td><span class="strong">${e.nome}</span></td>
+            <td>${e.categoria}</td>
+            <td style="font-family:var(--mono);font-size:12px">${e.ca}</td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-family:var(--mono);font-weight:500;color:${e.estoque<e.minimo?'var(--red)':'var(--text)'}">${e.estoque}</span>
+                <div class="progress-bar" style="width:60px">
+                  <div class="progress-fill ${e.estoque>=e.minimo?'green':'red'}" style="width:${Math.min(pct,100)}%"></div>
+                </div>
+              </div>
+            </td>
+            <td style="font-family:var(--mono)">${e.minimo}</td>
+            <td>${fmtDate(e.validade)}</td>
+            <td><span class="badge ${badge}">${status}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title">Histórico de Entregas</div></div>
+    <table>
+      <thead><tr><th>EPI</th><th>Colaborador</th><th>Data</th><th>Qtd</th><th>Devolvido</th></tr></thead>
+      <tbody>
+        ${APP.entregasEPI.map(e => {
+          const epi = getEPI(e.epiId);
+          const col = getColaborador(e.colaboradorId);
+          return `<tr>
+            <td><span class="strong">${epi?.nome||'—'}</span></td>
+            <td>${col?.nome||'—'}</td>
+            <td>${fmtDate(e.data)}</td>
+            <td style="font-family:var(--mono)">${e.quantidade}</td>
+            <td><span class="badge ${e.devolvida?'badge-green':'badge-amber'}">${e.devolvida?'Sim':'Em uso'}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function openFormEPI() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Cadastrar EPI</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome do EPI</label><input placeholder="Ex: Capacete de Segurança" id="f-nome"></div>
+      <div class="form-group"><label>Categoria</label><input placeholder="Ex: Proteção Craniana" id="f-cat"></div>
+      <div class="form-group"><label>Nº CA (Certificado Aprovação)</label><input placeholder="00000" id="f-ca"></div>
+      <div class="form-group"><label>Estoque Inicial</label><input type="number" placeholder="0" id="f-estoque"></div>
+      <div class="form-group"><label>Estoque Mínimo</label><input type="number" placeholder="0" id="f-min"></div>
+      <div class="form-group"><label>Validade</label><input type="date" id="f-val"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEPI()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarEPI() {
+  const nome = document.getElementById('f-nome').value;
+  const categoria = document.getElementById('f-cat').value;
+  const ca = document.getElementById('f-ca').value;
+  const estoque = parseInt(document.getElementById('f-estoque').value)||0;
+  const minimo = parseInt(document.getElementById('f-min').value)||0;
+  const validade = document.getElementById('f-val').value;
+  if (!nome) { alert('Informe o nome do EPI.'); return; }
+  APP.epis.push({ id:APP.epis.length+1, nome, categoria, ca, estoque, minimo, validade });
+  closeForm(); navigate('epis');
+}
+
+function openFormEntregaEPI() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Registrar Entrega de EPI</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>EPI</label>
+        <select id="f-epi">${APP.epis.map(e=>`<option value="${e.id}">${e.nome}</option>`).join('')}</select></div>
+      <div class="form-group full"><label>Colaborador</label>
+        <select id="f-col">${APP.colaboradores.filter(c=>c.status==='Ativo').map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Data de Entrega</label><input type="date" id="f-data"></div>
+      <div class="form-group"><label>Quantidade</label><input type="number" value="1" id="f-qtd"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEntregaEPI()">Registrar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarEntregaEPI() {
+  const epiId = parseInt(document.getElementById('f-epi').value);
+  const colaboradorId = parseInt(document.getElementById('f-col').value);
+  const data = document.getElementById('f-data').value;
+  const quantidade = parseInt(document.getElementById('f-qtd').value)||1;
+  const epi = getEPI(epiId);
+  if (epi && epi.estoque >= quantidade) {
+    epi.estoque -= quantidade;
+    APP.entregasEPI.push({ id:APP.entregasEPI.length+1, epiId, colaboradorId, data, quantidade, devolvida:false });
+    closeForm(); navigate('epis');
+  } else {
+    alert('Estoque insuficiente para esta entrega.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FINANCEIRO
+// ═══════════════════════════════════════════════════════════
+function renderFinanceiro() {
+  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
+  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  const resultado = receitas - despesas;
+
+  // Categorias de despesa
+  const catDespesas = {};
+  APP.financeiro.filter(f=>f.tipo==='Despesa').forEach(f => {
+    catDespesas[f.categoria] = (catDespesas[f.categoria]||0) + f.valor;
   });
 
-  // Update step dots
-  const labels = ['Dados da Empresa','Administrador','Plano & Confirmação'];
-  document.getElementById('step-label').textContent = labels[n-1];
-  [1,2,3].forEach(i => {
-    const dot = document.getElementById('step'+i+'-dot');
-    dot.className = 'step-dot ' + (i < n ? 'done' : i === n ? 'active' : '');
-    dot.textContent = i < n ? '✓' : i;
-  });
-  document.getElementById('step-line-1').className = 'step-line' + (n > 1 ? ' done' : '');
-  document.getElementById('step-line-2').className = 'step-line' + (n > 2 ? ' done' : '');
+  return `
+  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Financeiro</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">Fluxo de caixa, DRE e controle por obra</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Receitas</div>
+      <div class="kpi-value green">${fmt(receitas)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total de Despesas</div>
+      <div class="kpi-value red">${fmt(despesas)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Resultado</div>
+      <div class="kpi-value ${resultado>=0?'green':'red'}">${fmt(resultado)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Margem Líquida</div>
+      <div class="kpi-value amber">${receitas>0?(resultado/receitas*100).toFixed(1)+'%':'—'}</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px">
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Despesas por Categoria</div></div>
+      <div style="padding:16px">
+        ${Object.entries(catDespesas).map(([cat, val]) => `
+          <div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;color:var(--text)">${cat}</span>
+              <span style="font-size:12px;font-family:var(--mono);color:var(--red)">${fmt(val)}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill red" style="width:${Math.round(val/despesas*100)}%"></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">DRE Simplificado</div></div>
+      <div style="padding:16px">
+        <div class="folha-box">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Demonstrativo</div>
+          <div class="folha-item"><span style="font-weight:500">Receita Bruta</span><span class="folha-plus">${fmt(receitas)}</span></div>
+          ${Object.entries(catDespesas).map(([cat,val])=>`
+            <div class="folha-item"><span style="font-size:12px;color:var(--text3)">${cat}</span><span class="folha-deduct">- ${fmt(val)}</span></div>
+          `).join('')}
+          <div class="folha-item total"><span>Resultado Período</span><span style="color:${resultado>=0?'var(--green)':'var(--red)'}">${fmt(resultado)}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-title">Lançamentos Financeiros</div>
+      <button class="btn btn-primary" onclick="openFormLancamento()">+ Lançamento</button>
+    </div>
+    <table>
+      <thead><tr><th>Tipo</th><th>Descrição</th><th>Categoria</th><th>Obra</th><th>Data</th><th>Valor</th></tr></thead>
+      <tbody>
+        ${APP.financeiro.map(f => {
+          const obra = getObra(f.obraId);
+          return `<tr>
+            <td><span class="badge ${f.tipo==='Receita'?'badge-green':'badge-red'}">${f.tipo}</span></td>
+            <td><span class="strong">${f.descricao}</span></td>
+            <td><span class="badge badge-gray">${f.categoria}</span></td>
+            <td style="font-size:11px;color:var(--text3)">${obra?.nome?.substring(0,16)||'Geral'}${obra?'...':''}</td>
+            <td>${fmtDate(f.data)}</td>
+            <td style="font-family:var(--mono);font-weight:500;color:${f.tipo==='Receita'?'var(--green)':'var(--red)'}">${f.tipo==='Despesa'?'- ':'+ '}${fmt(f.valor)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
 }
 
-// ─────────────────────────────────────────────────────────
-//  VALIDATION
-// ─────────────────────────────────────────────────────────
-function validateStep(step) {
-  clearAlerts();
-  if (step === 1) {
-    const razao = v('r-razao'), cnpj = v('r-cnpj'), tel = v('r-telefone'),
-          setor = v('r-setor'), porte = v('r-porte'), end = v('r-endereco'), slug = v('r-slug');
-    if (!razao || !cnpj || !tel || !setor || !porte || !end || !slug)
-      return err('reg-error-1', 'Preencha todos os campos obrigatórios.');
-    if (!validCNPJ(cnpj.replace(/\D/g,'')))
-      return err('reg-error-1', 'CNPJ inválido. Verifique o número informado.');
-    if (slug.length < 3)
-      return err('reg-error-1', 'Subdomínio deve ter ao menos 3 caracteres.');
-    return true;
-  }
-  if (step === 2) {
-    const nome = v('r-nome'), cargo = v('r-cargo'), email = v('r-email'),
-          pw = v('r-pw'), pw2 = v('r-pw2');
-    if (!nome || !cargo || !email || !pw || !pw2)
-      return err('reg-error-2', 'Preencha todos os campos obrigatórios.');
-    if (!validEmail(email))
-      return err('reg-error-2', 'E-mail inválido.');
-    if (!strongPassword(pw))
-      return err('reg-error-2', 'Senha fraca. Use mínimo 12 caracteres, maiúsculas, minúsculas, números e caractere especial.');
-    if (pw !== pw2)
-      return err('reg-error-2', 'As senhas não coincidem.');
-    return true;
-  }
-  return true;
+function openFormLancamento() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Novo Lançamento Financeiro</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo</label>
+        <select id="f-tipo"><option value="Receita">Receita</option><option value="Despesa">Despesa</option></select></div>
+      <div class="form-group"><label>Categoria</label>
+        <select id="f-cat"><option>Faturamento</option><option>Pessoal</option><option>Materiais</option><option>Equipamentos</option><option>Serviços</option><option>Impostos</option><option>Outros</option></select></div>
+      <div class="form-group full"><label>Descrição</label><input placeholder="Descreva o lançamento" id="f-desc"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" placeholder="0.00" id="f-valor"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
+      <div class="form-group full"><label>Obra (opcional)</label>
+        <select id="f-obra"><option value="">— Sem obra específica —</option>${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarLancamento()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
 }
 
-function v(id) { return (document.getElementById(id)?.value || '').trim(); }
-
-function validEmail(e) {
-  return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(e);
+function salvarLancamento() {
+  const tipo = document.getElementById('f-tipo').value;
+  const categoria = document.getElementById('f-cat').value;
+  const descricao = document.getElementById('f-desc').value;
+  const valor = parseFloat(document.getElementById('f-valor').value)||0;
+  const data = document.getElementById('f-data').value;
+  const obraId = parseInt(document.getElementById('f-obra').value)||null;
+  if (!descricao || valor<=0) { alert('Preencha todos os campos.'); return; }
+  APP.financeiro.push({ id:APP.financeiro.length+1, tipo, categoria, descricao, valor, data, obraId });
+  closeForm(); navigate('financeiro');
 }
 
-function strongPassword(p) {
-  return p.length >= 12 && /[A-Z]/.test(p) && /[a-z]/.test(p)
-      && /[0-9]/.test(p) && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p);
+// ═══════════════════════════════════════════════════════════
+//  RELATÓRIOS / PDF
+// ═══════════════════════════════════════════════════════════
+function renderRelatorios() {
+  return `
+  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Relatórios & Exportação</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Gere e exporte relatórios em PDF para todas as áreas do sistema</div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+    ${[
+      { titulo:'Relatório Geral', desc:'Visão consolidada de toda a empresa: obras, financeiro, folha, EPIs.', icon:'📊', fn:'gerarPDFGeral', color:'var(--accent)' },
+      { titulo:'Obras & Medições', desc:'Listagem de obras com avanço físico, medições e contratos.', icon:'🏗️', fn:'gerarPDFObras', color:'var(--blue)' },
+      { titulo:'Faturamento', desc:'Notas fiscais emitidas, recebimentos e inadimplência.', icon:'💰', fn:'gerarPDFFaturamento', color:'var(--green)' },
+      { titulo:'Folha de Pagamento', desc:'Holerites CLT com INSS, IRRF, FGTS, provisões e diaristas.', icon:'👷', fn:'gerarPDFFolha', color:'var(--purple)' },
+      { titulo:'Controle de EPIs', desc:'Estoque atual, alertas de reposição e histórico de entregas.', icon:'🦺', fn:'gerarPDFEPIs', color:'var(--red)' },
+      { titulo:'Financeiro / DRE', desc:'Demonstrativo de resultado, fluxo de caixa e análise por categoria.', icon:'📈', fn:'gerarPDFFinanceiro', color:'var(--green)' },
+    ].map(r => `
+      <div class="table-card" style="padding:20px">
+        <div style="font-size:28px;margin-bottom:12px">${r.icon}</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px">${r.titulo}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:16px;line-height:1.6">${r.desc}</div>
+        <button class="btn btn-primary" onclick="${r.fn}()" style="width:100%;justify-content:center;background:${r.color}">
+          <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6M9 13l3 3 3-3M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2" stroke-width="2"/><path d="M17 9a5 5 0 00-10 0" stroke-width="2"/></svg>
+          Exportar PDF
+        </button>
+      </div>
+    `).join('')}
+  </div>`;
 }
 
-// CNPJ Validation (algoritmo oficial)
-function validCNPJ(c) {
-  if (c.length !== 14 || /^(\d)\1+$/.test(c)) return false;
-  let t = c.substring(0,12), s = 0, p = 5;
-  for (let i = 0; i < 12; i++) { s += parseInt(t[i]) * p; p = p === 2 ? 9 : p - 1; }
-  let r = s % 11 < 2 ? 0 : 11 - (s % 11);
-  if (r !== parseInt(c[12])) return false;
-  t += r; s = 0; p = 6;
-  for (let i = 0; i < 13; i++) { s += parseInt(t[i]) * p; p = p === 2 ? 9 : p - 1; }
-  r = s % 11 < 2 ? 0 : 11 - (s % 11);
-  return r === parseInt(c[13]);
+// ═══════════════════════════════════════════════════════════
+//  GERAÇÃO DE PDF (jsPDF)
+// ═══════════════════════════════════════════════════════════
+function pdfHeader(doc, titulo, subtitulo) {
+  doc.setFillColor(13, 15, 18);
+  doc.rect(0, 0, 210, 30, 'F');
+  doc.setTextColor(240, 165, 0);
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text('ConstruPRO', 14, 14);
+  doc.setTextColor(200, 200, 200);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text(APP.empresa.nome + ' · ' + APP.empresa.cnpj, 14, 21);
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11);
+  doc.setFont('helvetica','bold');
+  doc.text(titulo, 210-14, 12, { align:'right' });
+  doc.setTextColor(180,180,180);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text(subtitulo || new Date().toLocaleDateString('pt-BR', { dateStyle:'full' }), 210-14, 20, { align:'right' });
+  return 36;
 }
 
-// ─────────────────────────────────────────────────────────
-//  MASKS
-// ─────────────────────────────────────────────────────────
-function maskCNPJ(el) {
-  let v = el.value.replace(/\D/g,'').substring(0,14);
-  v = v.replace(/^(\d{2})(\d)/,'$1.$2');
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
-  v = v.replace(/\.(\d{3})(\d)/,'.$1/$2');
-  v = v.replace(/(\d{4})(\d)/,'$1-$2');
-  el.value = v;
-}
-function maskPhone(el) {
-  let v = el.value.replace(/\D/g,'').substring(0,11);
-  v = v.replace(/^(\d{2})(\d)/,'($1) $2');
-  v = v.replace(/(\d{5})(\d)/,'$1-$2');
-  el.value = v;
-}
-function sanitizeSlug(el) {
-  el.value = el.value.toLowerCase().replace(/[^a-z0-9\-]/g,'').replace(/--+/g,'-');
-  updateSlugPreview();
-}
-function previewSlug() {
-  const razao = v('r-razao');
-  const slug = razao.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/[^a-z0-9\s\-]/g,'').trim()
-    .replace(/\s+/g,'-').replace(/--+/g,'-').substring(0,40);
-  const el = document.getElementById('r-slug');
-  if (!el.dataset.touched) el.value = slug;
-  updateSlugPreview();
-}
-function updateSlugPreview() {
-  const slug = v('r-slug');
-  document.getElementById('slug-preview').textContent =
-    slug ? `Acesso: construpro.app/${slug}` : '';
-}
-document.getElementById('r-slug')?.addEventListener('input', () => {
-  document.getElementById('r-slug').dataset.touched = '1';
-});
+function gerarPDFGeral() {
+  const doc = new window.jspdf.jsPDF();
+  let y = pdfHeader(doc, 'Relatório Geral', 'Consolidado completo da empresa');
 
-// ─────────────────────────────────────────────────────────
-//  PASSWORD STRENGTH
-// ─────────────────────────────────────────────────────────
-function checkStrength(el) {
-  const p = el.value;
-  let score = 0;
-  if (p.length >= 12) score++;
-  if (p.length >= 16) score++;
-  if (/[A-Z]/.test(p)) score++;
-  if (/[a-z]/.test(p)) score++;
-  if (/[0-9]/.test(p)) score++;
-  if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p)) score++;
+  doc.setFontSize(10); doc.setTextColor(50,50,50);
+  doc.setFont('helvetica','bold');
+  doc.text('RESUMO EXECUTIVO', 14, y);
+  y += 6;
 
-  const fill = document.getElementById('pw-fill');
-  const label = document.getElementById('pw-label');
-  const pct = Math.min(100, Math.round(score/6*100));
-  fill.style.width = pct + '%';
+  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
+  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  const resultado = receitas - despesas;
 
-  if (score <= 2)      { fill.style.background='var(--red)';    label.textContent='Muito fraca'; label.style.color='var(--red)'; }
-  else if (score <= 3) { fill.style.background='#f97316';        label.textContent='Fraca';       label.style.color='#f97316'; }
-  else if (score <= 4) { fill.style.background='var(--accent)'; label.textContent='Razoável';    label.style.color='var(--accent)'; }
-  else if (score <= 5) { fill.style.background='var(--blue)';   label.textContent='Boa';         label.style.color='var(--blue)'; }
-  else                 { fill.style.background='var(--green)';  label.textContent='Excelente';   label.style.color='var(--green)'; }
-}
+  const resumo = [
+    ['Obras ativas', APP.obras.filter(o=>o.status==='Em andamento').length + ' obras'],
+    ['Colaboradores CLT', APP.colaboradores.filter(c=>c.tipo==='CLT'&&c.status==='Ativo').length + ' colaboradores'],
+    ['Total Faturado (recebido)', fmt(APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0))],
+    ['Total Receitas', fmt(receitas)],
+    ['Total Despesas', fmt(despesas)],
+    ['Resultado do Período', fmt(resultado)],
+    ['Margem Líquida', receitas>0?(resultado/receitas*100).toFixed(1)+'%':'—'],
+  ];
 
-// ─────────────────────────────────────────────────────────
-//  CAPTCHA (simulado — integrar hCaptcha/Cloudflare Turnstile em produção)
-// ─────────────────────────────────────────────────────────
-function toggleCaptcha() {
-  captchaOk = !captchaOk;
-  const el = document.getElementById('captcha-check');
-  el.classList.toggle('checked', captchaOk);
-  el.textContent = captchaOk ? '✓' : '';
-}
-
-// ─────────────────────────────────────────────────────────
-//  PLAN SELECTOR
-// ─────────────────────────────────────────────────────────
-function selectPlan(card, plan) {
-  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-  selectedPlan = plan;
-}
-
-// ─────────────────────────────────────────────────────────
-//  SHOW/HIDE PASSWORD
-// ─────────────────────────────────────────────────────────
-function togglePw(id, btn) {
-  const el = document.getElementById(id);
-  if (el.type === 'password') { el.type = 'text';     btn.textContent = 'OCULTAR'; }
-  else                        { el.type = 'password'; btn.textContent = 'VER'; }
-}
-
-// ─────────────────────────────────────────────────────────
-//  ALERT HELPERS
-// ─────────────────────────────────────────────────────────
-function err(id, msg) {
-  const el = document.getElementById(id);
-  if (!el) return false;
-  el.textContent = '⚠ ' + msg;
-  el.classList.add('show');
-  return false;
-}
-function showAlert(id, msg, type='error') {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.className = 'alert alert-' + type + ' show';
-  el.textContent = (type==='error' ? '⚠ ' : type==='success' ? '✓ ' : 'ℹ ') + msg;
-}
-function clearAlerts() {
-  document.querySelectorAll('.alert').forEach(a => a.classList.remove('show'));
-}
-
-// ─────────────────────────────────────────────────────────
-//  RATE LIMITING (client-side guard)
-// ─────────────────────────────────────────────────────────
-function startCooldown() {
-  let secs = COOLDOWN_SEC;
-  const wrap = document.getElementById('cooldown-wrap');
-  const text = document.getElementById('cooldown-text');
-  const fill = document.getElementById('cooldown-fill');
-  const btn  = document.getElementById('login-btn');
-  wrap.style.display = 'block';
-  btn.disabled = true;
-
-  cooldownTimer = setInterval(() => {
-    secs--;
-    text.textContent = `Muitas tentativas. Aguarde ${secs}s para tentar novamente.`;
-    fill.style.width = (secs/COOLDOWN_SEC*100) + '%';
-    if (secs <= 0) {
-      clearInterval(cooldownTimer);
-      wrap.style.display = 'none';
-      btn.disabled = false;
-      loginAttempts = 0;
-    }
-  }, 1000);
-  fill.style.width = '100%';
-  text.textContent = `Muitas tentativas. Aguarde ${secs}s para tentar novamente.`;
-}
-
-// ─────────────────────────────────────────────────────────
-//  LOGIN
-// ─────────────────────────────────────────────────────────
-async function doLogin() {
-  if (cooldownTimer) return;
-  clearAlerts();
-
-  const email    = v('login-email');
-  const password = document.getElementById('login-password').value;
-  const remember = document.getElementById('remember-me').checked;
-
-  if (!email || !password)
-    return showAlert('login-error', 'Informe e-mail e senha.');
-  if (!validEmail(email))
-    return showAlert('login-error', 'E-mail inválido.');
-
-  setLoading('login-btn', true);
-
-  try {
-    const res = await apiCall('POST', '/auth/login', { email, password, remember });
-
-    if (res.ok) {
-      // Salva token de sessão (httpOnly cookie é gerenciado pelo Worker — aqui só redirect)
-      window.location.href = res.redirect || '/dashboard';
-    } else {
-      loginAttempts++;
-      if (loginAttempts >= MAX_ATTEMPTS) {
-        startCooldown();
-        showAlert('login-error', 'Conta temporariamente bloqueada por segurança. Aguarde 60 segundos.');
-      } else {
-        const remaining = MAX_ATTEMPTS - loginAttempts;
-        showAlert('login-error', res.message || `Credenciais inválidas. ${remaining} tentativa(s) restante(s).`);
-      }
-    }
-  } catch (e) {
-    showAlert('login-error', 'Erro de conexão. Verifique sua internet e tente novamente.');
-  } finally {
-    setLoading('login-btn', false);
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  FORGOT PASSWORD
-// ─────────────────────────────────────────────────────────
-async function doForgot() {
-  clearAlerts();
-  const email = v('forgot-email');
-  if (!validEmail(email)) return showAlert('forgot-error', 'E-mail inválido.');
-
-  setLoading('forgot-btn', true);
-  try {
-    await apiCall('POST', '/auth/forgot-password', { email });
-    // Sempre retorna sucesso (não vaza se e-mail existe)
-    showAlert('forgot-success',
-      'Se esse e-mail estiver cadastrado, você receberá um link em até 5 minutos.', 'success');
-    document.getElementById('forgot-email').value = '';
-  } catch (e) {
-    showAlert('forgot-error', 'Erro de conexão. Tente novamente.');
-  } finally {
-    setLoading('forgot-btn', false);
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  REGISTER
-// ─────────────────────────────────────────────────────────
-async function doRegister() {
-  clearAlerts();
-  if (!document.getElementById('terms1').checked || !document.getElementById('terms2').checked)
-    return err('reg-error-3', 'Aceite os termos e confirme a representação legal.');
-  if (!captchaOk)
-    return err('reg-error-3', 'Confirme que não é um robô.');
-
-  setLoading('register-btn', true);
-
-  const payload = {
-    company: {
-      razao_social:   v('r-razao'),
-      cnpj:           v('r-cnpj').replace(/\D/g,''),
-      ie:             v('r-ie'),
-      telefone:       v('r-telefone').replace(/\D/g,''),
-      setor:          v('r-setor'),
-      porte:          v('r-porte'),
-      endereco:       v('r-endereco'),
-      slug:           v('r-slug'),
-    },
-    admin: {
-      nome:   v('r-nome'),
-      cargo:  v('r-cargo'),
-      email:  v('r-email'),
-      senha:  document.getElementById('r-pw').value,
-    },
-    plano: selectedPlan,
-  };
-
-  try {
-    const res = await apiCall('POST', '/auth/register', payload);
-    if (res.ok) {
-      // Mostrar tela de sucesso
-      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('success-email').textContent = payload.admin.email;
-      document.getElementById('success-screen').classList.add('show');
-    } else {
-      err('reg-error-3', res.message || 'Erro ao criar conta. Verifique os dados e tente novamente.');
-    }
-  } catch (e) {
-    err('reg-error-3', 'Erro de conexão. Tente novamente.');
-  } finally {
-    setLoading('register-btn', false);
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  API HELPER  (com CSRF token + headers de segurança)
-// ─────────────────────────────────────────────────────────
-async function apiCall(method, path, body) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'X-Requested-With': 'XMLHttpRequest',
-  };
-  // CSRF token (lido do cookie set pelo Worker)
-  const csrf = getCookie('csrf_token');
-  if (csrf) headers['X-CSRF-Token'] = csrf;
-
-  const res = await fetch(API_BASE + path, {
-    method,
-    headers,
-    credentials: 'include',
-    body: body ? JSON.stringify(body) : undefined,
+  doc.autoTable({
+    startY: y, head: [['Indicador', 'Valor']],
+    body: resumo,
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [240,165,0], textColor: [0,0,0] },
+    alternateRowStyles: { fillColor: [248,248,248] },
+    margin: { left: 14, right: 14 }
   });
 
-  if (res.status === 429) throw new Error('rate_limit');
-  return res.json();
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(10);
+  doc.text('OBRAS', 14, y);
+  y += 4;
+
+  doc.autoTable({
+    startY: y,
+    head: [['Obra','Cliente','Contrato','Status','Avanço']],
+    body: APP.obras.map(o => [o.nome, o.cliente, o.contrato, o.status, o.avanco+'%']),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [50,55,65], textColor: [255,255,255] },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save('ConstruPRO_Relatorio_Geral.pdf');
 }
 
-function getCookie(name) {
-  const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return m ? decodeURIComponent(m.pop()) : null;
+function gerarPDFObras() {
+  const doc = new window.jspdf.jsPDF();
+  let y = pdfHeader(doc, 'Obras & Medições', '');
+
+  doc.autoTable({
+    startY: y,
+    head: [['Obra','Cliente','Contrato','Início','Prev. Fim','Status','Avanço','Faturado','Despesas','Resultado']],
+    body: APP.obras.map(o => [
+      o.nome, o.cliente, o.contrato, fmtDate(o.inicio), fmtDate(o.prevFim),
+      o.status, o.avanco+'%', fmt(o.faturado), fmt(o.despesas), fmt(o.faturado-o.despesas)
+    ]),
+    styles: { fontSize: 7 },
+    headStyles: { fillColor: [59,130,246], textColor: [255,255,255] },
+    alternateRowStyles: { fillColor: [248,248,248] },
+    margin: { left: 8, right: 8 }
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(50,50,50);
+  doc.text('MEDIÇÕES', 14, y); y += 4;
+
+  doc.autoTable({
+    startY: y,
+    head: [['Obra','Nº Medição','Data','Valor','Status','Responsável']],
+    body: APP.medicoes.map(m => {
+      const obra = getObra(m.obraId);
+      return [obra?.nome||'—', m.numero, fmtDate(m.data), fmt(m.valor), m.status, m.responsavel];
+    }),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [59,130,246], textColor: [255,255,255] },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save('ConstruPRO_Obras_Medicoes.pdf');
 }
 
-// ─────────────────────────────────────────────────────────
-//  UI HELPERS
-// ─────────────────────────────────────────────────────────
-function setLoading(btnId, state) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
-  btn.classList.toggle('loading', state);
-  btn.disabled = state;
+function gerarPDFFaturamento() {
+  const doc = new window.jspdf.jsPDF();
+  let y = pdfHeader(doc, 'Faturamento', '');
+
+  const totalRecebido = APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
+  const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente').reduce((a,b)=>a+b.valor,0);
+
+  doc.autoTable({
+    startY: y,
+    head: [['NF','Obra','Emissão','Vencimento','Valor','Forma','Status']],
+    body: APP.faturamentos.map(f => {
+      const obra = getObra(f.obraId);
+      return [f.numero, obra?.nome||'—', fmtDate(f.data), fmtDate(f.vencimento), fmt(f.valor), f.formaPgto, f.status];
+    }),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [34,197,94], textColor: [0,0,0] },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+  doc.setFontSize(9);
+  doc.setTextColor(50,50,50);
+  doc.text(`Total Recebido: ${fmt(totalRecebido)}    A Receber: ${fmt(totalPendente)}`, 14, y);
+
+  doc.save('ConstruPRO_Faturamento.pdf');
 }
 
-// ─────────────────────────────────────────────────────────
-//  SESSION EXPIRY CHECK
-// ─────────────────────────────────────────────────────────
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get('reason') === 'session_expired') {
-  document.getElementById('session-banner').classList.add('show');
+function gerarPDFFolha() {
+  const doc = new window.jspdf.jsPDF({ orientation:'landscape' });
+  let y = pdfHeader(doc, 'Folha de Pagamento', 'Tabelas INSS e IRRF 2024');
+
+  const clts = APP.colaboradores.filter(c => c.tipo==='CLT' && c.status==='Ativo');
+  const body = clts.map(c => {
+    const calc = calcularLiquidoCLT(c.salario);
+    const obra = getObra(c.obraId);
+    return [c.nome, c.cargo, obra?.nome||'—', fmt(c.salario), fmt(calc.inss), fmt(calc.irrf), fmt(calc.liquido), fmt(calc.fgts), fmt(calc.prov13), fmt(calc.provFerias), fmt(calc.custoTotal)];
+  });
+
+  const totaisGerais = clts.reduce((acc, c) => {
+    const calc = calcularLiquidoCLT(c.salario);
+    return { bruto:acc.bruto+c.salario, inss:acc.inss+calc.inss, irrf:acc.irrf+calc.irrf, liquido:acc.liquido+calc.liquido, fgts:acc.fgts+calc.fgts, p13:acc.p13+calc.prov13, pf:acc.pf+calc.provFerias, custo:acc.custo+calc.custoTotal };
+  }, { bruto:0,inss:0,irrf:0,liquido:0,fgts:0,p13:0,pf:0,custo:0 });
+
+  body.push(['TOTAL','','', fmt(totaisGerais.bruto), fmt(totaisGerais.inss), fmt(totaisGerais.irrf), fmt(totaisGerais.liquido), fmt(totaisGerais.fgts), fmt(totaisGerais.p13), fmt(totaisGerais.pf), fmt(totaisGerais.custo)]);
+
+  doc.autoTable({
+    startY: y,
+    head: [['Nome','Cargo','Obra','Bruto','INSS','IRRF','Líquido','FGTS','Prov.13º','Prov.Férias','Custo Total']],
+    body,
+    styles: { fontSize: 7 },
+    headStyles: { fillColor: [167,139,250], textColor: [0,0,0] },
+    alternateRowStyles: { fillColor: [248,248,248] },
+    margin: { left: 8, right: 8 }
+  });
+
+  doc.save('ConstruPRO_Folha_Pagamento.pdf');
 }
 
-// ─────────────────────────────────────────────────────────
-//  ENTER KEY SUPPORT
-// ─────────────────────────────────────────────────────────
-document.getElementById('login-password').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
+function gerarPDFEPIs() {
+  const doc = new window.jspdf.jsPDF();
+  let y = pdfHeader(doc, 'Controle de EPIs', '');
+
+  doc.autoTable({
+    startY: y,
+    head: [['EPI','Categoria','CA','Estoque','Mínimo','Validade','Status']],
+    body: APP.epis.map(e => {
+      let status = e.estoque < e.minimo ? 'CRÍTICO' : e.estoque < e.minimo*1.3 ? 'BAIXO' : 'OK';
+      return [e.nome, e.categoria, e.ca, e.estoque, e.minimo, fmtDate(e.validade), status];
+    }),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [239,68,68], textColor: [255,255,255] },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(10); doc.setFont('helvetica','bold'); doc.setTextColor(50,50,50);
+  doc.text('HISTÓRICO DE ENTREGAS', 14, y); y += 4;
+
+  doc.autoTable({
+    startY: y,
+    head: [['EPI','Colaborador','Data','Quantidade','Devolvido']],
+    body: APP.entregasEPI.map(e => {
+      const epi = getEPI(e.epiId);
+      const col = getColaborador(e.colaboradorId);
+      return [epi?.nome||'—', col?.nome||'—', fmtDate(e.data), e.quantidade, e.devolvida?'Sim':'Não'];
+    }),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [239,68,68], textColor: [255,255,255] },
+    margin: { left: 14, right: 14 }
+  });
+
+  doc.save('ConstruPRO_EPIs.pdf');
+}
+
+function gerarPDFFinanceiro() {
+  const doc = new window.jspdf.jsPDF();
+  let y = pdfHeader(doc, 'Financeiro / DRE', '');
+
+  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
+  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+
+  doc.autoTable({
+    startY: y,
+    head: [['Tipo','Descrição','Categoria','Data','Valor']],
+    body: APP.financeiro.map(f => {
+      const obra = getObra(f.obraId);
+      return [f.tipo, f.descricao, f.categoria, fmtDate(f.data), (f.tipo==='Despesa'?'- ':'')+fmt(f.valor)];
+    }),
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [34,197,94], textColor: [0,0,0] },
+    alternateRowStyles: { fillColor: [248,248,248] },
+    margin: { left: 14, right: 14 }
+  });
+
+  y = doc.lastAutoTable.finalY + 8;
+  const resultado = receitas - despesas;
+  doc.setFontSize(9); doc.setTextColor(50,50,50);
+  doc.text(`Receitas: ${fmt(receitas)}   Despesas: ${fmt(despesas)}   Resultado: ${fmt(resultado)}   Margem: ${receitas>0?(resultado/receitas*100).toFixed(1)+'%':'—'}`, 14, y);
+
+  doc.save('ConstruPRO_Financeiro_DRE.pdf');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLES GERAIS
+// ═══════════════════════════════════════════════════════════
+function closeForm() {
+  document.getElementById('form-overlay').classList.remove('open');
+}
+
+document.getElementById('form-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeForm();
 });
-document.getElementById('login-email').addEventListener('keydown', e => {
-  if (e.key === 'Enter') document.getElementById('login-password').focus();
-});
+
+// INICIALIZAR
+navigate('dashboard');
 </script>
 </body>
 </html>
