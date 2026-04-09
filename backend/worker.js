@@ -122,7 +122,6 @@ async function handleRegister(request, env, headers) {
 
   // Verificar duplicatas
   const existing = await env.DB.prepare(\n    'SELECT id FROM companies WHERE slug = ? LIMIT 1'\n  ).bind(company.slug).first();\n\n  if (existing) {\n    return jsonResponse({ ok: false, message: 'Subdomínio já cadastrado na plataforma.' }, 409, headers);\n  }
-  const existing = await env.DB.prepare(\n    'SELECT id FROM companies WHERE slug = ? LIMIT 1'\n  ).bind(company.slug).first();\n\n  if (existing) {\n    return jsonResponse({ ok: false, message: 'Subdomínio já cadastrado na plataforma.' }, 409, headers);\n  }
 
   const emailExists = await env.DB.prepare(
     'SELECT id FROM users WHERE email = ? LIMIT 1'
