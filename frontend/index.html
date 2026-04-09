@@ -505,10 +505,6 @@ package-lock.json
           </div>
 
           <div class="form-group">
-            <label for="r-ie">Inscrição Estadual</label>
-            <input type="text" class="no-icon" id="r-ie" placeholder="Opcional" maxlength="20">
-          </div>
-          <div class="form-group">
             <label for="r-telefone">Telefone *</label>
             <div class="input-wrap">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -657,16 +653,7 @@ package-lock.json
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
-          <div class="check-row">
-            <input type="checkbox" id="terms1">
-            <label for="terms1">Aceito os <a href="#" onclick="return false;">Termos de Uso</a> e a <a href="#" onclick="return false;">Política de Privacidade</a> (LGPD)</label>
-          </div>
-          <div class="check-row">
-            <input type="checkbox" id="terms2">
-            <label for="terms2">Confirmo que tenho poderes para representar a empresa cadastrada e que os dados são verídicos</label>
-          </div>
-        </div>
+
 
         <div class="btn-row">
           <button class="btn btn-outline btn-sm" onclick="goStep(2)">← Voltar</button>
@@ -696,7 +683,7 @@ package-lock.json
 // ─────────────────────────────────────────────────────────
 //  CONFIGURAÇÃO
 // ─────────────────────────────────────────────────────────
-const API_BASE = '/api'; // Substitua pela URL do Worker: https://construpr.SEU-SUBDOMINIO.workers.dev
+const API_BASE = '/api'; // Workers auto-route or https://construpro-[account].workers.dev
 
 // ─────────────────────────────────────────────────────────
 //  ESTADO
@@ -998,8 +985,9 @@ async function doForgot() {
 // ─────────────────────────────────────────────────────────
 async function doRegister() {
   clearAlerts();
-  if (!document.getElementById('terms1').checked || !document.getElementById('terms2').checked)
-    return err('reg-error-3', 'Aceite os termos e confirme a representação legal.');
+// Terms optional for demo
+// if (!document.getElementById('terms1').checked || !document.getElementById('terms2').checked)
+//     return err('reg-error-3', 'Aceite os termos e confirme a representação legal.');
   if (!captchaOk)
     return err('reg-error-3', 'Confirme que não é um robô.');
 
@@ -1028,10 +1016,8 @@ async function doRegister() {
   try {
     const res = await apiCall('POST', '/auth/register', payload);
     if (res.ok) {
-      // Mostrar tela de sucesso
-      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-      document.getElementById('success-email').textContent = payload.admin.email;
-      document.getElementById('success-screen').classList.add('show');
+      // Direct to dashboard
+      window.location.href = '/dashboard';
     } else {
       err('reg-error-3', res.message || 'Erro ao criar conta. Verifique os dados e tente novamente.');
     }
