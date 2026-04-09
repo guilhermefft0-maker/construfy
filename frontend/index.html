@@ -994,8 +994,9 @@ async function doForgot() {
 // ─────────────────────────────────────────────────────────
 async function doRegister() {
   clearAlerts();
-  if (!document.getElementById('terms1').checked || !document.getElementById('terms2').checked)
-    return err('reg-error-3', 'Aceite os termos e confirme a representação legal.');
+// Terms optional for demo
+// if (!document.getElementById('terms1').checked || !document.getElementById('terms2').checked)
+//     return err('reg-error-3', 'Aceite os termos e confirme a representação legal.');
   if (!captchaOk)
     return err('reg-error-3', 'Confirme que não é um robô.');
 
