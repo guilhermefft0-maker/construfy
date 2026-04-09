@@ -7,7 +7,7 @@
 CREATE TABLE IF NOT EXISTS companies (
   id              TEXT PRIMARY KEY,
   razao_social    TEXT NOT NULL,
-  cnpj            TEXT NOT NULL UNIQUE,
+cnpj            TEXT,
   ie              TEXT,
   telefone        TEXT NOT NULL,
   setor           TEXT NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS companies (
   updated_at      TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_companies_cnpj   ON companies(cnpj);
+
 CREATE INDEX IF NOT EXISTS idx_companies_slug   ON companies(slug);
 CREATE INDEX IF NOT EXISTS idx_companies_status ON companies(status);
 

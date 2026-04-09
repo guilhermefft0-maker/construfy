@@ -1,3 +1,12 @@
+node_modules/
+.wrangler/
+.dev.vars
+dist/
+package-lock.json
+*.log
+
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -494,13 +503,7 @@
               <input type="text" id="r-razao" placeholder="Construtora Exemplo Ltda" maxlength="200" oninput="previewSlug()">
             </div>
           </div>
-          <div class="form-group">
-            <label for="r-cnpj">CNPJ *</label>
-            <div class="input-wrap">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <input type="text" id="r-cnpj" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)">
-            </div>
-          </div>
+
           <div class="form-group">
             <label for="r-ie">Inscrição Estadual</label>
             <input type="text" class="no-icon" id="r-ie" placeholder="Opcional" maxlength="20">
@@ -756,12 +759,10 @@ function goStep(n) {
 function validateStep(step) {
   clearAlerts();
   if (step === 1) {
-    const razao = v('r-razao'), cnpj = v('r-cnpj'), tel = v('r-telefone'),
+    const razao = v('r-razao'), tel = v('r-telefone'),
           setor = v('r-setor'), porte = v('r-porte'), end = v('r-endereco'), slug = v('r-slug');
-    if (!razao || !cnpj || !tel || !setor || !porte || !end || !slug)
+    if (!razao || !tel || !setor || !porte || !end || !slug)
       return err('reg-error-1', 'Preencha todos os campos obrigatórios.');
-    if (!validCNPJ(cnpj.replace(/\D/g,'')))
-      return err('reg-error-1', 'CNPJ inválido. Verifique o número informado.');
     if (slug.length < 3)
       return err('reg-error-1', 'Subdomínio deve ter ao menos 3 caracteres.');
     return true;
@@ -794,29 +795,12 @@ function strongPassword(p) {
 }
 
 // CNPJ Validation (algoritmo oficial)
-function validCNPJ(c) {
-  if (c.length !== 14 || /^(\d)\1+$/.test(c)) return false;
-  let t = c.substring(0,12), s = 0, p = 5;
-  for (let i = 0; i < 12; i++) { s += parseInt(t[i]) * p; p = p === 2 ? 9 : p - 1; }
-  let r = s % 11 < 2 ? 0 : 11 - (s % 11);
-  if (r !== parseInt(c[12])) return false;
-  t += r; s = 0; p = 6;
-  for (let i = 0; i < 13; i++) { s += parseInt(t[i]) * p; p = p === 2 ? 9 : p - 1; }
-  r = s % 11 < 2 ? 0 : 11 - (s % 11);
-  return r === parseInt(c[13]);
-}
+
 
 // ─────────────────────────────────────────────────────────
 //  MASKS
 // ─────────────────────────────────────────────────────────
-function maskCNPJ(el) {
-  let v = el.value.replace(/\D/g,'').substring(0,14);
-  v = v.replace(/^(\d{2})(\d)/,'$1.$2');
-  v = v.replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3');
-  v = v.replace(/\.(\d{3})(\d)/,'.$1/$2');
-  v = v.replace(/(\d{4})(\d)/,'$1-$2');
-  el.value = v;
-}
+
 function maskPhone(el) {
   let v = el.value.replace(/\D/g,'').substring(0,11);
   v = v.replace(/^(\d{2})(\d)/,'($1) $2');
@@ -1024,7 +1008,7 @@ async function doRegister() {
   const payload = {
     company: {
       razao_social:   v('r-razao'),
-      cnpj:           v('r-cnpj').replace(/\D/g,''),
+      cnpj:           null,
       ie:             v('r-ie'),
       telefone:       v('r-telefone').replace(/\D/g,''),
       setor:          v('r-setor'),
