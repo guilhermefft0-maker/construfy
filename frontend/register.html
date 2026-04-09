@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConstruPRO — Criar Conta</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f12;
+    --bg2: #13161b;
+    --bg3: #1a1e25;
+    --border: #2a2f3a;
+    --border2: #343b4a;
+    --text: #e8eaf0;
+    --text2: #8b92a5;
+    --text3: #5a6075;
+    --accent: #f0a500;
+    --green: #22c55e;
+    --red: #ef4444;
+    --radius: 12px;
+    --font: 'DM Sans', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--font); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  .shell { width:100%; max-width:520px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:36px; }
+  .form-title { font-size:24px; font-weight:500; color:var(--text); margin-bottom:8px; text-align:center; }
+  .form-desc { font-size:13px; color:var(--text2); margin-bottom:28px; text-align:center; }
+  .form-group { margin-bottom:18px; }
+  label { display:block; font-size:11px; color:var(--text3); margin-bottom:6px; letter-spacing:0.8px; text-transform:uppercase; font-weight:500; }
+  input { width:100%; padding:12px 16px; background:var(--bg3); border:1px solid var(--border2); color:var(--text); border-radius:var(--radius); font-size:14px; outline:none; font-family:var(--font); transition:border 0.15s; }
+  input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(240,165,0,0.1); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .plan-selector { display:flex; gap:12px; margin:24px 0; }
+  .plan-btn { flex:1; padding:16px; border:1px solid var(--border2); border-radius:var(--radius); background:var(--bg3); color:var(--text2); cursor:pointer; transition:all .2s; text-align:center; font-weight:500; }
+  .plan-btn.active { border-color:var(--accent); background:var(--accent); color:#000; }
+  .terms-group { margin:20px 0; }
+  .terms-check { display:flex; align-items:flex-start; gap:12px; cursor:pointer; }
+  .terms-check input[type="checkbox"] { width:18px; height:18px; accent-color:var(--accent); margin-top:2px; flex-shrink:0; }
+  .terms-text { font-size:13px; color:var(--text2); line-height:1.6; }
+  .terms-text a { color:var(--accent); text-decoration:none; }
+  .btn { width:100%; padding:14px; background:var(--accent); color:#000; border:none; border-radius:var(--radius); font-size:15px; font-weight:500; cursor:pointer; transition:background .15s; font-family:var(--font); margin-top:8px; }
+  .btn:hover { background:#d89600; }
+  .btn:disabled { opacity:0.6; cursor:not-allowed; }
+  .alert { padding:12px 16px; border-radius:var(--radius); margin:16px 0; display:none; }
+  .alert-error { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; }
+  .alert-success { background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); color:#86efac; }
+  .loading { position:relative; }
+  .spinner { display:inline-block; width:16px; height:16px; border:2px solid rgba(0,0,0,0.2); border-top-color:#000; border-radius:50%; animation:spin 1s linear infinite; position:absolute; right:16px; top:50%; transform:translateY(-50%); }
+  @keyframes spin { to { transform:translateY(-50%) rotate(360deg); } }
+  @media (max-width:600px) { .shell { margin:16px; padding:24px; } .form-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <h1 class="form-title">Criar Conta na ConstruPRO</h1>
+    <p class="form-desc">Preencha os dados da sua construtora e aceite os termos para criar a conta.</p>
+
+    <div class="alert alert-error" id="error-msg" style="display:none"></div>
+    <div class="alert alert-success" id="success-msg" style="display:none"></div>
+
+    <form id="register-form">
+      <div class="form-group">
+        <label for="company-name">Razão Social *</label>
+        <input type="text" id="company-name" required maxlength="200" placeholder="Construtora Exemplo Ltda">
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="phone">Telefone *</label>
+          <input type="tel" id="phone" required maxlength="15" placeholder="(11) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label for="slug">Subdomínio *</label>
+          <input type="text" id="slug" required minlength="3" maxlength="40" placeholder="minha-construtora" oninput="sanitizeSlug(this)">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="admin-name">Nome do Admin *</label>
+          <input type="text" id="admin-name" required maxlength="100" placeholder="João Silva">
+        </div>
+        <div class="form-group">
+          <label for="admin-email">E-mail *</label>
+          <input type="email" id="admin-email" required maxlength="254" placeholder="admin@construtora.com">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="admin-password">Senha *</label>
+          <input type="password" id="admin-password" required minlength="12" placeholder="Senha segura (12+ chars)">
+        </div>
+        <div class="form-group">
+          <label for="plan">Plano</label>
+          <select id="plan">
+            <option value="starter">Starter - R$ 197/mês</option>
+            <option value="pro" selected>Pro - R$ 497/mês</option>
+            <option value="enterprise">Enterprise - Sob consulta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="terms-group">
+        <label class="terms-check">
+          <input type="checkbox" id="terms" required>
+          <span class="terms-text">
+            Aceito os <a href="/terms.html" target="_blank">Termos de Uso</a> e a <a href="/privacy.html" target="_blank">Política de Privacidade</a> (LGPD).<br>
+            Confirmo que possuo poderes para representar esta empresa.
+          </span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn" id="submit-btn">
+        Criar Conta Gratuitamente (14 dias free)
+      </button>
+    </form>
+
+    <p style="text-align:center;margin-top:24px;font-size:12px;color:var(--text3);">
+      Já tem conta? <a href="login.html" style="color:var(--accent)">Fazer login</a>
+    </p>
+  </div>
+
+<script>
+const API_BASE = window.API_BASE || '/api';
+
+document.getElementById('register-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  const errorEl = document.getElementById('error-msg');
+  const successEl = document.getElementById('success-msg');
+
+  // Reset alerts
+  errorEl.style.display = 'none';
+  successEl.style.display = 'none';
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Enviando...';
+
+  try {
+    const payload = {
+      company: {
+        razao_social: document.getElementById('company-name').value.trim(),
+        telefone: document.getElementById('phone').value.trim(),
+        slug: document.getElementById('slug').value.trim().toLowerCase(),
+        setor: 'residencial', // default, enhance later
+        porte: 'epp', // default
+        endereco: 'Endereço padrão', // enhance
+      },
+      admin: {
+        nome: document.getElementById('admin-name').value.trim(),
+        email: document.getElementById('admin-email').value.trim().toLowerCase(),
+        senha: document.getElementById('admin-password').value,
+        cargo: 'Administrador'
+      },
+      plano: document.getElementById('plan').value
+    };
+
+    const response = await fetch(`${API_BASE}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (data.ok) {
+      successEl.textContent = 'Conta criada! Redirecionando para login...';
+      successEl.style.display = 'block';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 2000);
+    } else {
+      throw new Error(data.message || 'Erro ao criar conta');
+    }
+  } catch (error) {
+    errorEl.textContent = `Erro: ${error.message}`;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Criar Conta Gratuitamente (14 dias free)';
+  }
+});
+
+function sanitizeSlug(el) {
+  el.value = el.value.toLowerCase()
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/-+/g, '-')
+    .substring(0, 40);
+}
+</script>
+</body>
+</html>
