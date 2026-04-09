@@ -1,37 +1,32 @@
-# TODO - Fynext ConstruPRO - Fixed & Ready
+# ConstruPRO - Deploy Tracker
+Status: 🚀 DEPLOY IN PROGRESS
 
-## CNPJ Removal Complete ✅
-- [x] Fixed backend/worker.js syntax (duplicates, corruption)
-- [x] Removed validCNPJ()
-- [x] Schema already nullable
-- [x] Frontend clean (no CNPJ fields)
+## ✅ Phase 1 COMPLETE: Backend Fixes
+- [x] Fix register handler ✓
+- [x] 7 CRUD endpoints (obras/medicoes/etc.) ✓
+- [x] Sample data (backend/sample-data.sql) ✓
+- [x] RBAC middleware ✓
 
-## Code Issues Fixed ✅
-- Duplicate slug checks removed
-- dec64url() corruption fixed
-- All TS errors resolved
+## ⏳ Phase 2: Frontend Integration (Next)
+- Update API_BASE + mock → fetch()
+- Error handling 401/403/429
 
-## Security Enhancements Complete ✅
-- CSP tightened
-- All headers (HSTS, Permissions-Policy)
-- Rate limiting KV
-- PBKDF2-SHA512 passwords
-- JWT HMAC256
-- CSRF tokens
-- Audit logs
-- Session revocation
-- Account lockout
-- Timing-safe login
+## ⏳ Phase 3: Deploy Instructions
+1. wrangler d1 create
+2. Secrets + deploy.bat
 
-## GitHub Ready
-- wrangler.toml configured
-- .gitignore proper
-- README pending
+**Backend 100% → Frontend Next**
 
-**Status: Deploy & test ready.** Run:
-```bash
-wrangler deploy
-```
 
-**Next:** Push to GitHub, create PR.
+## ⏳ Phase 2: Frontend API Integration
+1. index.html API_BASE update
+2. login.html mock → fetch() calls
+
+## ⏳ Phase 3: Deploy
+1. wrangler d1 create + database_id
+2. wrangler d1 execute schema.sql
+3. Secrets (JWT_SECRET)
+4. wrangler deploy
+
+**Progress: 5% → Next: backend/worker.js**
 
