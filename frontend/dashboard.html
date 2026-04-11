@@ -337,8 +337,7 @@ async function apiGet(endpoint) {
   try {
     const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${token}`, 'X-Company-ID': CID },
     });
     if (res.status === 401) { logout(); return []; }
     const data = await res.json();
@@ -351,8 +350,7 @@ async function apiPost(endpoint, body) {
     const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'X-Company-ID': CID },
       body: JSON.stringify(body),
     });
     if (res.status === 401) { logout(); return {}; }
@@ -365,8 +363,7 @@ async function apiPut(endpoint, body) {
     const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`, 'X-Company-ID': CID },
       body: JSON.stringify(body),
     });
     if (res.status === 401) { logout(); return {}; }
@@ -379,8 +376,7 @@ async function apiDelete(endpoint) {
     const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` },
-      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${token}`, 'X-Company-ID': CID },
     });
     if (res.status === 401) { logout(); return {}; }
     return res.json();
@@ -403,8 +399,7 @@ async function loadAll() {
   try {
     const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/all`, {
-      headers: { 'Authorization': `Bearer ${token}` },
-      credentials: 'include',
+      headers: { 'Authorization': `Bearer ${token}`, 'X-Company-ID': CID },
     });
     if (res.status === 401) { logout(); return; }
     const d = await res.json();
@@ -438,7 +433,7 @@ async function loadAll() {
 
 // ── NORMALIZERS (DB snake_case → JS camelCase) ─────────
 function normalizeObra(o) {
-  return { ...o, prevFim: o.prev_fim, medicoes: o.medicoes_count };
+  return { ...o, prevFim: o.prev_fim, medicoes: o.medicoes_count, valorContrato: o.valor_contrato || 0 };
 }
 function normalizeMedicao(m) {
   return { ...m, obraId: m.obra_id };
@@ -544,10 +539,29 @@ function renderDashboard() {
   const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente'||f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
   const totalDespesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
   const obrasAtivas = APP.obras.filter(o=>o.status==='Em andamento').length;
-  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'];
-  const receitasMes = [0,0,320000,630000,310000,280000,196000,0,312000,0];
-  const maxR = Math.max(...receitasMes) || 1;
+  const now = new Date();
+  const last6 = Array.from({length:6}, (_,i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5-i), 1);
+    return { label: d.toLocaleString('pt-BR',{month:'short'}).replace('.',''), year: d.getFullYear(), month: d.getMonth() };
+  });
+  const meses = last6.map(m => m.label.charAt(0).toUpperCase()+m.label.slice(1));
+  const receitasMes = last6.map(({year,month}) =>
+    APP.faturamentos.filter(f => {
+      if (f.status !== 'Recebida' || !f.data) return false;
+      const d = new Date(f.data + 'T00:00:00');
+      return d.getFullYear() === year && d.getMonth() === month;
+    }).reduce((a,b) => a+b.valor, 0)
+  );
+  const despesasMes = last6.map(({year,month}) =>
+    APP.financeiro.filter(f => {
+      if (f.tipo !== 'Despesa' || !f.data) return false;
+      const d = new Date(f.data + 'T00:00:00');
+      return d.getFullYear() === year && d.getMonth() === month;
+    }).reduce((a,b) => a+b.valor, 0)
+  );
+  const maxR = Math.max(...receitasMes, ...despesasMes) || 1;
   const barsRec = receitasMes.map((v,i) => `<div class="bar-col green" style="height:${Math.round((v/maxR)*56)+4}px" title="${meses[i]}: ${fmt(v)}"></div>`).join('');
+  const barsDes = despesasMes.map((v,i) => `<div class="bar-col" style="height:${Math.round((v/maxR)*56)+4}px" title="${meses[i]}: ${fmt(v)}"></div>`).join('');
 
   return `
   <div class="kpi-grid">
@@ -559,12 +573,20 @@ function renderDashboard() {
 
   <div class="two-col" style="margin-bottom:20px">
     <div class="table-card">
-      <div class="table-header"><div><div class="table-title">Receitas por mês</div><div class="table-sub">Valores faturados e recebidos</div></div></div>
+      <div class="table-header"><div><div class="table-title">Receitas vs Despesas (6 meses)</div><div class="table-sub">
+        <span style="color:var(--green)">■</span> Recebido &nbsp; <span style="color:var(--accent)">■</span> Despesas
+      </div></div></div>
       <div style="padding:18px 18px 14px">
         <div style="display:flex;justify-content:space-between;margin-bottom:8px">
           ${meses.map(m => `<span style="font-size:9px;color:var(--text3);flex:1;text-align:center">${m}</span>`).join('')}
         </div>
-        <div class="mini-chart">${barsRec}</div>
+        <div style="display:flex;gap:4px;align-items:flex-end;height:64px">
+          ${last6.map((_,i) => `
+            <div style="flex:1;display:flex;gap:1px;align-items:flex-end;height:60px">
+              <div class="bar-col green" style="flex:1;height:${Math.round((receitasMes[i]/maxR)*56)+4}px" title="Receita ${meses[i]}: ${fmt(receitasMes[i])}"></div>
+              <div class="bar-col" style="flex:1;height:${Math.round((despesasMes[i]/maxR)*56)+4}px" title="Despesa ${meses[i]}: ${fmt(despesasMes[i])}"></div>
+            </div>`).join('')}
+        </div>
       </div>
     </div>
     <div class="table-card">
@@ -722,7 +744,7 @@ function navegarDia(delta) {
   navigate('ponto');
 }
 
-function editarBatida(id, tipo) {
+async function editarBatida(id, tipo) {
   const ponto = APP.pontos.find(p => p.id === id);
   if (!ponto) return;
   const agora = new Date().toTimeString().slice(0,5);
@@ -732,6 +754,12 @@ function editarBatida(id, tipo) {
   } else {
     ponto.hora_saida = agora;
   }
+  await apiPut(`pontos/${id}`, {
+    hora_entrada: ponto.hora_entrada || null,
+    hora_saida:   ponto.hora_saida   || null,
+    status:       ponto.status,
+    obs:          ponto.obs
+  });
   navigate('ponto');
 }
 
@@ -849,28 +877,35 @@ async function salvarPonto() {
   if (!col)  return alert('Selecione um colaborador');
   if (!data) return alert('Informe a data');
 
-  const jaExiste = APP.pontos.find(p => p.colaborador_id == colId && p.data === data);
+  const jaExiste = APP.pontos.find(p => (p.colaborador_id || p.colaboradorId) === colId && p.data === data);
   if (jaExiste) {
     if (!confirm(`Já existe um registro de ${col.nome} em ${new Date(data+'T00:00:00').toLocaleDateString('pt-BR')}. Deseja substituir?`)) return;
     await apiDelete(`pontos/${jaExiste.id}`);
-    APP.pontos = APP.pontos.filter(p => !(p.colaborador_id == colId && p.data === data));
+    APP.pontos = APP.pontos.filter(p => p.id !== jaExiste.id);
   }
 
   const payload = {
-    colaborador_id: colId,
+    colaboradorId:   colId,
+    colaboradorNome: col.nome,
+    cargo:           col.cargo,
     data,
-    hora_entrada: status === 'presente' ? (document.getElementById('f-entrada').value || null) : null,
-    hora_saida:   status === 'presente' ? (document.getElementById('f-saida').value   || null) : null,
+    horaEntrada: status === 'presente' ? (document.getElementById('f-entrada').value || null) : null,
+    horaSaida:   status === 'presente' ? (document.getElementById('f-saida').value   || null) : null,
     status,
     obs: obs || (status === 'presente' ? 'Registro administrativo' : 'Falta registrada pelo administrador'),
   };
 
   const novo = await apiPost('pontos', payload);
   APP.pontos.unshift({
-    ...payload,
-    id: novo?.id || ('ponto' + Date.now()),
+    id:               novo?.id || ('ponto' + Date.now()),
+    colaborador_id:   colId,
     colaborador_nome: col.nome,
-    cargo: col.cargo
+    cargo:            col.cargo,
+    data,
+    hora_entrada: payload.horaEntrada,
+    hora_saida:   payload.horaSaida,
+    status:       payload.status,
+    obs:          payload.obs,
   });
   window.PONTO_DATA_FILTRO = data;
   closeForm();
@@ -904,7 +939,7 @@ function renderObras() {
 
   <div class="obra-grid">
     ${APP.obras.map(o => `
-    <div class="obra-card" onclick="verDetalheObra(${o.id})">
+    <div class="obra-card" onclick="verDetalheObra('${o.id}')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
         <span class="badge ${o.status==='Em andamento'?'badge-green':'badge-gray'}">${o.status}</span>
         <span style="font-size:11px;color:var(--text3)">${o.avanco}% concluído</span>
@@ -915,12 +950,12 @@ function renderObras() {
         <div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div>
       </div>
       <div class="obra-stats">
-        <div><div class="obra-stat-val">${fmt(o.faturado)}</div><div class="obra-stat-label">Faturado</div></div>
+        <div><div class="obra-stat-val">${fmt(o.valorContrato||0)}</div><div class="obra-stat-label">Contrato</div></div>
         <div><div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas)}</div><div class="obra-stat-label">Despesas</div></div>
-        <div><div class="obra-stat-val" style="color:var(--green)">${fmt(o.faturado-o.despesas)}</div><div class="obra-stat-label">Resultado</div></div>
+        <div><div class="obra-stat-val" style="color:var(--green)">${fmt((o.valorContrato||0)-o.despesas)}</div><div class="obra-stat-label">Margem</div></div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
-        <span>Contrato: <span style="color:var(--text)">${o.contrato}</span></span>
+        <span>Nº: <span style="color:var(--text)">${o.contrato||'—'}</span></span>
         <span>${o.medicoes} medições</span>
       </div>
     </div>`).join('')}
@@ -948,7 +983,8 @@ function openFormObra(id) {
     <div class="form-grid">
       <div class="form-group full"><label>Nome da Obra</label><input id="f-nome" value="${o?.nome||''}"></div>
       <div class="form-group"><label>Cliente</label><input id="f-cliente" value="${o?.cliente||''}"></div>
-      <div class="form-group"><label>Contrato</label><input id="f-contrato" value="${o?.contrato||''}"></div>
+      <div class="form-group"><label>Nº do Contrato</label><input id="f-contrato" value="${o?.contrato||''}" placeholder="CT-2026-001"></div>
+      <div class="form-group"><label>Valor do Contrato (R$)</label><input type="number" id="f-valor-contrato" value="${o?.valorContrato||0}" placeholder="0" min="0" step="0.01"></div>
       <div class="form-group"><label>Início</label><input type="date" id="f-inicio" value="${o?.inicio||''}"></div>
       <div class="form-group"><label>Previsão Fim</label><input type="date" id="f-prevfim" value="${o?.prevFim||''}"></div>
       <div class="form-group"><label>Status</label>
@@ -961,8 +997,9 @@ function openFormObra(id) {
       <div class="form-group"><label>Avanço (%)</label><input type="number" id="f-avanco" min="0" max="100" value="${o?.avanco||0}"></div>
     </div>
     <div class="form-actions">
+      ${o ? `<button class="btn btn-danger" onclick="excluirObra('${o.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarObra(${o?.id||'null'})">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarObra('${o?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
@@ -972,21 +1009,30 @@ async function salvarObra(id) {
   if (!nome) return alert('Informe o nome da obra');
   const payload = {
     nome,
-    cliente:  document.getElementById('f-cliente').value.trim(),
-    contrato: document.getElementById('f-contrato').value.trim(),
-    inicio:   document.getElementById('f-inicio').value,
-    prev_fim: document.getElementById('f-prevfim').value,
-    status:   document.getElementById('f-status').value,
-    avanco:   parseInt(document.getElementById('f-avanco').value)||0,
+    cliente:         document.getElementById('f-cliente').value.trim(),
+    contrato:        document.getElementById('f-contrato').value.trim(),
+    valorContrato:   parseFloat(document.getElementById('f-valor-contrato').value)||0,
+    inicio:          document.getElementById('f-inicio').value,
+    prevFim:         document.getElementById('f-prevfim').value,
+    status:          document.getElementById('f-status').value,
+    avanco:          parseInt(document.getElementById('f-avanco').value)||0,
   };
   if (id) {
     await apiPut(`obras/${id}`, payload);
     const o = APP.obras.find(x=>x.id===id);
-    Object.assign(o, payload, { prevFim: payload.prev_fim });
+    if (o) Object.assign(o, payload);
   } else {
     const nova = await apiPost('obras', payload);
-    if (nova?.id) APP.obras.push(normalizeObra({ ...payload, id: nova.id, medicoes_count: 0, faturado: 0, despesas: 0 }));
+    if (nova?.id) APP.obras.push(normalizeObra({ ...payload, id: nova.id, medicoes_count: 0, faturado: 0, despesas: 0, valor_contrato: payload.valorContrato }));
   }
+  closeForm();
+  navigate('obras');
+}
+
+async function excluirObra(id) {
+  if (!confirm('Excluir esta obra? Medições e dados associados serão mantidos.')) return;
+  await apiDelete(`obras/${id}`);
+  APP.obras = APP.obras.filter(o => o.id !== id);
   closeForm();
   navigate('obras');
 }
@@ -1001,13 +1047,14 @@ function verDetalheObra(id) {
   document.getElementById('detalhe-obra-body').innerHTML = `
     <div class="three-col" style="margin-bottom:16px">
       <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Cliente</div><div style="color:var(--text)">${o.cliente}</div></div>
-      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Contrato</div><div style="color:var(--accent)">${o.contrato}</div></div>
-      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Período</div><div style="color:var(--text)">${fmtDate(o.inicio)} → ${fmtDate(o.prevFim)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Nº Contrato</div><div style="color:var(--accent)">${o.contrato||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Período</div><div style="color:var(--text)">${o.inicio?fmtDate(o.inicio):'—'} → ${o.prevFim?fmtDate(o.prevFim):'—'}</div></div>
     </div>
-    <div class="three-col" style="margin-bottom:16px">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Valor Contrato</div><div style="color:var(--blue);font-weight:500">${fmt(o.valorContrato||0)}</div></div>
       <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Faturado</div><div style="color:var(--green);font-weight:500">${fmt(o.faturado)}</div></div>
       <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Despesas</div><div style="color:var(--red);font-weight:500">${fmt(o.despesas)}</div></div>
-      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Resultado</div><div style="color:${o.faturado-o.despesas>=0?'var(--green)':'var(--red)'};font-weight:500">${fmt(o.faturado-o.despesas)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Margem</div><div style="color:${(o.valorContrato||0)-o.despesas>=0?'var(--green)':'var(--red)'};font-weight:500">${fmt((o.valorContrato||0)-o.despesas)}</div></div>
     </div>
     <div class="two-col">
       <div>
@@ -1022,7 +1069,7 @@ function verDetalheObra(id) {
       </div>
     </div>
     <div style="margin-top:16px;display:flex;gap:8px">
-      <button class="btn btn-outline" onclick="openFormObra(${o.id})">✏️ Editar</button>
+      <button class="btn btn-outline" onclick="openFormObra('${o.id}')">✏️ Editar Obra</button>
     </div>`;
   panel.style.display = 'block';
   panel.scrollIntoView({ behavior:'smooth' });
