@@ -8,3 +8,4 @@ sample-data.sql
 src/
 schema.sql
 worker.js
+wrangler.toml
