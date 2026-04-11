@@ -7,3 +7,4 @@ package-lock.json
 sample-data.sql
 src/
 schema.sql
+worker.js
