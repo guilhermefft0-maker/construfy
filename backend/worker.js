@@ -218,6 +218,8 @@ async function handleLogin(request, env, headers) {
   const hash  = user?.password_hash || dummy;
   const valid = await verifyPassword(password, hash);
 
+  console.log("[LOGIN DEBUG]", JSON.stringify({ email, userFound: !!user, valid, status: user?.status, company_status: user?.company_status, email_verified_at: user?.email_verified_at, hash_prefix: hash?.substring(0,20) }));
+
   if (!user || !valid) {
     // Log tentativa
     if (user) {
