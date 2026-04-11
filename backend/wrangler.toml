@@ -11,12 +11,12 @@ ENVIRONMENT = "production"
 [[d1_databases]]
 binding    = "DB"
 database_name = "construpro-db"
-database_id   = "496328a6-a6be-43ca-9aa1-f62c6bbaf64c"
+database_id   = "YOUR_NEW_D1_DATABASE_ID"  # **SECURITY: Replace before deploy**
 
 # ── KV Namespace (rate limiting)
 [[kv_namespaces]]
 binding = "RATE_KV"
-id      = "32d4a3cb8a4c4f909064d0f8654cc88c"
+id      = "YOUR_NEW_KV_NAMESPACE_ID"  # **SECURITY: Replace before deploy**
 
 # ── Secrets (configurar via: wrangler secret put NOME)
 # JWT_SECRET     → string aleatória ≥ 64 caracteres
@@ -28,8 +28,8 @@ crons = ["0 3 * * *"]
 
 # ── Rotas
 [[routes]]
-pattern = "construpro.app/api/*"
-zone_name = "construpro.app"
+pattern = "your-domain.com/api/*"  # **SECURITY: Replace with your custom domain**
+zone_name = "your-domain.com"
 
 # ── Configurações de segurança
 [build]

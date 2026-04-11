@@ -1,0 +1,33 @@
+{
+  "name": "ConstruPRO — Gestão para Construtoras",
+  "short_name": "ConstruPRO",
+  "description": "Gestão completa para construtoras: obras, medições, folha, EPIs e financeiro",
+  "start_url": "/frontend/index.html",
+  "display": "standalone",
+  "background_color": "#090b0e",
+  "theme_color": "#f0a500",
+  "orientation": "portrait-primary",
+  "categories": ["business", "productivity", "finance"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMyAyMVY5TDEyIDNMMjEgOVYyMUgxNVYxNUg5VjIxSDNaIiBmaWxsPSIjRjBBNTAwIi8+Cjwvc3ZnPgo=",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMyAyMVY5TDEyIDNMMjEgOVYyMUgxNVYxNUg5VjIxSDNaIiBmaWxsPSIjRjBBNTAwIi8+Cjwvc3ZnPgo=",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==",
+      "sizes": "1334x750",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}

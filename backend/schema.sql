@@ -1,5 +1,5 @@
 -- ╔══════════════════════════════════════════════════════════════╗
--- ║  ConstruPRO — Schema D1 (Cloudflare SQLite)                  ║
+-- ║  ConstruFY — Schema D1 (Cloudflare SQLite)                   ║
 -- ║  Multi-tenant · LGPD-ready · Auditoria completa              ║
 -- ╚══════════════════════════════════════════════════════════════╝
 

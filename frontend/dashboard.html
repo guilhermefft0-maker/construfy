@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - ConstruFY</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f59e0b">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com;">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0c12;
+      --bg-card: #111621;
+      --bg-hover: #151a25;
+      --glass: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.08);
+      --border-glow: rgba(100,116,139,0.2);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent: #f59e0b;
+      --accent-glow: #f59e0b33;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gradient: linear-gradient(135deg, #0a0c12 0%, #1a1f2e 100%);
+      --shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+      --shadow-card: 0 10px 25px rgba(0,0,0,0.3);
+      --radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Inter', sans-serif;
+      background: var(--gradient);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── LAYOUT ─── */
+    .app-container { min-height: 100vh; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(20px);
+      background: rgba(10,12,18,0.95);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+      padding: 1rem 2rem;
+    }
+    .topbar-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .company-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .company-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #fbbf24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #000;
+    }
+    .company-details h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.125rem;
+    }
+    .company-details p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .notification-bell {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .notification-bell:hover { background: var(--bg-hover); }
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--danger);
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      padding: 0.5rem 1rem;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .user-menu:hover { background: var(--bg-hover); }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #000;
+      font-size: 0.875rem;
+    }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 280px;
+      max-width: 280px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 90;
+      backdrop-filter: blur(20px);
+    }
+    .logo-section {
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #fbbf24);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-section {
+      padding: 0 1.5rem;
+    }
+    .nav-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 0 0.5rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .nav-item:hover, .nav-item.active {
+      background: var(--glass);
+      color: var(--text);
+      border: 1px solid var(--accent);
+    }
+    .nav-icon { 
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    /* ─── MAIN CONTENT ─── */
+    .main-content {
+      margin-left: 280px;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .page-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #fbbf24);
+      color: #000;
+      box-shadow: var(--shadow-glow);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--glass);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── CARDS ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      backdrop-filter: blur(20px);
+      transition: var(--transition);
+    }
+    .stat-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-card);
+    }
+    .stat-primary {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .stat-secondary {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+    .stat-change {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+      font-weight: 500;
+    }
+    .change-positive { color: var(--success); }
+    .change-negative { color: var(--danger); }
+
+    /* ─── TABLES ─── */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+    }
+    .table-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .table-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th, .table td {
+      padding: 1rem 2rem 1rem 1.5rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .table th {
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .table td {
+      font-size: 0.875rem;
+    }
+    .table tr:hover {
+      background: var(--glass);
+    }
+    .status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .status.em-andamento { background: rgba(34,197,94,0.2); color: var(--success); }
+    .status.concluida { background: rgba(34,197,94,0.1); color: var(--success); }
+    .status.aprovada { background: rgba(59,130,246,0.2); color: #60a5fa; }
+    .status.faturada { background: var(--accent-glow); color: var(--accent); }
+    .status.pendente { background: rgba(239,68,68,0.1); color: var(--danger); }
+    .status.vencida { background: rgba(239,68,68,0.2); color: var(--danger); }
+
+    /* ─── FORMS ─── */
+    .form-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .form-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 500px;
+      width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      backdrop-filter: blur(20px);
+      transform: scale(0.9) translateY(20px);
+      transition: var(--transition);
+    }
+    .form-overlay.open .form-box {
+      transform: scale(1) translateY(0);
+    }
+    .form-title {
+      padding: 2rem 2.5rem 1rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-actions {
+      padding: 2rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; }
+      .topbar-content { padding: 0 1rem; }
+    }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+      .data-grid { grid-template-columns: 1fr; }
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Topbar -->
+    <div class="topbar" id="topbar">
+      <div class="topbar-content">
+        <div class="company-info" id="company-info">
+          <div class="company-avatar" id="company-avatar">CF</div>
+          <div class="company-details">
+            <h1 id="company-name">Carregando...</h1>
+            <p id="company-plan">Plano FREE</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="notification-bell" title="Notificações">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
+            <div class="notification-badge">3</div>
+          </div>
+          <div class="user-menu" onclick="toggleUserMenu()">
+            <div class="user-avatar">JS</div>
+            <span id="user-name">João Silva</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+      <div class="logo-section">
+        <div class="logo">ConstruFY</div>
+      </div>
+      
+      <!-- Dashboard -->
+      <div class="nav-section">
+        <div class="nav-item active" onclick="loadSection('dashboard')">
+          <div class="nav-icon">📊</div>
+          <span>Dashboard</span>
+        </div>
+      </div>
+
+      <!-- Obras (FREE) -->
+      <div class="nav-section">
+        <div class="nav-title">Obras &amp; Medições (FREE)</div>
+        <div class="nav-item" onclick="loadSection('obras')">
+          <div class="nav-icon">🏗️</div>
+          <span>Obras</span>
+        </div>
+        <div class="nav-item" onclick="loadSection('medicoes')">
+          <div class="nav-icon">📏</div>
+          <span>Medições</span>
+        </div>
+        <div class="nav-item" onclick="loadSection('colaboradores')">
+          <div class="nav-icon">👥</div>
+          <span>Colaboradores (até 5)</span>
+        </div>
+      </div>
+
+      <!-- PRO Features (Hidden on FREE) -->
+      <div class="nav-section hidden" id="nav-faturamento">
+        <div class="nav-title">Faturamento PRO</div>
+        <div class="nav-item" onclick="loadSection('faturamentos')">
+          <div class="nav-icon">💰</div>
+          <span>Faturamentos</span>
+        </div>
+      </div>
+
+      <div class="nav-section hidden" id="nav-financeiro">
+        <div class="nav-title">Financeiro PRO</div>
+        <div class="nav-item" onclick="loadSection('financeiro')">
+          <div class="nav-icon">💹</div>
+          <span>Fluxo de Caixa</span>
+        </div>
+      </div>
+
+      <div class="nav-section hidden" id="nav-epis">
+        <div class="nav-title">EPIs PRO</div>
+        <div class="nav-item" onclick="loadSection('epis')">
+          <div class="nav-icon">🦺</div>
+          <span>Estoque EPIs</span>
+        </div>
+        <div class="nav-item" onclick="loadSection('entregas_epi')">
+          <div class="nav-icon">📦</div>
+          <span>Entregas</span>
+        </div>
+      </div>
+
+      <!-- Config -->
+      <div class="nav-section">
+        <div class="nav-title">Configurações</div>
+        <div class="nav-item" onclick="loadSection('perfil')">
+          <div class="nav-icon">⚙️</div>
+          <span>Perfil</span>
+        </div>
+        <div class="nav-item" onclick="loadSection('plan')">
+          <div class="nav-icon">💎</div>
+          <span>Plano &amp; Faturamento</span>
+        </div>
+        <div class="nav-item" onclick="logout()">
+          <div class="nav-icon">🚪</div>
+          <span>Sair</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+      <!-- Loading -->
+      <div style="display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:1rem;">
+        <div style="width:48px;height:48px;border:3px solid var(--glass);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <div style="color:var(--text-muted);">Carregando dashboard...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Form Overlay -->
+  <div class="form-overlay" id="form-overlay">
+    <div class="form-box" id="form-box"></div>
+  </div>
+
+  <script>
+    // ─── CONSTANTS ───
+    const API_BASE = '/api';
+    let APP = {
+      user: null,
+      empresa: null,
+      sections: {}
+    };
+
+    // ─── INIT ───
+    async function init() {
+      await authCheck();
+      await loadEmpresa();
+      renderTopbar();
+      loadSection('dashboard');
+    }
+
+    // ─── AUTH CHECK ───
+    async function authCheck() {
+      try {
+        const res = await fetch(API_BASE + '/auth/me', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) {
+          window.location.href = 'login.html';
+          return false;
+        }
+        APP.user = data.user;
+        return true;
+      } catch {
+        window.location.href = 'login.html';
+        return false;
+      }
+    }
+
+// ─── LOAD EMPRESA ───
+    async function loadEmpresa() {
+      try {
+        const res = await fetch(API_BASE + '/auth/me', { credentials: 'include' });
+        const data = await res.json();
+        APP.empresa = data.user;
+      } catch {
+        window.location.href = 'login.html';
+      }
+      applyFreePlanUI();
+    }
+
+
+    // ─── RENDER TOPBAR ───
+    function renderTopbar() {
+      document.getElementById('company-avatar').textContent = APP.empresa.razao_social?.[0] || 'C';
+      document.getElementById('company-name').textContent = APP.empresa.razao_social || 'Demo Construtora';
+      document.getElementById('user-name').textContent = APP.user?.nome?.split(' ')[0] || 'Usuário';
+      document.getElementById('company-plan').textContent = `Plano ${APP.empresa.plano?.toUpperCase() || 'FREE'}`;
+    }
+
+    // ─── FREE PLAN UI ───
+    function applyFreePlanUI() {
+      if (APP.empresa.plano !== 'free') return;
+      
+      // Hide PRO sections
+      ['nav-faturamento', 'nav-financeiro', 'nav-epis', 'nav-folha', 'nav-relatorios'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+      });
+
+      // Add upgrade banner to topbar
+      const topbar = document.getElementById('topbar-content');
+      const banner = document.createElement('div');
+      banner.innerHTML = `
+        <div style="background:var(--accent-glow);border:1px solid var(--accent);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.875rem;color:var(--accent);display:flex;align-items:center;gap:0.75rem;">
+          🔒 <strong>Plano FREE</strong> - <span>Upgrade PRO libera Faturamento, EPIs, Financeiro & Relatórios</span>
+          <button onclick="showUpgrade()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:0.375rem 1rem;font-size:0.75rem;font-weight:600;cursor:pointer;">Upgrade →</button>
+        </div>`;
+      topbar.appendChild(banner);
+    }
+
+    // ─── NAVIGATION ───
+    function loadSection(section) {
+      // Update sidebar
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      event?.target.closest('.nav-item')?.classList.add('active');
+
+      // Load content
+      const content = document.getElementById('main-content');
+      content.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);">
+          <div style="text-align:center;">
+            <div style="font-size:3rem;margin-bottom:1rem;">📊</div>
+            <h2 style="font-size:1.5rem;margin-bottom:0.5rem;color:var(--text);">${getSectionTitle(section)}</h2>
+            <p>Carregando ${getSectionTitle(section, true).toLowerCase()}...</p>
+          </div>
+        </div>`;
+      
+      loadSectionData(section);
+    }
+
+    function getSectionTitle(section, short = false) {
+      const titles = {
+        dashboard: short ? 'Dashboard' : 'Dashboard Principal',
+        obras: short ? 'Obras' : 'Gestão de Obras',
+        medicoes: short ? 'Medições' : 'Medições de Obras',
+        colaboradores: short ? 'Colaboradores' : 'Gestão de Colaboradores',
+        faturamentos: short ? 'Faturamentos' : 'Controle de Faturamentos',
+        financeiro: short ? 'Financeiro' : 'Fluxo de Caixa & Financeiro',
+        epis: short ? 'EPIs' : 'Estoque de EPIs',
+        entregas_epi: short ? 'Entregas EPI' : 'Entregas de EPIs',
+        perfil: short ? 'Perfil' : 'Meu Perfil',
+        plan: short ? 'Plano' : 'Meu Plano & Faturamento'
+      };
+      return titles[section] || section;
+    }
+
+    // ─── DATA LOADING ───
+    async function loadSectionData(section) {
+      try {
+        const res = await fetch(`${API_BASE}/${section}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
+        });
+        const data = await res.json();
+        
+        if (res.status === 402) {
+          showUpgradePrompt(section);
+          return;
+        }
+        
+        renderSection(section, data);
+      } catch (err) {
+        document.getElementById('main-content').innerHTML = `
+          <div style="text-align:center;padding:4rem 2rem;color:var(--text-muted);">
+            <div style="font-size:4rem;margin-bottom:1rem;">⚠️</div>
+            <h2>Erro ao carregar</h2>
+            <p>Tente novamente em alguns segundos ou contate o suporte.</p>
+            <button onclick="loadSection('${section}')" class="btn btn-primary" style="margin-top:2rem;">Tentar Novamente</button>
+          </div>`;
+      }
+    }
+
+// ─── RENDER SECTIONS ───
+    async function renderSection(section, data) {
+      const content = document.getElementById('main-content');
+      
+      if (section === 'dashboard') {
+        // Real data only
+        content.innerHTML = renderDashboard(data);
+        return;
+      }
+
+      try {
+        const res = await fetch(API_BASE + `/${section}`, {
+          credentials: 'include'
+        });
+        if (res.status === 402) {
+          showUpgradePrompt(section);
+          return;
+        }
+        const realData = await res.json();
+        content.innerHTML = renderGenericTable(section, realData);
+      } catch {
+        content.innerHTML = `<div style="padding:4rem;text-align:center;color:var(--text-muted);">
+          <h3>Erro ao carregar ${getSectionTitle(section)}</h3>
+          <button class="btn btn-primary" onclick="loadSection('${section}')">Tentar novamente</button>
+        </div>`;
+      }
+    }
+
+
+function renderDashboard(data) {
+      const { obras = [], medicoes = [], colaboradores = [], stats = {} } = data || {};
+      
+      const totalValor = obras.reduce((sum, o) => sum + (o.valor || 0), 0);
+      const avgAvanco = obras.length ? Math.round(obras.reduce((sum, o) => sum + (o.avanco || 0), 0) / obras.length) : 0;
+      
+      return `
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Dashboard - ${APP.empresa.razao_social}</h1>
+            <p>Dados reais da sua empresa • ${new Date().toLocaleString('pt-BR')}</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="exportData('dashboard')">📄 PDF</button>
+            <button class="btn btn-primary" onclick="loadSection('obras')">+ Nova Obra</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-primary">${obras.length}</div>
+            <div class="stat-secondary">Obras</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-primary">R$ ${formatCurrency(totalValor)}</div>
+            <div class="stat-secondary">Valor Total</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-primary">${avgAvanco}%</div>
+            <div class="stat-secondary">Média Avanço</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-primary">${colaboradores.length}</div>
+            <div class="stat-secondary">Colaboradores</div>
+          </div>
+        </div>
+
+
+        <div class="data-grid">
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">🏗️ Obras em Andamento</div>
+              <button class="btn btn-primary" onclick="loadSection('obras')">Ver Todas</button>
+            </div>
+            ${renderObrasTable(obras.slice(0,4))}
+          </div>
+          
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">📏 Próximas Medições</div>
+              <button class="btn btn-primary" onclick="loadSection('medicoes')">Ver Todas</button>
+            </div>
+            ${renderMedicoesTable(medicoes.slice(0,4))}
+          </div>
+        </div>
+
+        <div style="margin-top:2rem;padding:2rem;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);">
+          <h3 style="margin-bottom:1rem;">💡 Dicas Rápidas</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;">
+            <div>
+              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Cadastre sua primeira obra</h4>
+              <p style="color:var(--text-muted);font-size:0.875rem;">Acesse "Obras" → "+ Nova Obra" para começar</p>
+            </div>
+            <div>
+              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Configure EPIs (PRO)</h4>
+              <p style="color:var(--text-muted);font-size:0.875rem;">Upgrade para PRO e gerencie estoque de EPIs automaticamente</p>
+            </div>
+            <div>
+              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Folha automática (PRO)</h4>
+              <p style="color:var(--text-muted);font-size:0.875rem;">Calcule INSS/IRRF/FGTS com um clique</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderObrasTable(obras) {
+      return `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Obra</th>
+              <th>Valor</th>
+              <th>Avanço</th>
+              <th>Status</th>
+              <th>Faturado</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${obras.map(obra => `
+              <tr onclick="loadSection('obras')">
+                <td><strong>${obra.nome || 'N/D'}</strong><br><small style="color:var(--text-dim);">${obra.cliente || ''}</small></td>
+                <td>${formatCurrency(obra.valor || 0)}</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div style="width:40px;height:8px;background:var(--glass);border-radius:4px;overflow:hidden;">
+                      <div style="height:100%;background:var(--accent);width:${obra.avanco || 0}%"></div>
+                    </div>
+                    <span>${obra.avanco || 0}%</span>
+                  </div>
+                </td>
+                <td><span class="status ${obra.status?.toLowerCase().replace(' ','-') || 'pendente'}">${obra.status || 'Pendente'}</span></td>
+                <td>R$ ${formatCurrency(obra.faturado || 0)}</td>
+              </tr>
+            `).join('')}
+            ${obras.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem;">Nenhuma obra cadastrada. <button onclick="loadSection(\'obras\')" class="btn btn-primary" style="margin-top:1rem;">Criar Primeira</button></td></tr>' : ''}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderMedicoesTable(medicoes) {
+      return `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Obra</th>
+              <th>Nº</th>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${medicoes.map(m => `
+              <tr onclick="loadSection('medicoes')">
+                <td style="min-width:180px;"><strong>${m.obra_nome || 'N/D'}</strong></td>
+                <td>${m.numero || 'N/D'}</td>
+                <td>${new Date(m.data || 0).toLocaleDateString('pt-BR')}</td>
+                <td>R$ ${formatCurrency(m.valor || 0)}</td>
+                <td><span class="status ${m.status?.toLowerCase() || 'pendente'}">${m.status || 'Pendente'}</span></td>
+              </tr>
+            `).join('')}
+            ${medicoes.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem;">Nenhuma medição. <button onclick="loadSection(\'medicoes\')" class="btn btn-primary" style="margin-top:1rem;">Criar Nova</button></td></tr>' : ''}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderGenericTable(section, data) {
+      const titles = {
+        obras: 'Obras',
+        medicoes: 'Medições',
+        colaboradores: 'Colaboradores',
+        faturamentos: 'Faturamentos',
+        financeiro: 'Financeiro',
+        epis: 'EPIs',
+        entregas_epi: 'Entregas EPI'
+      };
+      
+      return `
+        <div class="page-header">
+          <h1 class="page-title">${titles[section] || section}</h1>
+          <div class="page-actions">
+            <button class="btn btn-secondary">🔄 Atualizar</button>
+            <button class="btn btn-secondary">📄 PDF</button>
+            <button class="btn btn-primary">+ Novo ${section === 'obras' ? 'Obra' : section === 'medicoes' ? 'Medição' : 'Item'}</button>
+          </div>
+        </div>
+        <div class="data-grid">
+          <div class="table-card">
+            <div class="table-header">
+              <div class="table-title">${titles[section] || section}</div>
+              <button class="btn btn-primary" onclick="loadSection('${section}')">Ver Todos</button>
+            </div>
+            ${renderTable(data.data || data, section)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTable(items, section) {
+      if (!items.length) {
+        return `
+          <div style="padding:4rem 2rem;text-align:center;color:var(--text-muted);">
+            <div style="font-size:4rem;margin-bottom:1rem;">📭</div>
+            <h3>Nenhum ${section} encontrado</h3>
+            <p>Seja o primeiro a cadastrar!</p>
+            <button onclick="showForm('${section}')" class="btn btn-primary" style="margin-top:2rem;">+ Criar ${getSectionTitle(section, true)}</button>
+          </div>
+        `;
+      }
+
+      return `
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome/Descrição</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.slice(0,10).map(item => `
+              <tr>
+                <td style="font-family:monospace;font-size:0.75rem;color:var(--text-dim);">${item.id?.slice(-8) || '-'}</td>
+                <td>${item.nome || item.descricao || 'N/D'}</td>
+                <td>${new Date(item.created_at || item.data || 0).toLocaleDateString('pt-BR')}</td>
+                <td><span class="status pendente">${item.status || 'Ativo'}</span></td>
+                <td>
+                  <button class="btn btn-secondary" style="padding:0.5rem;font-size:0.75rem;">Editar</button>
+                  <button class="btn btn-secondary" style="padding:0.5rem;font-size:0.75rem;background:var(--danger);color:white;">Excluir</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // ─── UTILS ───
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 0
+      }).format(value / 100);
+    }
+
+    function showUpgradePrompt(section) {
+      document.getElementById('main-content').innerHTML = `
+        <div style="max-width:600px;margin:4rem auto;text-align:center;padding:4rem;background:var(--bg-card);border-radius:var(--radius);border:2px solid var(--accent);">
+          <div style="font-size:4rem;margin-bottom:1.5rem;">🔒</div>
+          <h2 style="font-size:2rem;margin-bottom:1rem;color:var(--accent);">Feature PRO</h2>
+          <p style="color:var(--text-muted);font-size:1.125rem;margin-bottom:2rem;line-height:1.6;">
+            Esta funcionalidade está disponível apenas nos planos <strong>Starter</strong> e <strong>Pro</strong>.
+          </p>
+          <div style="background:var(--accent-glow);border-radius:var(--radius);padding:1.5rem;margin:2rem 0;">
+            <h4 style="margin-bottom:1rem;color:var(--accent);">Upgrade Rápido</h4>
+            <p style="margin-bottom:1.5rem;color:var(--text);">De R$ 0 → R$ 197/mês</p>
+            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+              <button onclick="showUpgrade()" class="btn btn-primary" style="padding:1rem 2rem;font-size:1rem;">🚀 Fazer Upgrade</button>
+              <button onclick="loadSection('dashboard')" class="btn btn-secondary" style="padding:1rem 2rem;font-size:1rem;">← Voltar Dashboard</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showUpgrade() {
+      document.getElementById('form-box').innerHTML = `
+        <div class="form-title">🚀 Upgrade para Pro</div>
+        <div style="padding:2rem 3rem 3rem;text-align:center;">
+          <div style="font-size:3.5rem;margin-bottom:1rem;">⭐</div>
+          <h3 style="font-size:1.75rem;margin-bottom:0.5rem;">Plano Pro</h3>
+          <div style="font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:1.5rem;">R$ 497/mês</div>
+          <div style="max-width:400px;margin:0 auto 2.5rem;color:var(--text-muted);">
+            ✅ Todas features ilimitadas<br>
+            ✅ Relatórios avançados + PDF<br>
+            ✅ EPIs + entregas automáticas<br>
+            ✅ Financeiro completo + DRE<br>
+            ✅ Suporte prioritário 24/7
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" onclick="window.open('https://construfy.app/pricing')">Ir para Pagamento</button>
+            <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('form-overlay').classList.add('open');
+    }
+
+    function toggleUserMenu() {
+      // Implement user dropdown
+      console.log('User menu');
+    }
+
+    function logout() {
+      localStorage.removeItem('access_token');
+      window.location.href = 'login.html';
+    }
+
+    function exportData(type) {
+      // jsPDF integration placeholder
+      alert('Export PDF em desenvolvimento... (usa jsPDF)');
+    }
+
+    // ─── START ───
+    window.addEventListener('load', init);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>
+

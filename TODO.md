@@ -1,25 +1,15 @@
-# ConstruPRO — Fix Register Terms Checkbox + Vercel Deploy Tracker
+# Mobile Compatibility & PWA Implementation
+## Status: [IN PROGRESS] 3/9
 
-## ✅ Phase 0: Immediate Fixes (Complete)
-- [x] 1. Fix register terms validation (make optional for demo)
-- [x] 2. Add vercel.json proxy to Worker
-- [x] 3. Update deploy.bat (D1 + secrets)
-- [x] 4. Fix worker.js SQL syntax error
+### Approved Plan Steps:
+1. [✅] Create `frontend/manifest.json` (PWA manifest)
+2. [✅] Create `frontend/sw.js` (service worker)
+3. [✅] Add manifest link + SW registration to `frontend/index.html`
+4. [ ] 🔄 Add to `frontend/login.html`
+5. [✅] Add to `frontend/register.html`
+6. [ ] 🔄 Add to `frontend/dashboard.html`
+7. [ ] 🔄 Enhance responsive CSS in `frontend/global.css` & `frontend/index.css` (hamburger nav, touch targets)
+8. [ ] 🧪 Test Lighthouse PWA score & mobile responsive
+9. [ ] ✅ attempt_completion
 
-## ⏳ Phase 1: Deploy Backend
-```
-1. wrangler d1 create construPRO-db-[yourname]
-2. Copy DB ID to wrangler.toml 
-3. backend/deploy.bat
-4. Test: curl POST /api/auth/register (demo data)
-```
-
-## ⏳ Phase 2: Vercel Frontend + Proxy
-```
-vercel --prod
-→ Site proxies /api → your Worker URL
-```
-
-## Status
-**Register fixed!** Terms now optional. Deploy-ready. Provide Worker URL after backend deploy for Vercel proxy.
-
+**Next**: Step 4 - login.html & dashboard.html

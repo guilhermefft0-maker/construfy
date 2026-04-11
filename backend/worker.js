@@ -1,12 +1,12 @@
 /**
  * ╔══════════════════════════════════════════════════════════════╗
- * ║  ConstruPRO — Cloudflare Worker Backend                      ║
+ * ║  ConstruFY — Cloudflare Worker Backend                       ║
  * ║  Padrão enterprise: JWT + refresh tokens, RBAC, rate limit,  ║
  * ║  CORS restrito, CSRF, auditoria, LGPD-ready                  ║
  * ╚══════════════════════════════════════════════════════════════╝
  *
  * DEPLOY:
- *   1. wrangler d1 create construPRO-db
+wrangler d1 create construFY-db
  *   2. Copie o database_id gerado para wrangler.toml
  *   3. wrangler d1 execute construPRO-db --file=schema.sql
  *   4. wrangler secret put JWT_SECRET      (≥ 64 chars aleatórios)
@@ -18,10 +18,10 @@
 //  CONSTANTS
 // ─────────────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
-  'https://construPRO.app',
-  'https://www.construPRO.app',
+  'https://construFY.app',
   'http://localhost:3000',  // remova em produção
 ];
+
 
 const TOKEN_TTL_SECONDS    = 15 * 60;       // 15 min — access token
 const REFRESH_TTL_SECONDS  = 7 * 24 * 3600; // 7 dias — refresh token
@@ -79,11 +79,29 @@ export default {
       if (path === '/api/auth/me'              && method === 'GET')  return handleMe(request, env, secHeaders);
 
       // Rotas protegidas (CRUD business entities)
+// Free plan restrictions - block paid entities (before auth check)
+      const [, entity] = path.match(/^\/api\/(.+?)(s?)$/);
+      if (entity === 'folha') {
+        return jsonResponse({ ok: false, message: 'Feature bloqueada no plano FREE. Upgrade para PRO.' }, 402, secHeaders);
+      }
+      
+      const freeBlocked = ['faturamentos', 'financeiro', 'epis', 'entregas_epi', 'folha', 'relatorios'];
+      if (freeBlocked.includes(entity)) {
+        const auth = await verifyAccessToken(request, env);
+        if (!auth.ok) return jsonResponse({ ok: false, message: 'Não autorizado.' }, 401, secHeaders);
+        const companyPlano = await env.DB.prepare('SELECT plano FROM companies WHERE id = ?').bind(auth.cid).firstCol();
+        if (companyPlano === 'free') {
+          return jsonResponse({ ok: false, message: 'Feature bloqueada no plano FREE. Upgrade para acessar.' }, 402, secHeaders);
+        }
+      }
+
       if (path.match(/^\/api\/(obras|medicoes|faturamentos|colaboradores|epis|entregas_epi|financeiro)(s?)$/)) {
         const auth = await verifyAccessToken(request, env);
+
         if (!auth.ok) return jsonResponse({ ok: false, message: 'Não autorizado.' }, 401, secHeaders);
         return handleCRUDBusiness(path, method, request, env, auth, secHeaders);
       }
+
       
       if (path.startsWith('/api/')) {
         const auth = await verifyAccessToken(request, env);
@@ -116,7 +134,8 @@ async function handleRegister(request, env, headers) {
   if (!company?.slug || !/^[a-z0-9\-]{3,40}$/.test(company.slug)) errs.push('Slug inválido.');
   if (!validEmail(admin?.email))            errs.push('E-mail inválido.');
   if (!strongPassword(admin?.senha))        errs.push('Senha não atende os requisitos de segurança.');
-  if (!['starter','pro','enterprise'].includes(plano)) errs.push('Plano inválido.');
+if (!['free','starter','pro','enterprise'].includes(plano)) errs.push('Plano inválido.');
+
 
   if (errs.length) return jsonResponse({ ok: false, message: errs[0] }, 422, headers);
 

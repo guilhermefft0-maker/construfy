@@ -1,44 +1,46 @@
--- Sample Data for ConstruPRO Dashboard (1 empresa de teste)
--- Run: wrangler d1 execute construPRO-db --file=backend/sample-data.sql
+-- ⚠️ SECURITY: FULLY ANONYMIZED SAMPLE DATA ONLY
+-- NEVER commit real company/PII data. Use this for testing only.
+construFY
 
--- Empresa Alfa LTDA
+-- Empresa DEMO (COMPLETELY FAKE DATA)
 INSERT OR IGNORE INTO companies (id, razao_social, cnpj, ie, telefone, setor, porte, endereco, slug, plano, status) VALUES
-('demo-alfa', 'Construtora Alfa LTDA', '12345678000199', '1234567890', '(11) 99999-9999', 'residencial', 'epp', 'Rua das Construtoras, 123 - SP', 'alfa', 'pro', 'active');
+('demo-alfa', 'CONSTRUTORA DEMO LTDA', '00.000.000/0001-00', '00000000-0', '(11) 00000-0000', 'residencial', 'epp', 'Rua Exemplo, 123 - Cidade-SP', 'demo-alfa', 'free', 'active');
+
 
 -- Admin demo
 INSERT OR IGNORE INTO users (id, company_id, nome, cargo, email, password_hash, role, status, email_verified_at) VALUES
-('demo-admin', 'demo-alfa', 'Admin Demo', 'Administrador', 'admin@alfa.construpro', '$pbkdf2$310000$demo-salt-here$demo-hash-here', 'admin', 'active', CURRENT_TIMESTAMP);
+construfy
 
 -- 3 Obras (matching frontend APP.obras)
 INSERT OR IGNORE INTO obras (id, company_id, nome, cliente, contrato, valor, inicio, prev_fim, status, avanco, faturado, despesas, responsavel) VALUES
-('obra1', 'demo-alfa', 'Residencial Vista Verde', 'João Matos SA', 'R$ 2.800.000', 2800000, '2024-03-01', '2025-02-28', 'Em andamento', 62, 1540000, 890000, 'Eng. Carlos Lima'),
-('obra2', 'demo-alfa', 'Galpão Industrial Norte', 'LogTech LTDA', 'R$ 980.000', 980000, '2024-06-10', '2024-12-30', 'Concluída', 100, 980000, 560000, 'Eng. Carlos Lima'),
-('obra3', 'demo-alfa', 'Condomínio Parque Sul', 'Inv. Parque Sul', 'R$ 5.200.000', 5200000, '2024-09-01', '2026-08-31', 'Em andamento', 18, 936000, 480000, 'Eng. João Ferreira');
+('obra1', 'demo-alfa', 'OBRA RESIDENCIAL DEMO 1', 'CLIENTE DEMO LTDA', 'R$ 2.800.000', 2800000, '2024-03-01', '2025-02-28', 'Em andamento', 62, 1540000, 890000, 'ENGENHEIRO DEMO'),
+('obra2', 'demo-alfa', 'OBRA INDUSTRIAL DEMO 2', 'CLIENTE DEMO LOG LTDA', 'R$ 980.000', 980000, '2024-06-10', '2024-12-30', 'Concluída', 100, 980000, 560000, 'ENGENHEIRO DEMO'),
+('obra3', 'demo-alfa', 'OBRA CONDOMINIAL DEMO 3', 'INVESTIDOR DEMO LTDA', 'R$ 5.200.000', 5200000, '2024-09-01', '2026-08-31', 'Em andamento', 18, 936000, 480000, 'ENGENHEIRO DEMO');
 
 -- Medições (matching APP.medicoes)
 INSERT OR IGNORE INTO medicoes (id, company_id, obra_id, numero, data, valor, status, responsavel) VALUES
-('med1', 'demo-alfa', 'obra1', 'MED-001', '2024-03-31', 320000, 'Aprovada', 'Eng. Carlos Lima'),
-('med2', 'demo-alfa', 'obra1', 'MED-002', '2024-04-30', 310000, 'Aprovada', 'Eng. Carlos Lima'),
-('med3', 'demo-alfa', 'obra1', 'MED-003', '2024-05-31', 280000, 'Aprovada', 'Eng. Carlos Lima'),
-('med4', 'demo-alfa', 'obra1', 'MED-004', '2024-06-30', 210000, 'Faturada', 'Eng. Ana Paula'),
-('med5', 'demo-alfa', 'obra2', 'MED-001', '2024-06-30', 196000, 'Aprovada', 'Eng. Carlos Lima'),
-('med6', 'demo-alfa', 'obra3', 'MED-001', '2024-09-30', 312000, 'Faturada', 'Eng. João Ferreira');
+('med1', 'demo-alfa', 'obra1', 'MED-001', '2024-03-31', 320000, 'Aprovada', 'ENGENHEIRO DEMO'),
+('med2', 'demo-alfa', 'obra1', 'MED-002', '2024-04-30', 310000, 'Aprovada', 'ENGENHEIRO DEMO'),
+('med3', 'demo-alfa', 'obra1', 'MED-003', '2024-05-31', 280000, 'Aprovada', 'ENGENHEIRO DEMO'),
+('med4', 'demo-alfa', 'obra1', 'MED-004', '2024-06-30', 210000, 'Faturada', 'ENGENHEIRO DEMO'),
+('med5', 'demo-alfa', 'obra2', 'MED-001', '2024-06-30', 196000, 'Aprovada', 'ENGENHEIRO DEMO'),
+('med6', 'demo-alfa', 'obra3', 'MED-001', '2024-09-30', 312000, 'Faturada', 'ENGENHEIRO DEMO');
 
 -- Faturamentos (matching APP.faturamentos)
 INSERT OR IGNORE INTO faturamentos (id, company_id, obra_id, numero, data, vencimento, valor, forma_pgto, status) VALUES
-('nf1', 'demo-alfa', 'obra1', 'NF-0142', '2024-04-05', '2024-05-05', 320000, 'TED', 'Recebida'),
-('nf2', 'demo-alfa', 'obra1', 'NF-0155', '2024-05-07', '2024-06-07', 310000, 'TED', 'Recebida'),
-('nf3', 'demo-alfa', 'obra1', 'NF-0168', '2024-06-06', '2024-07-06', 280000, 'TED', 'Vencida'),
-('nf4', 'demo-alfa', 'obra2', 'NF-0173', '2024-07-10', '2024-08-10', 196000, 'Boleto', 'Recebida'),
-('nf5', 'demo-alfa', 'obra3', 'NF-0190', '2024-10-05', '2024-11-05', 312000, 'TED', 'Pendente');
+('nf1', 'demo-alfa', 'obra1', 'NF-0001', '2024-04-05', '2024-05-05', 320000, 'TED', 'Recebida'),
+('nf2', 'demo-alfa', 'obra1', 'NF-0002', '2024-05-07', '2024-06-07', 310000, 'TED', 'Recebida'),
+('nf3', 'demo-alfa', 'obra1', 'NF-0003', '2024-06-06', '2024-07-06', 280000, 'TED', 'Vencida'),
+('nf4', 'demo-alfa', 'obra2', 'NF-0004', '2024-07-10', '2024-08-10', 196000, 'Boleto', 'Recebida'),
+('nf5', 'demo-alfa', 'obra3', 'NF-0005', '2024-10-05', '2024-11-05', 312000, 'TED', 'Pendente');
 
 -- Colaboradores (matching APP.colaboradores)
 INSERT OR IGNORE INTO colaboradores (id, company_id, obra_id, nome, cpf, cargo, tipo, salario, admissao, status) VALUES
-('col1', 'demo-alfa', 'obra1', 'Carlos Eduardo Lima', '123.456.789-00', 'Engenheiro Civil', 'CLT', 8500, '2022-05-10', 'Ativo'),
-('col2', 'demo-alfa', 'obra1', 'Marcos Antonio Silva', '234.567.890-11', 'Mestre de Obras', 'CLT', 4800, '2021-03-15', 'Ativo'),
-('col3', 'demo-alfa', 'obra1', 'João Pedro Costa', '345.678.901-22', 'Pedreiro Oficial', 'CLT', 2800, '2023-01-20', 'Ativo'),
-('col4', 'demo-alfa', 'obra3', 'Ana Paula Ferreira', '456.789.012-33', 'Engenheira Civil', 'CLT', 7200, '2023-07-01', 'Ativo'),
-('col5', 'demo-alfa', 'obra1', 'Pedro Henrique Nunes', '567.890.123-44', 'Ajudante Geral', 'Diarista', 220, '2024-03-01', 'Ativo');
+('col1', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 1', '000.000.000-00', 'Engenheiro Civil', 'CLT', 8500, '2022-05-10', 'Ativo'),
+('col2', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 2', '000.000.000-01', 'Mestre de Obras', 'CLT', 4800, '2021-03-15', 'Ativo'),
+('col3', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 3', '000.000.000-02', 'Pedreiro Oficial', 'CLT', 2800, '2023-01-20', 'Ativo'),
+('col4', 'demo-alfa', 'obra3', 'COLABORADOR DEMO 4', '000.000.000-03', 'Engenheira Civil', 'CLT', 7200, '2023-07-01', 'Ativo'),
+('col5', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 5', '000.000.000-04', 'Ajudante Geral', 'Diarista', 220, '2024-03-01', 'Ativo');
 
 -- EPIs (matching APP.epis)
 INSERT OR IGNORE INTO epis (id, company_id, nome, categoria, ca, estoque, minimo, validade) VALUES

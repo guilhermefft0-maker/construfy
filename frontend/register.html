@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f0a500">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com;">
+<link rel="manifest" href="manifest.json">
 <title>ConstruPRO — Criar Conta</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -95,9 +98,11 @@
         <div class="form-group">
           <label for="plan">Plano</label>
           <select id="plan">
-            <option value="starter">Starter - R$ 197/mês</option>
-            <option value="pro" selected>Pro - R$ 497/mês</option>
-            <option value="enterprise">Enterprise - Sob consulta</option>
+<option value="free" selected>FREE - R$ 0/mês (Obras + Medições + Colaboradores)</option>
+<option value="starter">Starter - R$ 197/mês</option>
+<option value="pro">Pro - R$ 497/mês (Tudo ilimitado)</option>
+<option value="enterprise">Enterprise - Sob consulta</option>
+
           </select>
         </div>
       </div>
