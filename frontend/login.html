@@ -108,13 +108,14 @@
 
         const data = await res.json();
 
-        if (data.success) {
+        if (data.ok) {
+          localStorage.setItem('access_token', data.access_token);
           localStorage.setItem('user', JSON.stringify(data.user));
           successEl.textContent = '✓ Login realizado! Redirecionando...';
           successEl.style.display = 'block';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
         } else {
-          errorEl.textContent = data.error || 'Credenciais inválidas.';
+          errorEl.textContent = data.message || 'Credenciais inválidas.';
           errorEl.style.display = 'block';
         }
       } catch (err) {

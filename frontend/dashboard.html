@@ -298,37 +298,54 @@ const APP = {
 };
 
 // ── API HELPER ─────────────────────────────────────────
+function getToken() {
+  return localStorage.getItem('access_token') || '';
+}
+
 async function apiGet(endpoint) {
-  const res = await fetch(`${API}/data/${endpoint}`, {
-    headers: { 'X-Company-ID': CID }
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API}/${endpoint}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (res.status === 401) { logout(); return []; }
+    const data = await res.json();
+    return data.items ?? data.results ?? data ?? [];
+  } catch(e) { console.error('apiGet error', endpoint, e); return []; }
 }
 
 async function apiPost(endpoint, body) {
-  const res = await fetch(`${API}/data/${endpoint}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Company-ID': CID },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API}/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 401) { logout(); return {}; }
+    return res.json();
+  } catch(e) { console.error('apiPost error', endpoint, e); return {}; }
 }
 
 async function apiPut(endpoint, body) {
-  const res = await fetch(`${API}/data/${endpoint}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Company-ID': CID },
-    body: JSON.stringify(body)
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API}/${endpoint}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify(body)
+    });
+    if (res.status === 401) { logout(); return {}; }
+    return res.json();
+  } catch(e) { console.error('apiPut error', endpoint, e); return {}; }
 }
 
 async function apiDelete(endpoint) {
-  const res = await fetch(`${API}/data/${endpoint}`, {
-    method: 'DELETE',
-    headers: { 'X-Company-ID': CID }
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${API}/${endpoint}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (res.status === 401) { logout(); return {}; }
+    return res.json();
+  } catch(e) { console.error('apiDelete error', endpoint, e); return {}; }
 }
 
 // ── LOADING STATE ──────────────────────────────────────
@@ -683,19 +700,24 @@ function openEditPonto(id) {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarEdicaoPonto(id) {
+async function salvarEdicaoPonto(id) {
   const p = APP.pontos.find(x => x.id === id);
   if (!p) return;
-  p.hora_entrada = document.getElementById('fe-entrada').value || null;
-  p.hora_saida   = document.getElementById('fe-saida').value   || null;
-  p.status       = document.getElementById('fe-status').value;
-  p.obs          = document.getElementById('fe-obs').value.trim();
+  const payload = {
+    hora_entrada: document.getElementById('fe-entrada').value || null,
+    hora_saida:   document.getElementById('fe-saida').value   || null,
+    status:       document.getElementById('fe-status').value,
+    obs:          document.getElementById('fe-obs').value.trim()
+  };
+  await apiPut(`pontos/${id}`, payload);
+  Object.assign(p, payload);
   closeForm();
   navigate('ponto');
 }
 
-function excluirPonto(id) {
+async function excluirPonto(id) {
   if (!confirm('Excluir este registro de ponto?')) return;
+  await apiDelete(`pontos/${id}`);
   APP.pontos = APP.pontos.filter(p => p.id !== id);
   closeForm();
   navigate('ponto');
@@ -754,7 +776,7 @@ function toggleHorasForm(status) {
   document.getElementById('grupo-saida').style.display   = show ? '' : 'none';
 }
 
-function salvarPonto() {
+async function salvarPonto() {
   const colId  = document.getElementById('f-colaborador').value;
   const data   = document.getElementById('f-data').value;
   const status = document.getElementById('f-status').value;
@@ -763,27 +785,29 @@ function salvarPonto() {
   if (!col)  return alert('Selecione um colaborador');
   if (!data) return alert('Informe a data');
 
-  // Verificar se já existe registro deste colaborador nessa data
   const jaExiste = APP.pontos.find(p => p.colaborador_id == colId && p.data === data);
   if (jaExiste) {
     if (!confirm(`Já existe um registro de ${col.nome} em ${new Date(data+'T00:00:00').toLocaleDateString('pt-BR')}. Deseja substituir?`)) return;
+    await apiDelete(`pontos/${jaExiste.id}`);
     APP.pontos = APP.pontos.filter(p => !(p.colaborador_id == colId && p.data === data));
   }
 
-  const novoPonto = {
-    id: 'ponto' + Date.now(),
+  const payload = {
     colaborador_id: colId,
     data,
     hora_entrada: status === 'presente' ? (document.getElementById('f-entrada').value || null) : null,
     hora_saida:   status === 'presente' ? (document.getElementById('f-saida').value   || null) : null,
     status,
     obs: obs || (status === 'presente' ? 'Registro administrativo' : 'Falta registrada pelo administrador'),
-    colaborador_nome: col.nome,
-    cargo: col.cargo
   };
 
-  APP.pontos.unshift(novoPonto);
-  // Atualiza o filtro para o dia que foi registrado
+  const novo = await apiPost('pontos', payload);
+  APP.pontos.unshift({
+    ...payload,
+    id: novo?.id || ('ponto' + Date.now()),
+    colaborador_nome: col.nome,
+    cargo: col.cargo
+  });
   window.PONTO_DATA_FILTRO = data;
   closeForm();
   navigate('ponto');
@@ -879,29 +903,25 @@ function openFormObra(id) {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarObra(id) {
+async function salvarObra(id) {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome da obra');
+  const payload = {
+    nome,
+    cliente:  document.getElementById('f-cliente').value.trim(),
+    contrato: document.getElementById('f-contrato').value.trim(),
+    inicio:   document.getElementById('f-inicio').value,
+    prev_fim: document.getElementById('f-prevfim').value,
+    status:   document.getElementById('f-status').value,
+    avanco:   parseInt(document.getElementById('f-avanco').value)||0,
+  };
   if (id) {
+    await apiPut(`obras/${id}`, payload);
     const o = APP.obras.find(x=>x.id===id);
-    o.nome = nome;
-    o.cliente = document.getElementById('f-cliente').value.trim();
-    o.contrato = document.getElementById('f-contrato').value.trim();
-    o.inicio = document.getElementById('f-inicio').value;
-    o.prevFim = document.getElementById('f-prevfim').value;
-    o.status = document.getElementById('f-status').value;
-    o.avanco = parseInt(document.getElementById('f-avanco').value)||0;
+    Object.assign(o, payload, { prevFim: payload.prev_fim });
   } else {
-    APP.obras.push({
-      id: Date.now(), nome,
-      cliente: document.getElementById('f-cliente').value.trim(),
-      contrato: document.getElementById('f-contrato').value.trim(),
-      inicio: document.getElementById('f-inicio').value,
-      prevFim: document.getElementById('f-prevfim').value,
-      status: document.getElementById('f-status').value,
-      avanco: parseInt(document.getElementById('f-avanco').value)||0,
-      medicoes:0, faturado:0, despesas:0
-    });
+    const nova = await apiPost('obras', payload);
+    if (nova?.id) APP.obras.push(normalizeObra({ ...payload, id: nova.id, medicoes_count: 0, faturado: 0, despesas: 0 }));
   }
   closeForm();
   navigate('obras');
@@ -1167,19 +1187,21 @@ function openFormColaborador() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarColaborador() {
+async function salvarColaborador() {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome');
-  APP.colaboradores.push({
-    id: Date.now(), nome,
-    cpf: document.getElementById('f-cpf').value.trim(),
-    cargo: document.getElementById('f-cargo').value.trim(),
-    tipo: document.getElementById('f-tipo').value,
-    salario: parseFloat(document.getElementById('f-salario').value)||0,
-    obraId: parseInt(document.getElementById('f-obra').value)||null,
+  const payload = {
+    nome,
+    cpf:      document.getElementById('f-cpf').value.trim(),
+    cargo:    document.getElementById('f-cargo').value.trim(),
+    tipo:     document.getElementById('f-tipo').value,
+    salario:  parseFloat(document.getElementById('f-salario').value)||0,
+    obra_id:  document.getElementById('f-obra').value || null,
     admissao: document.getElementById('f-admissao').value,
-    status: document.getElementById('f-status').value
-  });
+    status:   document.getElementById('f-status').value
+  };
+  const novo = await apiPost('colaboradores', payload);
+  if (novo?.id) APP.colaboradores.push(normalizeColab({ ...payload, id: novo.id, obraId: payload.obra_id }));
   closeForm();
   navigate('colaboradores');
 }
@@ -1319,17 +1341,19 @@ function openFormEPI() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarEPI() {
+async function salvarEPI() {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome do EPI');
-  APP.epis.push({
-    id: Date.now(), nome,
+  const payload = {
+    nome,
     categoria: document.getElementById('f-cat').value.trim(),
-    ca: document.getElementById('f-ca').value.trim(),
-    estoque: parseInt(document.getElementById('f-estoque').value)||0,
-    minimo: parseInt(document.getElementById('f-minimo').value)||10,
-    validade: document.getElementById('f-validade').value
-  });
+    ca:        document.getElementById('f-ca').value.trim(),
+    estoque:   parseInt(document.getElementById('f-estoque').value)||0,
+    minimo:    parseInt(document.getElementById('f-minimo').value)||10,
+    validade:  document.getElementById('f-validade').value
+  };
+  const novo = await apiPost('epis', payload);
+  if (novo?.id) APP.epis.push({ ...payload, id: novo.id });
   closeForm();
   navigate('epis');
 }
@@ -1354,18 +1378,23 @@ function openFormEntregaEPI() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarEntregaEPI() {
-  const epiId = parseInt(document.getElementById('f-epi').value);
-  const qtd = parseInt(document.getElementById('f-qtd').value)||1;
-  const epi = getEPI(epiId);
-  if (epi.estoque < qtd) return alert('Estoque insuficiente!');
-  epi.estoque -= qtd;
-  APP.entregasEPI.push({
-    id: Date.now(), epiId,
-    colaboradorId: parseInt(document.getElementById('f-col').value),
-    data: document.getElementById('f-data').value,
-    quantidade: qtd, devolvida: false
-  });
+async function salvarEntregaEPI() {
+  const epiId = document.getElementById('f-epi').value;
+  const qtd   = parseInt(document.getElementById('f-qtd').value)||1;
+  const epi   = getEPI(parseInt(epiId));
+  if (epi && epi.estoque < qtd) return alert('Estoque insuficiente!');
+  const payload = {
+    epi_id:          epiId,
+    colaborador_id:  document.getElementById('f-col').value,
+    data:            document.getElementById('f-data').value,
+    quantidade:      qtd,
+    devolvida:       false
+  };
+  const nova = await apiPost('entregas-epi', payload);
+  if (nova?.id) {
+    if (epi) epi.estoque -= qtd;
+    APP.entregasEPI.push({ ...payload, id: nova.id, epiId: parseInt(epiId), colaboradorId: parseInt(payload.colaborador_id) });
+  }
   closeForm();
   navigate('epis');
 }
