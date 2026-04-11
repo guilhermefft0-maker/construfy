@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ConstruPRO — Painel de Gestão</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <!-- jsPDF carregado apenas quando necessário (relatórios) -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -302,10 +301,14 @@ function getToken() {
   return localStorage.getItem('access_token') || '';
 }
 
+function _headers(extra = {}) {
+  return { 'Content-Type': 'application/json', 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}`, ...extra };
+}
+
 async function apiGet(endpoint) {
   try {
-    const res = await fetch(`${API}/${endpoint}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
+    const res = await fetch(`${API}/data/${endpoint}`, {
+      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
     });
     if (res.status === 401) { logout(); return []; }
     const data = await res.json();
@@ -315,9 +318,9 @@ async function apiGet(endpoint) {
 
 async function apiPost(endpoint, body) {
   try {
-    const res = await fetch(`${API}/${endpoint}`, {
+    const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      headers: _headers(),
       body: JSON.stringify(body)
     });
     if (res.status === 401) { logout(); return {}; }
@@ -327,9 +330,9 @@ async function apiPost(endpoint, body) {
 
 async function apiPut(endpoint, body) {
   try {
-    const res = await fetch(`${API}/${endpoint}`, {
+    const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      headers: _headers(),
       body: JSON.stringify(body)
     });
     if (res.status === 401) { logout(); return {}; }
@@ -339,9 +342,9 @@ async function apiPut(endpoint, body) {
 
 async function apiDelete(endpoint) {
   try {
-    const res = await fetch(`${API}/${endpoint}`, {
+    const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${getToken()}` }
+      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
     });
     if (res.status === 401) { logout(); return {}; }
     return res.json();
@@ -350,25 +353,48 @@ async function apiDelete(endpoint) {
 
 // ── LOADING STATE ──────────────────────────────────────
 function showLoading() {
-  document.getElementById('content').innerHTML = '<div class="page" style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3)"><div>Carregando...</div></div>';
+  document.getElementById('content').innerHTML = `
+    <div class="page" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:14px">
+      <div style="width:32px;height:32px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite"></div>
+      <div style="color:var(--text3);font-size:13px">Carregando dados...</div>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
 }
 
-// ── LOAD ALL DATA ──────────────────────────────────────
+// ── LOAD ALL DATA (batch — 1 request só) ──────────────
 async function loadAll() {
   showLoading();
-  const [obras, medicoes, faturamentos, colaboradores, epis, entregasEPI, financeiro, pontos] = await Promise.all([
-    apiGet('obras'), apiGet('medicoes'), apiGet('faturamentos'),
-    apiGet('colaboradores'), apiGet('epis'), apiGet('entregas-epi'),
-    apiGet('financeiro'), apiGet('pontos')
-  ]);
-  APP.obras         = (obras || []).map(normalizeObra);
-  APP.medicoes      = (medicoes || []).map(normalizeMedicao);
-  APP.faturamentos  = (faturamentos || []).map(normalizeFat);
-  APP.colaboradores = (colaboradores || []).map(normalizeColab);
-  APP.epis          = (epis || []).map(normalizeEPI);
-  APP.entregasEPI   = entregasEPI || [];
-  APP.financeiro    = (financeiro || []).map(normalizeFin);
-  APP.pontos        = (pontos || []).map(normalizePonto);
+  try {
+    const res = await fetch(`${API}/data/all`, {
+      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
+    });
+    if (res.status === 401) { logout(); return; }
+    const d = await res.json();
+    APP.obras         = (d.obras         || []).map(normalizeObra);
+    APP.medicoes      = (d.medicoes       || []).map(normalizeMedicao);
+    APP.faturamentos  = (d.faturamentos   || []).map(normalizeFat);
+    APP.colaboradores = (d.colaboradores  || []).map(normalizeColab);
+    APP.epis          = (d.epis           || []).map(normalizeEPI);
+    APP.entregasEPI   = d.entregasEPI     || [];
+    APP.financeiro    = (d.financeiro     || []).map(normalizeFin);
+    APP.pontos        = (d.pontos         || []).map(normalizePonto);
+  } catch(e) {
+    console.error('loadAll error', e);
+    // Fallback: tenta individual se o batch falhar
+    const [obras, medicoes, faturamentos, colaboradores, epis, entregasEPI, financeiro, pontos] = await Promise.all([
+      apiGet('obras'), apiGet('medicoes'), apiGet('faturamentos'),
+      apiGet('colaboradores'), apiGet('epis'), apiGet('entregas-epi'),
+      apiGet('financeiro'), apiGet('pontos')
+    ]);
+    APP.obras         = (obras         || []).map(normalizeObra);
+    APP.medicoes      = (medicoes      || []).map(normalizeMedicao);
+    APP.faturamentos  = (faturamentos  || []).map(normalizeFat);
+    APP.colaboradores = (colaboradores || []).map(normalizeColab);
+    APP.epis          = (epis          || []).map(normalizeEPI);
+    APP.entregasEPI   = entregasEPI    || [];
+    APP.financeiro    = (financeiro    || []).map(normalizeFin);
+    APP.pontos        = (pontos        || []).map(normalizePonto);
+  }
   navigate(APP.currentPage);
 }
 
@@ -1544,6 +1570,25 @@ function renderRelatorios() {
   </div>`;
 }
 
+// ── LAZY jsPDF LOADER ──
+let _jspdfLoaded = false;
+async function _ensureJsPDF() {
+  if (_jspdfLoaded) return;
+  await new Promise((res, rej) => {
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+      s2.onload = () => { _jspdfLoaded = true; res(); };
+      s2.onerror = rej;
+      document.head.appendChild(s2);
+    };
+    s1.onerror = rej;
+    document.head.appendChild(s1);
+  });
+}
+
 // ── PDF GENERATORS ──
 function _initPDF(titulo) {
   const { jsPDF } = window.jspdf;
@@ -1564,7 +1609,8 @@ function _initPDF(titulo) {
   return doc;
 }
 
-function gerarPDFObras() {
+async function gerarPDFObras() {
+  await _ensureJsPDF();
   const doc = _initPDF('Relatório de Obras');
   doc.autoTable({
     startY: 40,
@@ -1578,7 +1624,8 @@ function gerarPDFObras() {
   doc.save('obras.pdf');
 }
 
-function gerarPDFFolha() {
+async function gerarPDFFolha() {
+  await _ensureJsPDF();
   const doc = _initPDF('Folha de Pagamento — ' + new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}));
   const clt = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
   doc.autoTable({
@@ -1595,7 +1642,8 @@ function gerarPDFFolha() {
   doc.save('folha.pdf');
 }
 
-function gerarPDFFinanceiro() {
+async function gerarPDFFinanceiro() {
+  await _ensureJsPDF();
   const doc = _initPDF('DRE Simplificado');
   const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
   const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);

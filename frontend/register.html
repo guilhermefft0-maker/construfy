@@ -155,10 +155,13 @@
 
         const data = await res.json();
 
-        if (data.success) {
-          successEl.textContent = '✓ Conta criada com sucesso! Redirecionando para o login...';
+        if (data.ok || data.success) {
+          // Salva token e usuário igual ao login — vai direto pro dashboard
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          successEl.textContent = '✓ Conta criada! Redirecionando para o painel...';
           successEl.style.display = 'block';
-          setTimeout(() => { window.location.href = 'login.html'; }, 2000);
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
         } else {
           errorEl.textContent = data.error || 'Erro ao criar conta.';
           errorEl.style.display = 'block';
