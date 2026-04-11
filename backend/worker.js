@@ -19,6 +19,7 @@ wrangler d1 create construFY-db
 // ─────────────────────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://construFY.app',
+  'https://construfy-final.vercel.app',
   'http://localhost:3000',  // remova em produção
 ];
 
