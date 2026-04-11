@@ -175,6 +175,55 @@
       #content { padding:0; overflow:visible; }
       body { height:auto; overflow:visible; }
     }
+
+    /* ── SUPPORT FAB ── */
+    .support-fab { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+    .support-fab-btn { width:48px; height:48px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.4); transition:all 0.2s; }
+    .support-fab-btn:hover { transform:scale(1.1); }
+    .support-menu { display:none; flex-direction:column; gap:7px; align-items:flex-end; }
+    .support-menu.open { display:flex; }
+    .support-option { display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--border2); border-radius:40px; padding:9px 16px 9px 12px; text-decoration:none; color:var(--text); font-size:13px; font-weight:500; white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,0.5); transition:all 0.15s; }
+    .support-option:hover { border-color:var(--accent); background:var(--bg3); }
+    .support-option-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .support-option-icon.wa { background:#25D366; }
+    .support-option-icon.em { background:var(--accent); }
+    .support-sublabel { font-size:10px; color:var(--text3); display:block; margin-top:1px; }
+
+    /* ── ASSINATURA ── */
+    .plan-page { max-width:860px; margin:0 auto; }
+    .plan-current-banner { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:20px 24px; margin-bottom:28px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .plan-current-info { display:flex; align-items:center; gap:14px; }
+    .plan-badge-icon { width:44px; height:44px; border-radius:var(--radius); background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.2); display:flex; align-items:center; justify-content:center; color:var(--accent); flex-shrink:0; }
+    .plan-current-name { font-size:15px; font-weight:500; color:var(--text); }
+    .plan-current-desc { font-size:12px; color:var(--text3); margin-top:2px; }
+    .plan-cards-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:32px; }
+    .plan-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:24px; position:relative; transition:border-color 0.2s; }
+    .plan-card.pro { border-color:rgba(240,165,0,0.4); background:rgba(240,165,0,0.03); }
+    .plan-tag-popular { position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--accent); color:#000; font-size:9px; font-family:var(--mono); font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 12px; border-radius:100px; white-space:nowrap; }
+    .plan-card-name { font-size:12px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--text2); margin-bottom:12px; }
+    .plan-card-price { font-size:36px; font-weight:500; color:var(--text); letter-spacing:-0.04em; line-height:1; margin-bottom:4px; }
+    .plan-card-price sub { font-size:15px; font-weight:400; color:var(--text2); vertical-align:baseline; margin-right:2px; }
+    .plan-card-price sup { font-size:11px; color:var(--text3); }
+    .plan-card-desc { font-size:12px; color:var(--text3); margin-bottom:20px; }
+    .plan-features-list { list-style:none; margin-bottom:22px; }
+    .plan-features-list li { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text2); padding:5px 0; border-bottom:1px solid var(--border); }
+    .plan-features-list li:last-child { border-bottom:none; }
+    .plan-features-list li svg.check { color:var(--green); flex-shrink:0; }
+    .plan-features-list li svg.cross { color:var(--text3); flex-shrink:0; }
+    .plan-features-list li.locked { color:var(--text3); }
+    .plan-limit-bar { margin-bottom:20px; }
+    .plan-limit-row { display:flex; justify-content:space-between; font-size:11px; color:var(--text3); margin-bottom:5px; }
+    .plan-limit-row span:last-child { color:var(--text2); font-weight:500; }
+    .progress-bar { height:4px; background:var(--bg4); border-radius:3px; overflow:hidden; margin-bottom:12px; }
+    .progress-fill { height:100%; border-radius:3px; background:var(--accent); }
+    .progress-fill.danger { background:var(--red); }
+    .btn-kiwify { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:11px; background:var(--accent); color:#000; border:none; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; text-decoration:none; font-family:var(--font); transition:all 0.15s; }
+    .btn-kiwify:hover { background:var(--accent2); transform:translateY(-1px); box-shadow:0 6px 20px rgba(240,165,0,0.25); }
+    .btn-current-plan { display:flex; align-items:center; justify-content:center; width:100%; padding:11px; background:transparent; color:var(--text3); border:1px solid var(--border2); border-radius:var(--radius); font-size:13px; cursor:default; font-family:var(--font); }
+    .support-cta-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:20px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .support-cta-text { font-size:13px; color:var(--text2); }
+    .support-cta-text strong { color:var(--text); display:block; margin-bottom:3px; }
+    .support-cta-actions { display:flex; gap:8px; flex-shrink:0; }
   </style>
 </head>
 <body>
@@ -242,6 +291,14 @@
     </div>
   </div>
 
+  <div class="nav-section">
+    <div class="nav-label">Conta</div>
+    <div class="nav-item" onclick="navigate('assinatura')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5"/></svg>
+      Assinatura
+    </div>
+  </div>
+
   <div class="sidebar-footer">
     <div class="user-pill">
       <div class="user-avatar" id="user-initials">--</div>
@@ -272,6 +329,33 @@
 <!-- FORM OVERLAY -->
 <div class="form-overlay" id="form-overlay">
   <div class="form-box" id="form-box"></div>
+</div>
+
+<!-- SUPPORT FAB -->
+<div class="support-fab" id="supportFab">
+  <div class="support-menu" id="supportMenu">
+    <a href="https://wa.me/5511915188474" target="_blank" class="support-option">
+      <div class="support-option-icon wa">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </div>
+      <div>
+        <span>WhatsApp</span>
+        <span class="support-sublabel">(11) 91518-8474</span>
+      </div>
+    </a>
+    <a href="mailto:suport@fynext.site" class="support-option">
+      <div class="support-option-icon em">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div>
+        <span>E-mail</span>
+        <span class="support-sublabel">suport@fynext.site</span>
+      </div>
+    </a>
+  </div>
+  <button class="support-fab-btn" id="supportToggle" title="Suporte">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+  </button>
 </div>
 
 <script>
@@ -509,7 +593,8 @@ const pageTitles = {
   folha: 'Folha de Pagamento',
   epis: 'EPIs',
   financeiro: 'Financeiro',
-  relatorios: 'Relatórios'
+  relatorios: 'Relatórios',
+  assinatura: 'Assinatura e Planos'
 };
 
 function navigate(page) {
@@ -529,7 +614,8 @@ function navigate(page) {
     folha:renderFolha, 
     epis:renderEPIs, 
     financeiro:renderFinanceiro, 
-    relatorios:renderRelatorios 
+    relatorios:renderRelatorios,
+    assinatura:renderAssinatura
   };
   document.getElementById('content').innerHTML = `<div class="page">${(pages[page] || (() => '<p style="color:var(--text3)">Em desenvolvimento</p>'))()}</div>`;
 }
@@ -1894,6 +1980,141 @@ function gerarPDFColaboradores() {
   });
   doc.save('colaboradores.pdf');
 }
+
+// ── ASSINATURA ─────────────────────────────────────────────────────
+function renderAssinatura() {
+  const plano = _user?.plano || 'free';
+  const isPro = plano === 'pro' || plano === 'starter' || plano === 'enterprise';
+  const obrasUsadas = APP.obras.length;
+  const colaboradoresUsados = APP.colaboradores.length;
+
+  const obrasMax = isPro ? '∞' : 1;
+  const colaboradoresMax = isPro ? '∞' : 4;
+  const obrasPercent = isPro ? 0 : Math.min((obrasUsadas / 1) * 100, 100);
+  const colabPercent = isPro ? 0 : Math.min((colaboradoresUsados / 4) * 100, 100);
+
+  return `
+  <div class="plan-page">
+
+    <!-- Banner plano atual -->
+    <div class="plan-current-banner">
+      <div class="plan-current-info">
+        <div class="plan-badge-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5"/></svg>
+        </div>
+        <div>
+          <div class="plan-current-name">Você está no plano <strong style="color:var(--accent)">${isPro ? 'PRO' : 'FREE'}</strong></div>
+          <div class="plan-current-desc">${isPro ? 'Acesso completo a todas as funcionalidades.' : 'Gestão de 1 obra e até 4 colaboradores.'}</div>
+        </div>
+      </div>
+      ${!isPro ? `<a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-kiwify" style="width:auto;padding:10px 24px;white-space:nowrap">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="2"/></svg>
+        Fazer upgrade para PRO
+      </a>` : `<div class="badge badge-green" style="font-size:12px;padding:6px 14px">✓ Plano ativo</div>`}
+    </div>
+
+    ${!isPro ? `
+    <!-- Uso atual (Free) -->
+    <div class="table-card" style="margin-bottom:24px">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Uso do plano Free</div>
+          <div class="table-sub">Limites da sua conta atual</div>
+        </div>
+      </div>
+      <div style="padding:20px 24px">
+        <div class="plan-limit-bar">
+          <div class="plan-limit-row"><span>Obras ativas</span><span>${obrasUsadas} / ${obrasMax}</span></div>
+          <div class="progress-bar"><div class="progress-fill ${obrasPercent >= 100 ? 'danger' : ''}" style="width:${obrasPercent}%"></div></div>
+        </div>
+        <div class="plan-limit-bar">
+          <div class="plan-limit-row"><span>Colaboradores</span><span>${colaboradoresUsados} / ${colaboradoresMax}</span></div>
+          <div class="progress-bar"><div class="progress-fill ${colabPercent >= 100 ? 'danger' : ''}" style="width:${colabPercent}%"></div></div>
+        </div>
+        ${obrasPercent >= 100 || colabPercent >= 100 ? `
+        <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--red);margin-top:4px">
+          ⚠ Você atingiu o limite do plano Free. Faça upgrade para continuar adicionando.
+        </div>` : ''}
+      </div>
+    </div>` : ''}
+
+    <!-- Cards de planos -->
+    <div class="plan-cards-grid">
+
+      <!-- FREE -->
+      <div class="plan-card ${!isPro ? 'pro' : ''}">
+        ${!isPro ? '<span class="plan-tag-popular">Plano atual</span>' : ''}
+        <div class="plan-card-name">Free</div>
+        <div class="plan-card-price"><sub>R$</sub>0<sup>/mês</sup></div>
+        <div class="plan-card-desc">Gestão básica sem compromisso.</div>
+        <ul class="plan-features-list">
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1 obra ativa</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Até 4 colaboradores</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Medições e dashboard</li>
+          <li class="locked"><svg class="cross" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Faturamento</li>
+          <li class="locked"><svg class="cross" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>EPIs &amp; Financeiro</li>
+          <li class="locked"><svg class="cross" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Relatórios PDF</li>
+          <li class="locked"><svg class="cross" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Folha de Pagamento</li>
+        </ul>
+        <button class="btn-current-plan">Plano gratuito</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="plan-card ${isPro ? 'pro' : ''}">
+        ${isPro ? '<span class="plan-tag-popular">Plano atual</span>' : '<span class="plan-tag-popular" style="background:var(--bg4);color:var(--accent);border:1px solid rgba(240,165,0,0.3)">Recomendado</span>'}
+        <div class="plan-card-name">Pro</div>
+        <div class="plan-card-price"><sub>R$</sub>299<sup>,99/mês</sup></div>
+        <div class="plan-card-desc">Tudo ilimitado para crescer.</div>
+        <ul class="plan-features-list">
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Obras ilimitadas</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Colaboradores ilimitados</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Faturamento completo</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>EPIs + Entregas</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Financeiro completo + DRE</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Relatórios PDF (6 modelos)</li>
+          <li><svg class="check" width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Suporte prioritário</li>
+        </ul>
+        ${isPro
+          ? `<button class="btn-current-plan">Plano ativo ✓</button>`
+          : `<a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-kiwify">
+              <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Assinar via Kiwify — R$ 299,99/mês
+            </a>`}
+      </div>
+    </div>
+
+    <!-- Box de suporte -->
+    <div class="support-cta-box">
+      <div class="support-cta-text">
+        <strong>Precisa de ajuda com sua assinatura?</strong>
+        Fale com nossa equipe de suporte pelo WhatsApp ou e-mail.
+      </div>
+      <div class="support-cta-actions">
+        <a href="https://wa.me/5511915188474" target="_blank" class="btn btn-success">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a href="mailto:suport@fynext.site" class="btn btn-outline">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          E-mail
+        </a>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── SUPPORT TOGGLE ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('supportToggle');
+  const menu   = document.getElementById('supportMenu');
+  if (!toggle) return;
+  toggle.addEventListener('click', () => {
+    menu.classList.toggle('open');
+    toggle.innerHTML = menu.classList.contains('open')
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+      : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+  });
+});
 
 // INICIALIZAR
 (function initUser() {

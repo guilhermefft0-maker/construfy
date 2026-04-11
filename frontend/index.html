@@ -7,8 +7,6 @@
   <link rel="stylesheet" href="global.css">
   <style>
     body { overflow-x:hidden; }
-
-    /* ── NAV ── */
     .site-nav { position:sticky; top:0; z-index:50; background:rgba(9,11,14,0.88); backdrop-filter:blur(18px); border-bottom:1px solid var(--border-lo); }
     .nav-inner { max-width:1180px; margin:0 auto; padding:0 24px; height:62px; display:flex; align-items:center; justify-content:space-between; gap:24px; }
     .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0; }
@@ -19,21 +17,12 @@
     .nav-links a { text-decoration:none; font-size:13px; font-weight:500; color:var(--text-md); transition:color 0.15s; }
     .nav-links a:hover { color:var(--text-hi); }
     .nav-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
-
     .btn-ghost { padding:8px 16px; border-radius:var(--r-md); font-size:13px; font-weight:500; color:var(--text-md); background:transparent; border:1px solid var(--border-md); cursor:pointer; text-decoration:none; transition:all 0.15s; display:inline-flex; align-items:center; }
     .btn-ghost:hover { color:var(--text-hi); border-color:var(--border-hi); background:var(--bg-3); }
     .btn-cta { padding:9px 20px; border-radius:var(--r-md); font-size:13px; font-weight:700; font-family:var(--font-display); color:#090b0e; background:var(--amber); border:none; cursor:pointer; text-decoration:none; transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
     .btn-cta:hover { background:var(--amber-dark); transform:translateY(-1px); box-shadow:0 6px 20px rgba(240,165,0,0.2); }
-
-    /* ── HERO ── */
     .hero { position:relative; overflow:hidden; min-height:88vh; display:flex; align-items:center; justify-content:center; padding:80px 24px 100px; }
-    .hero::before {
-      content:''; position:absolute; inset:0;
-      background-image:linear-gradient(rgba(240,165,0,0.035) 1px, transparent 1px), linear-gradient(90deg,rgba(240,165,0,0.035) 1px, transparent 1px);
-      background-size:52px 52px;
-      mask-image:radial-gradient(ellipse 70% 80% at 50% 50%, black 20%, transparent 100%);
-      pointer-events:none;
-    }
+    .hero::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(240,165,0,0.035) 1px, transparent 1px), linear-gradient(90deg,rgba(240,165,0,0.035) 1px, transparent 1px); background-size:52px 52px; mask-image:radial-gradient(ellipse 70% 80% at 50% 50%, black 20%, transparent 100%); pointer-events:none; }
     .hero::after { content:''; position:absolute; top:-200px; left:50%; transform:translateX(-50%); width:900px; height:500px; background:radial-gradient(ellipse, rgba(240,165,0,0.07) 0%, transparent 65%); pointer-events:none; }
     .hero-inner { position:relative; z-index:1; max-width:840px; text-align:center; }
     .hero-eyebrow { display:inline-flex; align-items:center; gap:6px; background:var(--amber-glow); border:1px solid var(--amber-ring); color:var(--amber); font-size:11px; font-family:var(--font-mono); font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:5px 14px; border-radius:100px; margin-bottom:28px; }
@@ -47,23 +36,17 @@
     .btn-hero-ghost:hover { color:var(--text-hi); border-color:var(--text-lo); background:var(--bg-3); }
     .hero-note { margin-top:20px; font-size:12px; color:var(--text-lo); display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap; }
     .hero-note span { display:flex; align-items:center; gap:5px; }
-
-    /* ── STATS BAR ── */
     .stats-bar { border-top:1px solid var(--border-lo); border-bottom:1px solid var(--border-lo); background:var(--bg-1); }
     .stats-bar-inner { max-width:1180px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:repeat(4,1fr); }
     .stat-item { padding:32px 24px; border-right:1px solid var(--border-lo); }
     .stat-item:last-child { border-right:none; }
     .stat-num { font-family:var(--font-display); font-size:32px; font-weight:700; color:var(--amber); letter-spacing:-0.03em; margin-bottom:4px; }
     .stat-lbl { font-size:12px; color:var(--text-lo); }
-
-    /* ── SECTIONS ── */
     .section { padding:100px 24px; }
     .section-inner { max-width:1180px; margin:0 auto; }
     .section-eyebrow { font-size:10px; font-family:var(--font-mono); font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--amber); margin-bottom:14px; }
     .section-title { font-family:var(--font-display); font-size:clamp(28px,4vw,42px); font-weight:700; letter-spacing:-0.025em; color:var(--text-hi); margin-bottom:16px; line-height:1.15; }
     .section-sub { font-size:16px; color:var(--text-md); font-weight:300; line-height:1.7; max-width:520px; }
-
-    /* ── FEATURES ── */
     .features-section { background:var(--bg-1); }
     .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border-lo); border:1px solid var(--border-lo); border-radius:var(--r-xl); overflow:hidden; margin-top:56px; }
     .feat-card { background:var(--bg-1); padding:32px 28px; transition:background 0.18s; }
@@ -71,16 +54,14 @@
     .feat-icon { width:44px; height:44px; border-radius:var(--r-md); background:var(--amber-glow); border:1px solid var(--amber-ring); display:grid; place-items:center; margin-bottom:20px; color:var(--amber); }
     .feat-title { font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--text-hi); margin-bottom:8px; }
     .feat-desc { font-size:13px; color:var(--text-lo); line-height:1.7; font-weight:300; }
-
-    /* ── PRICING ── */
-    .pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:56px; align-items:start; }
+    .pricing-wrap { display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:740px; margin:56px auto 0; align-items:start; }
     .price-card { background:var(--bg-2); border:1px solid var(--border-md); border-radius:var(--r-xl); padding:32px 28px; position:relative; transition:border-color 0.2s; }
     .price-card.featured { border-color:var(--amber); background:var(--bg-3); }
     .featured-tag { position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:var(--amber); color:#090b0e; font-size:10px; font-family:var(--font-mono); font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:3px 14px; border-radius:100px; white-space:nowrap; }
     .price-plan { font-family:var(--font-display); font-size:14px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-md); margin-bottom:14px; }
     .price-value { font-family:var(--font-display); font-size:40px; font-weight:800; color:var(--text-hi); letter-spacing:-0.04em; line-height:1; margin-bottom:4px; }
     .price-value sub { font-size:18px; font-weight:500; vertical-align:baseline; margin-right:2px; color:var(--text-md); }
-    .price-value sup { font-size:12px; font-weight:400; color:var(--text-lo); margin-left:4px; }
+    .price-value sup { font-size:13px; font-weight:400; color:var(--text-lo); }
     .price-desc { font-size:13px; color:var(--text-lo); margin-bottom:28px; font-weight:300; }
     .price-features { list-style:none; margin-bottom:28px; }
     .price-features li { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-md); padding:6px 0; border-bottom:1px solid var(--border-lo); }
@@ -92,48 +73,38 @@
     .btn-plan-primary:hover { background:var(--amber-dark); transform:translateY(-1px); }
     .btn-plan-outline { width:100%; padding:13px; background:transparent; color:var(--text-md); border:1px solid var(--border-hi); border-radius:var(--r-md); font-size:13px; font-weight:500; cursor:pointer; text-decoration:none; display:block; text-align:center; transition:all 0.15s; }
     .btn-plan-outline:hover { border-color:var(--text-lo); color:var(--text-hi); background:var(--bg-3); }
-
-    /* ── CTA ── */
     .cta-section { background:var(--bg-1); border-top:1px solid var(--border-lo); border-bottom:1px solid var(--border-lo); }
     .cta-inner { max-width:720px; margin:0 auto; padding:100px 24px; text-align:center; }
     .cta-title { font-family:var(--font-display); font-size:clamp(28px,4vw,44px); font-weight:800; letter-spacing:-0.03em; line-height:1.1; color:var(--text-hi); margin-bottom:16px; }
     .cta-sub { font-size:16px; color:var(--text-md); font-weight:300; margin-bottom:40px; line-height:1.7; }
-
-    /* ── FOOTER ── */
     .site-footer { padding:48px 24px 32px; border-top:1px solid var(--border-lo); }
     .footer-inner { max-width:1180px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; margin-bottom:28px; }
     .footer-links { display:flex; list-style:none; gap:24px; }
     .footer-links a { font-size:12px; color:var(--text-lo); text-decoration:none; transition:color 0.15s; }
     .footer-links a:hover { color:var(--text-md); }
     .footer-bottom { max-width:1180px; margin:0 auto; font-size:12px; color:var(--text-lo); border-top:1px solid var(--border-lo); padding-top:20px; }
-
-    @media (max-width:960px) {
-      .features-grid { grid-template-columns:repeat(2,1fr); }
-      .pricing-grid { grid-template-columns:1fr; max-width:420px; margin-left:auto; margin-right:auto; }
-      .stats-bar-inner { grid-template-columns:repeat(2,1fr); }
-      .stat-item:nth-child(2) { border-right:none; }
-    }
-    @media (max-width:640px) {
-      .nav-links { display:none; }
-      .features-grid { grid-template-columns:1fr; }
-      .stat-item { border-right:1px solid var(--border-lo); }
-      .stat-item:nth-child(even) { border-right:none; }
-      .section { padding:64px 20px; }
-      .hero { padding:60px 20px 80px; }
-    }
+    .support-fab { position:fixed; bottom:28px; right:28px; z-index:200; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+    .support-fab-btn { width:52px; height:52px; border-radius:50%; background:var(--amber); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.35); transition:all 0.2s; }
+    .support-fab-btn:hover { transform:scale(1.08); }
+    .support-menu { display:none; flex-direction:column; gap:8px; align-items:flex-end; }
+    .support-menu.open { display:flex; }
+    .support-option { display:flex; align-items:center; gap:10px; background:var(--bg-2,#1a1e25); border:1px solid var(--border-md,#2a2f3a); border-radius:40px; padding:10px 18px 10px 14px; text-decoration:none; color:var(--text-hi,#e8eaf0); font-size:13px; font-weight:500; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,0.4); transition:all 0.15s; }
+    .support-option:hover { border-color:var(--amber,#f0a500); background:var(--bg-3,#222730); }
+    .support-option-icon { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .support-option-icon.wa { background:#25D366; }
+    .support-option-icon.em { background:var(--amber,#f0a500); }
+    .support-label { font-size:11px; color:var(--text-lo,#5a6075); display:block; margin-top:1px; }
+    @keyframes pls { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+    @media (max-width:960px) { .features-grid { grid-template-columns:repeat(2,1fr); } .stats-bar-inner { grid-template-columns:repeat(2,1fr); } .stat-item:nth-child(2) { border-right:none; } }
+    @media (max-width:640px) { .nav-links { display:none; } .features-grid { grid-template-columns:1fr; } .pricing-wrap { grid-template-columns:1fr; max-width:420px; } .section { padding:64px 20px; } .hero { padding:60px 20px 80px; } }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
   <nav class="site-nav" role="navigation">
     <div class="nav-inner">
       <a href="index.html" class="nav-logo">
-        <div class="nav-logo-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M3 21V9L12 3L21 9V21H15V15H9V21H3Z" fill="#090b0e"/>
-          </svg>
-        </div>
+        <div class="nav-logo-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 21V9L12 3L21 9V21H15V15H9V21H3Z" fill="#090b0e"/></svg></div>
         <span class="nav-logo-text">Constru<span>PRO</span></span>
       </a>
       <ul class="nav-links">
@@ -142,28 +113,21 @@
       </ul>
       <div class="nav-actions">
         <a href="login.html" class="btn-ghost">Entrar</a>
-        <a href="register.html" class="btn-cta">
-          Criar Conta Grátis
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        <a href="register.html" class="btn-cta">Criar Conta Grátis <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-inner">
       <div class="hero-eyebrow">
-        <span class="pulse-dot" style="width:6px;height:6px;background:var(--amber);border-radius:50%;animation:pls 2s infinite;flex-shrink:0;"></span>
+        <span style="width:6px;height:6px;background:var(--amber);border-radius:50%;animation:pls 2s infinite;flex-shrink:0;"></span>
         Plataforma para construtoras brasileiras
       </div>
       <h1 class="hero-title">Gestão completa<br>para sua <em>construtora</em></h1>
       <p class="hero-sub">Controle obras, medições, folha de pagamento e EPIs em uma única plataforma. Rápida, confiável e feita para a construção civil.</p>
       <div class="hero-actions">
-        <a href="register.html" class="btn-hero-primary">
-          Começar gratuitamente
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        <a href="register.html" class="btn-hero-primary">Começar gratuitamente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         <a href="#funcionalidades" class="btn-hero-ghost">Ver funcionalidades</a>
       </div>
       <div class="hero-note">
@@ -174,7 +138,6 @@
     </div>
   </section>
 
-  <!-- STATS -->
   <div class="stats-bar">
     <div class="stats-bar-inner">
       <div class="stat-item"><div class="stat-num">50+</div><div class="stat-lbl">Construtoras ativas</div></div>
@@ -184,7 +147,6 @@
     </div>
   </div>
 
-  <!-- FEATURES -->
   <section class="section features-section" id="funcionalidades">
     <div class="section-inner">
       <div class="section-eyebrow">Funcionalidades</div>
@@ -225,58 +187,47 @@
     </div>
   </section>
 
-  <!-- PRICING -->
   <section class="section" id="planos" style="background:var(--bg-0)">
     <div class="section-inner">
       <div class="section-eyebrow">Planos</div>
       <h2 class="section-title">Simples e transparente</h2>
-      <p class="section-sub">Todos os planos incluem suporte e atualizações automáticas. Cancele quando quiser.</p>
-      <div class="pricing-grid">
+      <p class="section-sub">Comece grátis e faça upgrade quando precisar. Sem taxas escondidas.</p>
+      <div class="pricing-wrap">
         <div class="price-card">
           <div class="price-plan">Free</div>
           <div class="price-value"><sub>R$</sub>0<sup>/mês</sup></div>
           <p class="price-desc">Para começar sem compromisso.</p>
           <ul class="price-features">
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Obras + Medições</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Até 5 colaboradores</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Dashboard básico</li>
-            <li class="dim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Faturamento PRO</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>1 obra ativa</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Até 4 colaboradores</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Medições e dashboard básico</li>
+            <li class="dim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Faturamento</li>
             <li class="dim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>EPIs &amp; Financeiro</li>
+            <li class="dim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Relatórios PDF</li>
+            <li class="dim"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Folha de Pagamento</li>
           </ul>
           <a href="register.html" class="btn-plan-outline">Começar Grátis</a>
         </div>
         <div class="price-card featured">
           <span class="featured-tag">Mais popular</span>
           <div class="price-plan">Pro</div>
-          <div class="price-value"><sub>R$</sub>497<sup>/mês</sup></div>
-          <p class="price-desc">Para construtoras em crescimento.</p>
+          <div class="price-value"><sub>R$</sub>299<sup>,99/mês</sup></div>
+          <p class="price-desc">Tudo ilimitado para sua construtora crescer.</p>
           <ul class="price-features">
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Tudo ilimitado</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Relatórios PDF</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>EPIs + Entregas</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Financeiro completo + DRE</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Obras ilimitadas</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Colaboradores ilimitados</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Faturamento completo</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>EPIs + Entregas + Financeiro</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Folha de Pagamento completa</li>
+            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Relatórios PDF (6 modelos)</li>
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Suporte prioritário</li>
           </ul>
-          <a href="register.html" class="btn-plan-primary">Escolher Pro</a>
-        </div>
-        <div class="price-card">
-          <div class="price-plan">Enterprise</div>
-          <div class="price-value" style="font-size:28px;letter-spacing:-0.02em">Sob consulta</div>
-          <p class="price-desc">Para grandes grupos construtores.</p>
-          <ul class="price-features">
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Usuários ilimitados</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SSO + API dedicada</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SLA 99.9%</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onboarding dedicado</li>
-            <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Customizações</li>
-          </ul>
-          <a href="mailto:contato@construpro.com.br" class="btn-plan-outline">Falar com Vendas</a>
+          <a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-plan-primary">Assinar Pro — R$ 299,99/mês</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CTA -->
   <section class="cta-section">
     <div class="cta-inner">
       <h2 class="cta-title">Comece agora mesmo</h2>
@@ -288,7 +239,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-inner">
       <a href="index.html" class="nav-logo">
@@ -305,12 +255,42 @@
     <div class="footer-bottom">© 2025 ConstruPRO. Todos os direitos reservados. Feito para construtoras brasileiras.</div>
   </footer>
 
+  <!-- BOTÃO DE SUPORTE FLUTUANTE -->
+  <div class="support-fab" id="supportFab">
+    <div class="support-menu" id="supportMenu">
+      <a href="https://wa.me/5511915188474" target="_blank" class="support-option">
+        <div class="support-option-icon wa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div><span>WhatsApp</span><span class="support-label">(11) 91518-8474</span></div>
+      </a>
+      <a href="mailto:suport@fynext.site" class="support-option">
+        <div class="support-option-icon em">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div><span>E-mail</span><span class="support-label">suport@fynext.site</span></div>
+      </a>
+    </div>
+    <button class="support-fab-btn" id="supportToggle" title="Suporte">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    </button>
+  </div>
+
   <script>
+    document.getElementById('supportToggle').addEventListener('click', () => {
+      const menu = document.getElementById('supportMenu');
+      const btn  = document.getElementById('supportToggle');
+      menu.classList.toggle('open');
+      btn.innerHTML = menu.classList.contains('open')
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+        : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+    });
+
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
         const id = a.getAttribute('href').slice(1);
         const el = document.getElementById(id);
-        if (el) { e.preventDefault(); el.scrollIntoView({ behavior:'smooth' }); }
+        if (el) { e.preventDefault(); el.scrollIntoView({ behavior:'smooth', block:'start' }); }
       });
     });
   </script>
