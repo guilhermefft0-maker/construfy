@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://dash.cloudflare.com/17b7e50253f2d244cb6e64afa4ccff37/workers/services/view/construpro-worker/production"
+      "destination": "https://construpro-worker.guilhermefft0.workers.dev/api/:path*"
     }
   ],
   "headers": [
