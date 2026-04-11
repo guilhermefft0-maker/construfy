@@ -169,7 +169,25 @@
     @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
     .page { animation:fadeIn 0.2s ease; }
 
-    /* ── PRINT ── */
+    /* ── PLAN LIMIT LOCK OVERLAY ── */
+    .lock-overlay { position:absolute; inset:0; background:rgba(13,15,18,0.82); border-radius:var(--radius2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; z-index:10; backdrop-filter:blur(2px); }
+    .lock-icon { width:44px; height:44px; border-radius:50%; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); display:flex; align-items:center; justify-content:center; }
+    .lock-text { font-size:12px; color:var(--text2); text-align:center; line-height:1.4; }
+    .lock-btn { background:var(--accent); color:#000; border:none; border-radius:var(--radius); padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font); margin-top:2px; }
+    .lock-btn:hover { background:var(--accent2); }
+    /* Modal de upgrade */
+    .upgrade-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; }
+    .upgrade-modal.open { display:flex; }
+    .upgrade-box { background:var(--bg2); border:1px solid rgba(240,165,0,0.35); border-radius:var(--radius2); padding:32px; width:440px; text-align:center; position:relative; }
+    .upgrade-box .lock-big { font-size:36px; margin-bottom:12px; }
+    .upgrade-box h3 { font-size:16px; font-weight:600; color:var(--text); margin-bottom:6px; }
+    .upgrade-box p { font-size:13px; color:var(--text2); line-height:1.5; margin-bottom:20px; }
+    .upgrade-box .limit-info { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius); padding:10px 14px; font-size:12px; color:var(--red); margin-bottom:20px; }
+    .upgrade-actions { display:flex; gap:10px; justify-content:center; }
+    .upgrade-close { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; line-height:1; }
+    /* Folha — descontos extras */
+    .folha-discount-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:20px; padding:2px 8px; font-size:10px; color:var(--red); margin-right:4px; }
+  
     @media print {
       #sidebar, #topbar { display:none; }
       #content { padding:0; overflow:visible; }
@@ -358,7 +376,25 @@
   </button>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<!-- UPGRADE MODAL -->
+<div class="upgrade-modal" id="upgrade-modal">
+  <div class="upgrade-box">
+    <button class="upgrade-close" onclick="closeUpgradeModal()">✕</button>
+    <div class="lock-big">🔒</div>
+    <h3 id="upgrade-title">Limite do plano Free atingido</h3>
+    <p id="upgrade-desc">Você atingiu o limite de itens permitidos no plano Free.</p>
+    <div class="limit-info" id="upgrade-limit-info"></div>
+    <div class="upgrade-actions">
+      <button class="btn btn-outline" onclick="closeUpgradeModal()">Cancelar</button>
+      <a href="javascript:void(0)" onclick="closeUpgradeModal();navigate('assinatura')" class="btn btn-primary" style="text-decoration:none">
+        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Ver planos — Fazer upgrade
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
 // ── AUTH CHECK ──
 const _user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } })();
 if (!_user) { window.location.href = 'login.html'; }
@@ -379,6 +415,52 @@ const APP = {
   financeiro: [],
   loading: false,
 };
+
+// ── PLANO ── helpers de limite Free ──────────────────────────────
+function isPro() {
+  try { const u = JSON.parse(localStorage.getItem('user')); return u?.plano === 'pro' || u?.plano === 'enterprise'; } catch { return false; }
+}
+
+function showUpgradeModal(title, desc, limitInfo) {
+  document.getElementById('upgrade-title').textContent = title || 'Limite do plano Free atingido';
+  document.getElementById('upgrade-desc').textContent  = desc  || 'Faça upgrade para continuar.';
+  document.getElementById('upgrade-limit-info').textContent = limitInfo || '';
+  document.getElementById('upgrade-modal').classList.add('open');
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgrade-modal').classList.remove('open');
+}
+
+// Verifica limite antes de abrir form de obra
+function checkObrasLimit() {
+  if (isPro()) return true;
+  const ativos = APP.obras.length;
+  if (ativos >= 1) {
+    showUpgradeModal(
+      '🔒 Limite de obras atingido',
+      'O plano Free permite apenas 1 obra cadastrada. Faça upgrade para o plano Pro e cadastre obras ilimitadas.',
+      `Você já tem ${ativos} obra(s) cadastrada(s). Plano Free: limite de 1 obra.`
+    );
+    return false;
+  }
+  return true;
+}
+
+// Verifica limite antes de abrir form de colaborador
+function checkColabLimit() {
+  if (isPro()) return true;
+  const ativos = APP.colaboradores.filter(c => c.status === 'Ativo').length;
+  if (ativos >= 4) {
+    showUpgradeModal(
+      '🔒 Limite de colaboradores atingido',
+      'O plano Free permite até 4 colaboradores ativos. Faça upgrade para o plano Pro e adicione colaboradores ilimitados.',
+      `Você já tem ${ativos} colaborador(es) ativo(s). Plano Free: limite de 4 colaboradores.`
+    );
+    return false;
+  }
+  return true;
+}
 
 // ── TOKEN MANAGER (JWT + refresh automático) ─────────────────────
 const TokenManager = {
@@ -527,7 +609,14 @@ function normalizeFat(f) {
   return { ...f, obraId: f.obra_id, formaPgto: f.forma_pgto };
 }
 function normalizeColab(c) {
-  return { ...c, obraId: c.obra_id, diasTrabalhados: c.dias_trabalhados };
+  return {
+    ...c,
+    obraId: c.obra_id || c.obraId,
+    diasTrabalhados: c.dias_trabalhados || c.diasTrabalhados,
+    adiantamento:    parseFloat(c.adiantamento || 0),
+    vale_transporte: parseFloat(c.vale_transporte || 0),
+    outros_descontos: parseFloat(c.outros_descontos || 0),
+  };
 }
 function normalizeEPI(e) { return e; }
 function normalizeFin(f) {
@@ -1021,7 +1110,9 @@ function renderObras() {
       <div style="font-size:20px;font-weight:500;color:var(--text)">Gestão de Obras</div>
       <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.obras.length} obras · ${APP.obras.filter(o=>o.status==='Em andamento').length} em execução</div>
     </div>
-    <button class="btn btn-primary" onclick="openFormObra()">+ Nova Obra</button>
+    <button class="btn btn-primary" onclick="openFormObra()" ${!isPro() && APP.obras.length >= 1 ? 'style="opacity:0.6;position:relative"' : ''}>
+      ${!isPro() && APP.obras.length >= 1 ? '🔒 ' : ''}+ Nova Obra
+    </button>
   </div>
 
   <div class="obra-grid">
@@ -1065,8 +1156,18 @@ function closeForm() {
   document.getElementById('form-overlay').classList.remove('open');
 }
 
+function toggleCLTFields(tipo) {
+  const show = tipo === 'CLT';
+  ['grp-adiantamento','grp-vt','grp-outros'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = show ? '' : 'none';
+  });
+}
+
 // ── OBRAS ──
 function openFormObra(id) {
+  // Verifica limite Free apenas para nova obra (sem id)
+  if (!id && !checkObrasLimit()) return;
   const o = id ? APP.obras.find(x=>x.id===id) : null;
   document.getElementById('form-box').innerHTML = `
     <div class="form-title">${o ? 'Editar Obra' : 'Nova Obra'}</div>
@@ -1373,7 +1474,9 @@ function renderColaboradores() {
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div><div style="font-size:20px;font-weight:500;color:var(--text)">Colaboradores</div>
     <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.colaboradores.length} registros · ${ativos} ativos</div></div>
-    <button class="btn btn-primary" onclick="openFormColaborador()">+ Novo Colaborador</button>
+    <button class="btn btn-primary" onclick="openFormColaborador()" ${!isPro() && APP.colaboradores.filter(c=>c.status==='Ativo').length >= 4 ? 'style="opacity:0.6"' : ''}>
+      ${!isPro() && APP.colaboradores.filter(c=>c.status==='Ativo').length >= 4 ? '🔒 ' : ''}+ Novo Colaborador
+    </button>
   </div>
   <div class="table-card">
     <table>
@@ -1402,6 +1505,8 @@ function renderColaboradores() {
 }
 
 function openFormColaborador(id) {
+  // Verifica limite Free apenas para novo colaborador (sem id)
+  if (!id && !checkColabLimit()) return;
   const c = id ? APP.colaboradores.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
     <div class="form-title">${c ? 'Editar Colaborador' : 'Novo Colaborador'}</div>
@@ -1410,7 +1515,7 @@ function openFormColaborador(id) {
       <div class="form-group"><label>CPF</label><input id="f-cpf" placeholder="000.000.000-00" value="${c?.cpf||''}"></div>
       <div class="form-group"><label>Cargo</label><input id="f-cargo" value="${c?.cargo||''}"></div>
       <div class="form-group"><label>Tipo</label>
-        <select id="f-tipo">
+        <select id="f-tipo" onchange="toggleCLTFields(this.value)">
           <option ${c?.tipo==='CLT'?'selected':''}>CLT</option>
           <option ${c?.tipo==='Diarista'?'selected':''}>Diarista</option>
           <option ${c?.tipo==='PJ'?'selected':''}>PJ</option>
@@ -1427,6 +1532,9 @@ function openFormColaborador(id) {
           <option ${c?.status==='Inativo'?'selected':''}>Inativo</option>
         </select>
       </div>
+      <div class="form-group" id="grp-adiantamento" style="${c?.tipo!=='CLT'?'display:none':''}"><label>Adiantamento Salarial (R$)</label><input type="number" id="f-adiantamento" value="${c?.adiantamento||0}" min="0" step="0.01" placeholder="0"></div>
+      <div class="form-group" id="grp-vt" style="${c?.tipo!=='CLT'?'display:none':''}"><label>Vale Transporte a Descontar (R$)</label><input type="number" id="f-vale-transporte" value="${c?.vale_transporte||0}" min="0" step="0.01" placeholder="0"></div>
+      <div class="form-group" id="grp-outros" style="${c?.tipo!=='CLT'?'display:none':''}"><label>Outros Descontos (R$)</label><input type="number" id="f-outros-descontos" value="${c?.outros_descontos||0}" min="0" step="0.01" placeholder="0"></div>
     </div>
     <div class="form-actions">
       ${c ? `<button class="btn btn-danger" onclick="excluirColaborador('${c.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
@@ -1439,15 +1547,19 @@ function openFormColaborador(id) {
 async function salvarColaborador(id) {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome');
+  const tipo = document.getElementById('f-tipo').value;
   const payload = {
     nome,
-    cpf:      document.getElementById('f-cpf').value.trim(),
-    cargo:    document.getElementById('f-cargo').value.trim(),
-    tipo:     document.getElementById('f-tipo').value,
-    salario:  parseFloat(document.getElementById('f-salario').value)||0,
-    obra_id:  document.getElementById('f-obra').value || null,
-    admissao: document.getElementById('f-admissao').value,
-    status:   document.getElementById('f-status').value
+    cpf:               document.getElementById('f-cpf').value.trim(),
+    cargo:             document.getElementById('f-cargo').value.trim(),
+    tipo,
+    salario:           parseFloat(document.getElementById('f-salario').value)||0,
+    obra_id:           document.getElementById('f-obra').value || null,
+    admissao:          document.getElementById('f-admissao').value,
+    status:            document.getElementById('f-status').value,
+    adiantamento:      tipo === 'CLT' ? (parseFloat(document.getElementById('f-adiantamento')?.value)||0) : 0,
+    vale_transporte:   tipo === 'CLT' ? (parseFloat(document.getElementById('f-vale-transporte')?.value)||0) : 0,
+    outros_descontos:  tipo === 'CLT' ? (parseFloat(document.getElementById('f-outros-descontos')?.value)||0) : 0,
   };
   if (id) {
     await apiPut(`colaboradores/${id}`, payload);
@@ -1471,62 +1583,255 @@ async function excluirColaborador(id) {
 
 // ── FOLHA ──
 function renderFolha() {
-  const cltAtivos = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
-  const diaristas = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='Diarista');
-  const totalBruto = cltAtivos.reduce((a,c)=>a+c.salario,0) + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
-  const totalLiq = cltAtivos.reduce((a,c)=>{ const r=calcularLiquidoCLT(c.salario); return a+r.liquido; },0)
-                 + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
-  const totalCusto = cltAtivos.reduce((a,c)=>{ const r=calcularLiquidoCLT(c.salario); return a+r.custoTotal; },0)
-                   + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
+  // Período selecionado (mês/ano)
+  const hoje = new Date();
+  const mesAtual = window.FOLHA_MES || hoje.getMonth();
+  const anoAtual = window.FOLHA_ANO || hoje.getFullYear();
+  const nomeMes = new Date(anoAtual, mesAtual, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+
+  // Colaboradores ativos com tipo
+  const cltAtivos    = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'CLT');
+  const diaristas    = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'Diarista');
+  const pjColabs     = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'PJ');
+
+  // Pontos do mês filtrado
+  const pontosMes = APP.pontos.filter(p => {
+    if (!p.data) return false;
+    const d = new Date(p.data + 'T00:00:00');
+    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+  });
+
+  // Calcula dias trabalhados reais do ponto por colaborador
+  function diasTrabalhados(colaboradorId) {
+    return pontosMes.filter(p =>
+      (p.colaborador_id === colaboradorId || p.colaboradorId === colaboradorId) &&
+      p.status === 'presente'
+    ).length;
+  }
+
+  // Totais gerais
+  let totalBruto = 0, totalLiq = 0, totalCusto = 0, totalDescFolha = 0;
+
+  cltAtivos.forEach(c => {
+    const r = calcularLiquidoCLT(c.salario);
+    const adiant     = parseFloat(c.adiantamento || 0);
+    const valeTransp = parseFloat(c.vale_transporte || 0);
+    const outrosDesc = parseFloat(c.outros_descontos || 0);
+    const liquidoReal = r.liquido - adiant - valeTransp - outrosDesc;
+    totalBruto    += c.salario;
+    totalLiq      += liquidoReal;
+    totalCusto    += r.custoTotal;
+    totalDescFolha += (r.inss + r.irrf + adiant + valeTransp + outrosDesc);
+  });
+  diaristas.forEach(c => {
+    const dias = diasTrabalhados(c.id) || c.diasTrabalhados || 22;
+    const tot = c.salario * dias;
+    totalBruto += tot; totalLiq += tot; totalCusto += tot;
+  });
+  pjColabs.forEach(c => { totalBruto += c.salario; totalLiq += c.salario; totalCusto += c.salario; });
+
+  // Navegar mês
+  function navMesBtn(delta) {
+    return `<button onclick="navegarFolhaMes(${delta})" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0 6px;line-height:1">${delta < 0 ? '‹' : '›'}</button>`;
+  }
 
   return `
-  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Folha de Pagamento</div>
-  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+    <div style="font-size:20px;font-weight:500;color:var(--text)">Folha de Pagamento</div>
+    <div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:4px 10px">
+      ${navMesBtn(-1)}
+      <span style="font-size:13px;color:var(--text);font-weight:500;min-width:160px;text-align:center;text-transform:capitalize">${nomeMes}</span>
+      ${navMesBtn(1)}
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">${cltAtivos.length} CLT · ${diaristas.length} diarista(s) · ${pjColabs.length} PJ · ${pontosMes.length} pontos registrados no mês</div>
 
-  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-label">Total Bruto</div><div class="kpi-value amber">${fmt(totalBruto)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Líquido</div><div class="kpi-value green">${fmt(totalLiq)}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Custo Total Empresa</div><div class="kpi-value red">${fmt(totalCusto)}</div></div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Total Bruto</div><div class="kpi-value amber">${fmt(totalBruto)}</div><div class="kpi-change">Soma salários brutos</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Descontos</div><div class="kpi-value red">${fmt(totalDescFolha)}</div><div class="kpi-change">INSS + IRRF + outros</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Líquido a Pagar</div><div class="kpi-value green">${fmt(totalLiq)}</div><div class="kpi-change">O que a empresa paga</div></div>
+    <div class="kpi-card"><div class="kpi-label">Custo Total Empresa</div><div class="kpi-value" style="color:var(--blue)">${fmt(totalCusto)}</div><div class="kpi-change">Inclui FGTS + provisões</div></div>
   </div>
 
+  ${cltAtivos.length ? `
   <div class="table-card" style="margin-bottom:20px">
-    <div class="table-header"><div class="table-title">CLT — Holerites</div></div>
+    <div class="table-header">
+      <div>
+        <div class="table-title">CLT — Holerites Detalhados</div>
+        <div class="table-sub">Clique em "Ver holerite" para ver os descontos completos do colaborador</div>
+      </div>
+    </div>
     <table>
-      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Bruto</th><th>INSS</th><th>IRRF</th><th>Líquido</th><th>FGTS</th><th>Custo Empresa</th></tr></thead>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Dias Ponto</th><th>Salário Bruto</th><th>INSS</th><th>IRRF</th><th>Outros Descontos</th><th>💰 Líquido a Receber</th><th>Custo Empresa</th><th></th></tr></thead>
       <tbody>
         ${cltAtivos.map(c => {
-          const r = calcularLiquidoCLT(c.salario);
+          const r          = calcularLiquidoCLT(c.salario);
+          const adiant     = parseFloat(c.adiantamento || 0);
+          const valeTransp = parseFloat(c.vale_transporte || 0);
+          const outrosDesc = parseFloat(c.outros_descontos || 0);
+          const totalDesc  = r.inss + r.irrf + adiant + valeTransp + outrosDesc;
+          const liquidoReal = r.liquido - adiant - valeTransp - outrosDesc;
+          const diasPonto  = diasTrabalhados(c.id);
           return `<tr>
             <td><span class="strong">${c.nome}</span></td>
-            <td>${c.cargo}</td>
+            <td style="color:var(--text3)">${c.cargo}</td>
+            <td style="font-family:var(--mono);text-align:center">
+              <span style="color:${diasPonto>0?'var(--green)':'var(--text3)'}">${diasPonto > 0 ? diasPonto + 'd' : '—'}</span>
+            </td>
             <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
             <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.inss)}</td>
             <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.irrf)}</td>
-            <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(r.liquido)}</td>
-            <td style="font-family:var(--mono);color:var(--text3)">${fmt(r.fgts)}</td>
+            <td style="font-family:var(--mono);color:var(--red)">
+              ${adiant > 0 ? `<span class="folha-discount-tag">Adiant. -${fmt(adiant)}</span>` : ''}
+              ${valeTransp > 0 ? `<span class="folha-discount-tag">VT -${fmt(valeTransp)}</span>` : ''}
+              ${outrosDesc > 0 ? `<span class="folha-discount-tag">Outros -${fmt(outrosDesc)}</span>` : ''}
+              ${(adiant + valeTransp + outrosDesc) === 0 ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}
+            </td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:600;font-size:14px">${fmt(liquidoReal)}</td>
             <td style="font-family:var(--mono);color:var(--accent)">${fmt(r.custoTotal)}</td>
+            <td>
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;white-space:nowrap" onclick="verHoleriteCLT('${c.id}','${mesAtual}','${anoAtual}')">📋 Holerite</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
     </table>
-  </div>
+  </div>` : ''}
 
   ${diaristas.length ? `
-  <div class="table-card">
+  <div class="table-card" style="margin-bottom:20px">
     <div class="table-header"><div class="table-title">Diaristas</div></div>
     <table>
-      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Diária</th><th>Dias</th><th>Total</th></tr></thead>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Dias (Ponto)</th><th>Dias (Cadastro)</th><th>Valor/Dia</th><th>💰 Total a Pagar</th></tr></thead>
       <tbody>
-        ${diaristas.map(c => `<tr>
+        ${diaristas.map(c => {
+          const diasPonto  = diasTrabalhados(c.id);
+          const diasBase   = c.diasTrabalhados || 22;
+          const diasUsados = diasPonto > 0 ? diasPonto : diasBase;
+          return `<tr>
+            <td><span class="strong">${c.nome}</span></td>
+            <td style="color:var(--text3)">${c.cargo}</td>
+            <td style="font-family:var(--mono);text-align:center;color:${diasPonto>0?'var(--green)':'var(--text3)'}">${diasPonto > 0 ? diasPonto : '—'}</td>
+            <td style="font-family:var(--mono);text-align:center;color:var(--text3)">${diasBase}</td>
+            <td style="font-family:var(--mono)">${fmt(c.salario)}/dia</td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:600">
+              ${fmt(c.salario * diasUsados)}
+              ${diasPonto > 0 ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">(${diasPonto}d ponto)</span>` : `<span style="font-size:10px;color:var(--text3);margin-left:4px">(${diasBase}d cadastro)</span>`}
+            </td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>` : ''}
+
+  ${pjColabs.length ? `
+  <div class="table-card" style="margin-bottom:20px">
+    <div class="table-header"><div class="table-title">PJ — Prestadores</div></div>
+    <table>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>💰 Valor NF a Emitir</th></tr></thead>
+      <tbody>
+        ${pjColabs.map(c => `<tr>
           <td><span class="strong">${c.nome}</span></td>
-          <td>${c.cargo}</td>
-          <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
-          <td>${c.diasTrabalhados||22}</td>
-          <td style="font-family:var(--mono);color:var(--accent)">${fmt(c.salario*(c.diasTrabalhados||22))}</td>
+          <td style="color:var(--text3)">${c.cargo}</td>
+          <td style="font-family:var(--mono);color:var(--blue);font-weight:600">${fmt(c.salario)}</td>
         </tr>`).join('')}
       </tbody>
     </table>
-  </div>` : ''}`;
+  </div>` : ''}
+
+  <!-- Painel holerite individual -->
+  <div id="holerite-panel" style="display:none;margin-top:4px"></div>
+  `;
+}
+
+function navegarFolhaMes(delta) {
+  const hoje = new Date();
+  let mes = window.FOLHA_MES !== undefined ? window.FOLHA_MES : hoje.getMonth();
+  let ano = window.FOLHA_ANO !== undefined ? window.FOLHA_ANO : hoje.getFullYear();
+  mes += delta;
+  if (mes < 0) { mes = 11; ano--; }
+  if (mes > 11) { mes = 0; ano++; }
+  // Não permite ir além do mês atual
+  if (ano > hoje.getFullYear() || (ano === hoje.getFullYear() && mes > hoje.getMonth())) return;
+  window.FOLHA_MES = mes;
+  window.FOLHA_ANO = ano;
+  navigate('folha');
+}
+
+function verHoleriteCLT(colaboradorId, mes, ano) {
+  const c = APP.colaboradores.find(x => x.id == colaboradorId || x.id === colaboradorId);
+  if (!c) return;
+  const r          = calcularLiquidoCLT(c.salario);
+  const adiant     = parseFloat(c.adiantamento || 0);
+  const valeTransp = parseFloat(c.vale_transporte || 0);
+  const outrosDesc = parseFloat(c.outros_descontos || 0);
+  const liquidoReal = r.liquido - adiant - valeTransp - outrosDesc;
+  const nomeMes = new Date(parseInt(ano), parseInt(mes), 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+
+  const pontosMes = APP.pontos.filter(p => {
+    if (!p.data) return false;
+    const d = new Date(p.data + 'T00:00:00');
+    return d.getMonth() === parseInt(mes) && d.getFullYear() === parseInt(ano) &&
+           (p.colaborador_id == colaboradorId || p.colaboradorId == colaboradorId);
+  });
+  const diasPresente = pontosMes.filter(p => p.status === 'presente').length;
+  const horasTotais  = pontosMes.filter(p => p.hora_entrada && p.hora_saida).reduce((t, p) => {
+    return t + (new Date('2000-01-01T'+p.hora_saida) - new Date('2000-01-01T'+p.hora_entrada)) / 3600000;
+  }, 0);
+
+  const panel = document.getElementById('holerite-panel');
+  panel.style.display = 'block';
+  panel.innerHTML = `
+  <div class="table-card" style="border-color:rgba(240,165,0,0.3)">
+    <div class="table-header" style="background:rgba(240,165,0,0.04)">
+      <div>
+        <div class="table-title">📋 Holerite — ${c.nome}</div>
+        <div class="table-sub">${c.cargo} · ${nomeMes}</div>
+      </div>
+      <button class="btn btn-outline" style="font-size:11px" onclick="document.getElementById('holerite-panel').style.display='none'">Fechar</button>
+    </div>
+    <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- PROVENTOS -->
+      <div>
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px">Proventos</div>
+        <div class="folha-box">
+          <div class="folha-item"><span>Salário Base</span><span class="folha-plus">${fmt(c.salario)}</span></div>
+          <div class="folha-item"><span>FGTS (encargo empresa)</span><span style="color:var(--text3)">${fmt(r.fgts)}</span></div>
+          <div class="folha-item"><span>Provisão 13º (empresa)</span><span style="color:var(--text3)">${fmt(r.prov13)}</span></div>
+          <div class="folha-item"><span>Provisão Férias (empresa)</span><span style="color:var(--text3)">${fmt(r.provFerias)}</span></div>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px">Frequência no Mês</div>
+          <div class="folha-box">
+            <div class="folha-item"><span>Dias presentes (ponto)</span><span style="color:${diasPresente>0?'var(--green)':'var(--text3)'}">${diasPresente > 0 ? diasPresente + ' dias' : '— sem registro'}</span></div>
+            <div class="folha-item"><span>Horas trabalhadas</span><span style="color:var(--accent)">${horasTotais > 0 ? horasTotais.toFixed(1) + 'h' : '—'}</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- DESCONTOS -->
+      <div>
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px">Descontos</div>
+        <div class="folha-box">
+          <div class="folha-item"><span>INSS (desconto empregado)</span><span class="folha-deduct">-${fmt(r.inss)}</span></div>
+          <div class="folha-item"><span>IRRF</span><span class="folha-deduct">-${fmt(r.irrf)}</span></div>
+          ${adiant > 0 ? `<div class="folha-item"><span>Adiantamento salarial</span><span class="folha-deduct">-${fmt(adiant)}</span></div>` : ''}
+          ${valeTransp > 0 ? `<div class="folha-item"><span>Vale Transporte (6%)</span><span class="folha-deduct">-${fmt(valeTransp)}</span></div>` : ''}
+          ${outrosDesc > 0 ? `<div class="folha-item"><span>Outros descontos</span><span class="folha-deduct">-${fmt(outrosDesc)}</span></div>` : ''}
+          <div class="folha-item total">
+            <span>💰 Líquido a Receber</span>
+            <span style="color:var(--green);font-size:15px">${fmt(liquidoReal)}</span>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <div style="font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:10px">Custo Total Empresa</div>
+          <div class="folha-box">
+            <div class="folha-item"><span>Salário + FGTS + Provisões</span><span style="color:var(--accent);font-weight:500">${fmt(r.custoTotal)}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  panel.scrollIntoView({ behavior: 'smooth' });
 }
 
 // ── EPIs ──
