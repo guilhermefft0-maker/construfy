@@ -425,7 +425,8 @@ async function apiGet(endpoint) {
     });
     if (res.status === 401) { logout(); return []; }
     const data = await res.json();
-    return data.items ?? data.results ?? data ?? [];
+    // Worker retorna { ok, data: [] }
+    return data.data ?? data.items ?? data.results ?? [];
   } catch(e) { console.error('apiGet error', endpoint, e); return []; }
 }
 
