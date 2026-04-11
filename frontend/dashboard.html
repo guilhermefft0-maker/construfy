@@ -245,12 +245,13 @@
 
   <div class="sidebar-footer">
     <div class="user-pill">
-      <div class="user-avatar">AD</div>
-      <div>
-        <div class="user-name-hi">Admin</div>
-        <div class="user-name">construpro.com</div>
+      <div class="user-avatar" id="user-initials">--</div>
+      <div style="flex:1;min-width:0">
+        <div class="user-name-hi" id="user-display-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Carregando...</div>
+        <div class="user-name" id="user-display-email" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       </div>
     </div>
+    <button onclick="logout()" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border2);color:var(--text3);padding:6px;border-radius:var(--radius);font-size:11px;cursor:pointer;font-family:var(--font)">Sair</button>
   </div>
 </aside>
 
@@ -275,73 +276,21 @@
 </div>
 
 <script>
+// ── AUTH CHECK ──
+const _user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } })();
+if (!_user) { window.location.href = 'login.html'; }
+
 const APP = {
-  pontos: [
-    {id:'ponto1', colaborador_id:'col1', data:new Date().toISOString().split('T')[0], hora_entrada:'08:15', hora_saida:'17:45', status:'presente', obs:'Engenheiro principal', colaborador_nome:'COLABORADOR DEMO 1', cargo:'Engenheiro Civil'},
-    {id:'ponto2', colaborador_id:'col2', data:new Date().toISOString().split('T')[0], hora_entrada:'07:30', hora_saida:'18:00', status:'presente', obs:'Mestre de obras', colaborador_nome:'COLABORADOR DEMO 2', cargo:'Mestre de Obras'},
-    {id:'ponto3', colaborador_id:'col3', data:new Date().toISOString().split('T')[0], hora_entrada:'08:00', hora_saida:null, status:'presente', obs:'Pedreiro - ainda na obra', colaborador_nome:'COLABORADOR DEMO 3', cargo:'Pedreiro Oficial'},
-    {id:'ponto4', colaborador_id:'col4', data:new Date().toISOString().split('T')[0], hora_entrada:'09:20', hora_saida:'16:30', status:'presente', obs:'Engenheira estrutural', colaborador_nome:'COLABORADOR DEMO 4', cargo:'Engenheira Civil'},
-    {id:'ponto5', colaborador_id:'col5', data:new Date().toISOString().split('T')[0], hora_entrada:null, hora_saida:null, status:'ausente', obs:'Ajudante aguardando chamado', colaborador_nome:'COLABORADOR DEMO 5', cargo:'Ajudante Geral'}
-  ],
+  pontos: [],
   currentPage: 'dashboard',
-  empresa: { nome: 'Construtora Alfa LTDA', cnpj: '12.345.678/0001-99', regime: 'Lucro Presumido' },
-  obras: [
-    { id:1, nome:'Residencial Vista Verde', cliente:'João Matos SA', contrato:'R$ 2.800.000', inicio:'2024-03-01', prevFim:'2025-02-28', status:'Em andamento', avanco:62, medicoes:8, faturado:1540000, despesas:890000 },
-    { id:2, nome:'Galpão Industrial Norte', cliente:'LogTech LTDA', contrato:'R$ 980.000', inicio:'2024-06-10', prevFim:'2024-12-30', status:'Concluída', avanco:100, medicoes:5, faturado:980000, despesas:560000 },
-    { id:3, nome:'Condomínio Parque Sul', cliente:'Inv. Parque Sul', contrato:'R$ 5.200.000', inicio:'2024-09-01', prevFim:'2026-08-31', status:'Em andamento', avanco:18, medicoes:3, faturado:936000, despesas:480000 },
-  ],
-  medicoes: [
-    { id:1, obraId:1, numero:'MED-001', data:'2024-03-31', valor:320000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
-    { id:2, obraId:1, numero:'MED-002', data:'2024-04-30', valor:310000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
-    { id:3, obraId:1, numero:'MED-003', data:'2024-05-31', valor:280000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
-    { id:4, obraId:1, numero:'MED-004', data:'2024-06-30', valor:210000, status:'Faturada', responsavel:'Eng. Ana Paula' },
-    { id:5, obraId:2, numero:'MED-001', data:'2024-06-30', valor:196000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
-    { id:6, obraId:3, numero:'MED-001', data:'2024-09-30', valor:312000, status:'Faturada', responsavel:'Eng. João Ferreira' },
-  ],
-  faturamentos: [
-    { id:1, obraId:1, numero:'NF-0142', data:'2024-04-05', valor:320000, vencimento:'2024-05-05', status:'Recebida', formaPgto:'TED' },
-    { id:2, obraId:1, numero:'NF-0155', data:'2024-05-07', valor:310000, vencimento:'2024-06-07', status:'Recebida', formaPgto:'TED' },
-    { id:3, obraId:1, numero:'NF-0168', data:'2024-06-06', valor:280000, vencimento:'2024-07-06', status:'Vencida', formaPgto:'TED' },
-    { id:4, obraId:2, numero:'NF-0173', data:'2024-07-10', valor:196000, vencimento:'2024-08-10', status:'Recebida', formaPgto:'Boleto' },
-    { id:5, obraId:3, numero:'NF-0190', data:'2024-10-05', valor:312000, vencimento:'2024-11-05', status:'Pendente', formaPgto:'TED' },
-  ],
-  colaboradores: [
-    { id:1, nome:'Carlos Eduardo Lima', cpf:'123.456.789-00', cargo:'Engenheiro Civil', tipo:'CLT', salario:8500, obraId:1, admissao:'2022-05-10', status:'Ativo' },
-    { id:2, nome:'Marcos Antonio Silva', cpf:'234.567.890-11', cargo:'Mestre de Obras', tipo:'CLT', salario:4800, obraId:1, admissao:'2021-03-15', status:'Ativo' },
-    { id:3, nome:'João Pedro Costa', cpf:'345.678.901-22', cargo:'Pedreiro Oficial', tipo:'CLT', salario:2800, obraId:1, admissao:'2023-01-20', status:'Ativo' },
-    { id:4, nome:'Ana Paula Ferreira', cpf:'456.789.012-33', cargo:'Engenheira Civil', tipo:'CLT', salario:7200, obraId:3, admissao:'2023-07-01', status:'Ativo' },
-    { id:5, nome:'Pedro Henrique Nunes', cpf:'567.890.123-44', cargo:'Ajudante Geral', tipo:'Diarista', salario:220, obraId:1, admissao:'2024-03-01', status:'Ativo', diasTrabalhados:18 },
-    { id:6, nome:'Roberto Carlos Souza', cpf:'678.901.234-55', cargo:'Eletricista', tipo:'Diarista', salario:280, obraId:2, admissao:'2024-06-10', status:'Inativo', diasTrabalhados:22 },
-    { id:7, nome:'Luiz Fernando Mendes', cpf:'789.012.345-66', cargo:'Armador', tipo:'CLT', salario:3200, obraId:3, admissao:'2024-09-01', status:'Ativo' },
-  ],
-  epis: [
-    { id:1, nome:'Capacete de Segurança', categoria:'Proteção Craniana', estoque:48, minimo:20, validade:'2026-12-31', ca:'12345' },
-    { id:2, nome:'Botina de Segurança Bico Aço', categoria:'Proteção dos Pés', estoque:12, minimo:15, validade:'2027-06-30', ca:'23456' },
-    { id:3, nome:'Óculos de Proteção', categoria:'Proteção Ocular', estoque:35, minimo:20, validade:'2026-08-31', ca:'34567' },
-    { id:4, nome:'Luva de Raspa de Couro', categoria:'Proteção das Mãos', estoque:8, minimo:25, validade:'2026-03-31', ca:'45678' },
-    { id:5, nome:'Protetor Auricular', categoria:'Proteção Auditiva', estoque:60, minimo:30, validade:'2027-01-31', ca:'56789' },
-    { id:6, nome:'Cinto de Segurança Paraquedista', categoria:'Proteção Queda', estoque:6, minimo:8, validade:'2025-11-30', ca:'67890' },
-    { id:7, nome:'Máscara PFF2', categoria:'Proteção Respiratória', estoque:120, minimo:50, validade:'2025-12-31', ca:'78901' },
-  ],
-  entregasEPI: [
-    { id:1, epiId:1, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
-    { id:2, epiId:2, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
-    { id:3, epiId:1, colaboradorId:2, data:'2024-03-15', quantidade:1, devolvida:false },
-    { id:4, epiId:4, colaboradorId:3, data:'2024-03-20', quantidade:2, devolvida:false },
-    { id:5, epiId:6, colaboradorId:4, data:'2024-09-05', quantidade:1, devolvida:false },
-  ],
-  financeiro: [
-    { id:1, tipo:'Receita', descricao:'NF-0142 – Vista Verde', valor:320000, data:'2024-04-05', categoria:'Faturamento', obraId:1 },
-    { id:2, tipo:'Receita', descricao:'NF-0155 – Vista Verde', valor:310000, data:'2024-05-07', categoria:'Faturamento', obraId:1 },
-    { id:3, tipo:'Despesa', descricao:'Folha CLT – Abril', valor:38200, data:'2024-04-30', categoria:'Pessoal', obraId:1 },
-    { id:4, tipo:'Despesa', descricao:'Material – Vista Verde', valor:145000, data:'2024-04-15', categoria:'Materiais', obraId:1 },
-    { id:5, tipo:'Despesa', descricao:'Subempreiteiro elétrica', valor:42000, data:'2024-04-22', categoria:'Serviços', obraId:1 },
-    { id:6, tipo:'Receita', descricao:'NF-0173 – Galpão', valor:196000, data:'2024-07-10', categoria:'Faturamento', obraId:2 },
-    { id:7, tipo:'Despesa', descricao:'Equipamentos aluguel', valor:18500, data:'2024-07-05', categoria:'Equipamentos', obraId:2 },
-    { id:8, tipo:'Receita', descricao:'NF-0168 – Vista Verde', valor:280000, data:'2024-06-06', categoria:'Faturamento', obraId:1 },
-    { id:9, tipo:'Despesa', descricao:'Folha CLT – Junho', valor:41600, data:'2024-06-30', categoria:'Pessoal', obraId:1 },
-    { id:10, tipo:'Despesa', descricao:'ISS / Impostos', valor:29400, data:'2024-06-30', categoria:'Impostos', obraId:null },
-  ]
+  empresa: { nome: (_user?.name || 'Minha Empresa'), cnpj: '', regime: '' },
+  obras: [],
+  medicoes: [],
+  faturamentos: [],
+  colaboradores: [],
+  epis: [],
+  entregasEPI: [],
+  financeiro: []
 };
 
 function calcularINSS(salario) {
@@ -1569,6 +1518,25 @@ function gerarPDFColaboradores() {
 }
 
 // INICIALIZAR
+(function initUser() {
+  const u = _user;
+  if (!u) return;
+  const name = u.name || u.email || 'Usuário';
+  const email = u.email || '';
+  const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('user-initials').textContent = initials;
+  document.getElementById('user-display-name').textContent = name;
+  document.getElementById('user-display-email').textContent = email;
+  // Update empresa badge if present
+  const badge = document.getElementById('empresa-badge');
+  if (badge) badge.textContent = name;
+})();
+
+function logout() {
+  localStorage.removeItem('user');
+  window.location.href = 'login.html';
+}
+
 navigate('dashboard');
 </script>
 </body>
