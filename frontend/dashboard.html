@@ -1090,7 +1090,7 @@ function renderMedicoes() {
   </div>
   <div class="table-card">
     <table>
-      <thead><tr><th>Nº</th><th>Obra</th><th>Data</th><th>Valor</th><th>Responsável</th><th>Status</th></tr></thead>
+      <thead><tr><th>Nº</th><th>Obra</th><th>Data</th><th>Valor</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
         ${APP.medicoes.map(m => {
           const o = getObra(m.obraId);
@@ -1101,6 +1101,10 @@ function renderMedicoes() {
             <td style="color:var(--accent);font-family:var(--mono)">${fmt(m.valor)}</td>
             <td>${m.responsavel}</td>
             <td><span class="badge ${m.status==='Aprovada'?'badge-green':m.status==='Faturada'?'badge-blue':'badge-amber'}">${m.status}</span></td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormMedicao('${m.id}')">✏️</button>
+              <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirMedicao('${m.id}')">🗑</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1108,42 +1112,58 @@ function renderMedicoes() {
   </div>`;
 }
 
-function openFormMedicao() {
+function openFormMedicao(id) {
+  const m = id ? APP.medicoes.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
-    <div class="form-title">Nova Medição</div>
+    <div class="form-title">${m ? 'Editar Medição' : 'Nova Medição'}</div>
     <div class="form-grid">
       <div class="form-group full"><label>Obra</label>
         <select id="f-obra">
-          ${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}
+          ${APP.obras.map(o=>`<option value="${o.id}" ${m?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group"><label>Número</label><input id="f-numero" placeholder="MED-009"></div>
-      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
-      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor" placeholder="0"></div>
-      <div class="form-group"><label>Responsável</label><input id="f-resp" placeholder="Eng. Nome"></div>
+      <div class="form-group"><label>Número</label><input id="f-numero" placeholder="MED-009" value="${m?.numero||''}"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${m?.data||''}"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor" placeholder="0" value="${m?.valor||0}"></div>
+      <div class="form-group"><label>Responsável</label><input id="f-resp" placeholder="Eng. Nome" value="${m?.responsavel||''}"></div>
       <div class="form-group"><label>Status</label>
-        <select id="f-status"><option>Pendente</option><option>Aprovada</option><option>Faturada</option></select>
+        <select id="f-status">
+          <option ${m?.status==='Pendente'?'selected':''}>Pendente</option>
+          <option ${m?.status==='Aprovada'?'selected':''}>Aprovada</option>
+          <option ${m?.status==='Faturada'?'selected':''}>Faturada</option>
+        </select>
       </div>
     </div>
     <div class="form-actions">
+      ${m ? `<button class="btn btn-danger" onclick="excluirMedicao('${m.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarMedicao()">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarMedicao('${m?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
 
-async function salvarMedicao() {
+async function salvarMedicao(id) {
   const obraId = document.getElementById('f-obra').value;
   const numero = document.getElementById('f-numero').value.trim();
   const valor = parseFloat(document.getElementById('f-valor').value)||0;
   if (!numero) return alert('Informe o número da medição');
-  const nova = await apiPost('medicoes', {
-    obraId, numero, valor,
-    data: document.getElementById('f-data').value,
-    responsavel: document.getElementById('f-resp').value.trim(),
-    status: document.getElementById('f-status').value
-  });
-  APP.medicoes.unshift(normalizeMedicao(nova));
+  const payload = { obraId, numero, valor, data: document.getElementById('f-data').value, responsavel: document.getElementById('f-resp').value.trim(), status: document.getElementById('f-status').value };
+  if (id) {
+    await apiPut(`medicoes/${id}`, payload);
+    const m = APP.medicoes.find(x=>x.id==id);
+    if (m) Object.assign(m, payload);
+  } else {
+    const nova = await apiPost('medicoes', payload);
+    APP.medicoes.unshift(normalizeMedicao(nova));
+  }
+  closeForm();
+  navigate('medicoes');
+}
+
+async function excluirMedicao(id) {
+  if (!confirm('Excluir esta medição?')) return;
+  await apiDelete(`medicoes/${id}`);
+  APP.medicoes = APP.medicoes.filter(m=>m.id!=id);
   closeForm();
   navigate('medicoes');
 }
@@ -1166,7 +1186,7 @@ function renderFaturamento() {
   </div>
   <div class="table-card">
     <table>
-      <thead><tr><th>NF</th><th>Obra</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Status</th></tr></thead>
+      <thead><tr><th>NF</th><th>Obra</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
         ${APP.faturamentos.map(f => {
           const o = getObra(f.obraId);
@@ -1179,6 +1199,10 @@ function renderFaturamento() {
             <td style="color:var(--accent);font-family:var(--mono)">${fmt(f.valor)}</td>
             <td style="color:var(--text3)">${f.formaPgto}</td>
             <td><span class="badge ${badgeClass}">${f.status}</span></td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormFaturamento('${f.id}')">✏️</button>
+              <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirFaturamento('${f.id}')">🗑</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1186,35 +1210,46 @@ function renderFaturamento() {
   </div>`;
 }
 
-function openFormFaturamento() {
+function openFormFaturamento(id) {
+  const f = id ? APP.faturamentos.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
-    <div class="form-title">Nova Nota Fiscal</div>
+    <div class="form-title">${f ? 'Editar Nota Fiscal' : 'Nova Nota Fiscal'}</div>
     <div class="form-grid">
       <div class="form-group full"><label>Obra</label>
-        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}" ${f?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}</select>
       </div>
-      <div class="form-group"><label>Número NF</label><input id="f-numero" placeholder="NF-0200"></div>
-      <div class="form-group"><label>Data Emissão</label><input type="date" id="f-data"></div>
-      <div class="form-group"><label>Vencimento</label><input type="date" id="f-venc"></div>
-      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor"></div>
+      <div class="form-group"><label>Número NF</label><input id="f-numero" placeholder="NF-0200" value="${f?.numero||''}"></div>
+      <div class="form-group"><label>Data Emissão</label><input type="date" id="f-data" value="${f?.data||''}"></div>
+      <div class="form-group"><label>Vencimento</label><input type="date" id="f-venc" value="${f?.vencimento||''}"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor" value="${f?.valor||''}"></div>
       <div class="form-group"><label>Forma de Pagamento</label>
-        <select id="f-forma"><option>TED</option><option>Boleto</option><option>PIX</option><option>Cheque</option></select>
+        <select id="f-forma">
+          <option ${f?.formaPgto==='TED'?'selected':''}>TED</option>
+          <option ${f?.formaPgto==='Boleto'?'selected':''}>Boleto</option>
+          <option ${f?.formaPgto==='PIX'?'selected':''}>PIX</option>
+          <option ${f?.formaPgto==='Cheque'?'selected':''}>Cheque</option>
+        </select>
       </div>
       <div class="form-group"><label>Status</label>
-        <select id="f-status"><option>Pendente</option><option>Recebida</option><option>Vencida</option></select>
+        <select id="f-status">
+          <option ${f?.status==='Pendente'?'selected':''}>Pendente</option>
+          <option ${f?.status==='Recebida'?'selected':''}>Recebida</option>
+          <option ${f?.status==='Vencida'?'selected':''}>Vencida</option>
+        </select>
       </div>
     </div>
     <div class="form-actions">
+      ${f ? `<button class="btn btn-danger" onclick="excluirFaturamento('${f.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarFaturamento()">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarFaturamento('${f?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
 
-async function salvarFaturamento() {
+async function salvarFaturamento(id) {
   const numero = document.getElementById('f-numero').value.trim();
   if (!numero) return alert('Informe o número da NF');
-  const nova = await apiPost('faturamentos', {
+  const payload = {
     obraId: document.getElementById('f-obra').value,
     numero,
     data: document.getElementById('f-data').value,
@@ -1222,8 +1257,23 @@ async function salvarFaturamento() {
     valor: parseFloat(document.getElementById('f-valor').value)||0,
     formaPgto: document.getElementById('f-forma').value,
     status: document.getElementById('f-status').value,
-  });
-  APP.faturamentos.unshift(normalizeFat(nova));
+  };
+  if (id) {
+    await apiPut(`faturamentos/${id}`, payload);
+    const f = APP.faturamentos.find(x=>x.id==id);
+    if (f) Object.assign(f, payload);
+  } else {
+    const nova = await apiPost('faturamentos', payload);
+    APP.faturamentos.unshift(normalizeFat(nova));
+  }
+  closeForm();
+  navigate('faturamento');
+}
+
+async function excluirFaturamento(id) {
+  if (!confirm('Excluir esta nota fiscal?')) return;
+  await apiDelete(`faturamentos/${id}`);
+  APP.faturamentos = APP.faturamentos.filter(f=>f.id!=id);
   closeForm();
   navigate('faturamento');
 }
@@ -1255,7 +1305,7 @@ function renderColaboradores() {
   </div>
   <div class="table-card">
     <table>
-      <thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Tipo</th><th>Salário</th><th>Obra</th><th>Admissão</th><th>Status</th></tr></thead>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Tipo</th><th>Salário</th><th>Obra</th><th>Admissão</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
         ${APP.colaboradores.map(c => {
           const o = getObra(c.obraId);
@@ -1268,6 +1318,10 @@ function renderColaboradores() {
             <td style="color:var(--text3)">${trunc(o?.nome,18)}</td>
             <td style="font-family:var(--mono);font-size:12px">${fmtDate(c.admissao)}</td>
             <td><span class="badge ${c.status==='Ativo'?'badge-green':'badge-gray'}">${c.status}</span></td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormColaborador('${c.id}')">✏️</button>
+              <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirColaborador('${c.id}')">🗑</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1275,33 +1329,42 @@ function renderColaboradores() {
   </div>`;
 }
 
-function openFormColaborador() {
+function openFormColaborador(id) {
+  const c = id ? APP.colaboradores.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
-    <div class="form-title">Novo Colaborador</div>
+    <div class="form-title">${c ? 'Editar Colaborador' : 'Novo Colaborador'}</div>
     <div class="form-grid">
-      <div class="form-group full"><label>Nome Completo</label><input id="f-nome"></div>
-      <div class="form-group"><label>CPF</label><input id="f-cpf" placeholder="000.000.000-00"></div>
-      <div class="form-group"><label>Cargo</label><input id="f-cargo"></div>
+      <div class="form-group full"><label>Nome Completo</label><input id="f-nome" value="${c?.nome||''}"></div>
+      <div class="form-group"><label>CPF</label><input id="f-cpf" placeholder="000.000.000-00" value="${c?.cpf||''}"></div>
+      <div class="form-group"><label>Cargo</label><input id="f-cargo" value="${c?.cargo||''}"></div>
       <div class="form-group"><label>Tipo</label>
-        <select id="f-tipo"><option>CLT</option><option>Diarista</option><option>PJ</option></select>
+        <select id="f-tipo">
+          <option ${c?.tipo==='CLT'?'selected':''}>CLT</option>
+          <option ${c?.tipo==='Diarista'?'selected':''}>Diarista</option>
+          <option ${c?.tipo==='PJ'?'selected':''}>PJ</option>
+        </select>
       </div>
-      <div class="form-group"><label>Salário / Diária (R$)</label><input type="number" id="f-salario"></div>
+      <div class="form-group"><label>Salário / Diária (R$)</label><input type="number" id="f-salario" value="${c?.salario||''}"></div>
       <div class="form-group"><label>Obra</label>
-        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}" ${c?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}</select>
       </div>
-      <div class="form-group"><label>Data de Admissão</label><input type="date" id="f-admissao"></div>
+      <div class="form-group"><label>Data de Admissão</label><input type="date" id="f-admissao" value="${c?.admissao||''}"></div>
       <div class="form-group"><label>Status</label>
-        <select id="f-status"><option>Ativo</option><option>Inativo</option></select>
+        <select id="f-status">
+          <option ${c?.status==='Ativo'?'selected':''}>Ativo</option>
+          <option ${c?.status==='Inativo'?'selected':''}>Inativo</option>
+        </select>
       </div>
     </div>
     <div class="form-actions">
+      ${c ? `<button class="btn btn-danger" onclick="excluirColaborador('${c.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarColaborador()">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarColaborador('${c?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
 
-async function salvarColaborador() {
+async function salvarColaborador(id) {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome');
   const payload = {
@@ -1314,8 +1377,22 @@ async function salvarColaborador() {
     admissao: document.getElementById('f-admissao').value,
     status:   document.getElementById('f-status').value
   };
-  const novo = await apiPost('colaboradores', payload);
-  if (novo?.id) APP.colaboradores.push(normalizeColab({ ...payload, id: novo.id, obraId: payload.obra_id }));
+  if (id) {
+    await apiPut(`colaboradores/${id}`, payload);
+    const c = APP.colaboradores.find(x=>x.id==id);
+    if (c) Object.assign(c, { ...payload, obraId: payload.obra_id });
+  } else {
+    const novo = await apiPost('colaboradores', payload);
+    if (novo?.id) APP.colaboradores.push(normalizeColab({ ...payload, id: novo.id, obraId: payload.obra_id }));
+  }
+  closeForm();
+  navigate('colaboradores');
+}
+
+async function excluirColaborador(id) {
+  if (!confirm('Excluir este colaborador?')) return;
+  await apiDelete(`colaboradores/${id}`);
+  APP.colaboradores = APP.colaboradores.filter(c=>c.id!=id);
   closeForm();
   navigate('colaboradores');
 }
@@ -1397,7 +1474,7 @@ function renderEPIs() {
   <div class="table-card" style="margin-bottom:20px">
     <div class="table-header"><div class="table-title">Estoque de EPIs</div></div>
     <table>
-      <thead><tr><th>EPI</th><th>Categoria</th><th>CA</th><th>Estoque</th><th>Mínimo</th><th>Validade</th><th>Status</th></tr></thead>
+      <thead><tr><th>EPI</th><th>Categoria</th><th>CA</th><th>Estoque</th><th>Mínimo</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
         ${APP.epis.map(e => {
           const status = e.estoque < e.minimo ? 'Crítico' : e.estoque < e.minimo*1.3 ? 'Baixo' : 'OK';
@@ -1410,6 +1487,10 @@ function renderEPIs() {
             <td style="font-family:var(--mono)">${e.minimo}</td>
             <td style="font-size:12px;color:var(--text3)">${fmtDate(e.validade)}</td>
             <td><span class="badge ${badge}">${status}</span></td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormEPI('${e.id}')">✏️</button>
+              <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirEPI('${e.id}')">🗑</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1437,25 +1518,27 @@ function renderEPIs() {
   </div>`;
 }
 
-function openFormEPI() {
+function openFormEPI(id) {
+  const e = id ? APP.epis.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
-    <div class="form-title">Novo EPI</div>
+    <div class="form-title">${e ? 'Editar EPI' : 'Novo EPI'}</div>
     <div class="form-grid">
-      <div class="form-group full"><label>Nome</label><input id="f-nome"></div>
-      <div class="form-group"><label>Categoria</label><input id="f-cat" placeholder="Proteção Craniana"></div>
-      <div class="form-group"><label>CA (Nº Certificado)</label><input id="f-ca"></div>
-      <div class="form-group"><label>Estoque Inicial</label><input type="number" id="f-estoque" value="0"></div>
-      <div class="form-group"><label>Estoque Mínimo</label><input type="number" id="f-minimo" value="10"></div>
-      <div class="form-group"><label>Validade</label><input type="date" id="f-validade"></div>
+      <div class="form-group full"><label>Nome</label><input id="f-nome" value="${e?.nome||''}"></div>
+      <div class="form-group"><label>Categoria</label><input id="f-cat" placeholder="Proteção Craniana" value="${e?.categoria||''}"></div>
+      <div class="form-group"><label>CA (Nº Certificado)</label><input id="f-ca" value="${e?.ca||''}"></div>
+      <div class="form-group"><label>Estoque</label><input type="number" id="f-estoque" value="${e?.estoque??0}"></div>
+      <div class="form-group"><label>Estoque Mínimo</label><input type="number" id="f-minimo" value="${e?.minimo??10}"></div>
+      <div class="form-group"><label>Validade</label><input type="date" id="f-validade" value="${e?.validade||''}"></div>
     </div>
     <div class="form-actions">
+      ${e ? `<button class="btn btn-danger" onclick="excluirEPI('${e.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarEPI()">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarEPI('${e?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
 
-async function salvarEPI() {
+async function salvarEPI(id) {
   const nome = document.getElementById('f-nome').value.trim();
   if (!nome) return alert('Informe o nome do EPI');
   const payload = {
@@ -1466,8 +1549,22 @@ async function salvarEPI() {
     minimo:    parseInt(document.getElementById('f-minimo').value)||10,
     validade:  document.getElementById('f-validade').value
   };
-  const novo = await apiPost('epis', payload);
-  if (novo?.id) APP.epis.push({ ...payload, id: novo.id });
+  if (id) {
+    await apiPut(`epis/${id}`, payload);
+    const e = APP.epis.find(x=>x.id==id);
+    if (e) Object.assign(e, payload);
+  } else {
+    const novo = await apiPost('epis', payload);
+    if (novo?.id) APP.epis.push({ ...payload, id: novo.id });
+  }
+  closeForm();
+  navigate('epis');
+}
+
+async function excluirEPI(id) {
+  if (!confirm('Excluir este EPI?')) return;
+  await apiDelete(`epis/${id}`);
+  APP.epis = APP.epis.filter(e=>e.id!=id);
   closeForm();
   navigate('epis');
 }
@@ -1535,67 +1632,69 @@ function renderFinanceiro() {
     <div class="kpi-card"><div class="kpi-label">Saldo do Período</div><div class="kpi-value ${saldo>=0?'green':'red'}">${fmt(saldo)}</div></div>
   </div>
 
-  <div class="two-col" style="margin-bottom:20px">
-    <div class="table-card">
-      <div class="table-header"><div class="table-title">Despesas por Categoria</div></div>
-      <div style="padding:16px">
-        ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>{
-          const pct = Math.round((val/despesas)*100);
-          return `<div style="margin-bottom:14px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-              <span style="font-size:12px;color:var(--text)">${cat}</span>
-              <span style="font-size:12px;color:var(--red)">${fmt(val)}</span>
-            </div>
-            <div class="progress-bar"><div class="progress-fill red" style="width:${pct}%"></div></div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>
-    <div class="table-card">
-      <div class="table-header"><div class="table-title">Últimos Lançamentos</div></div>
+    <div class="table-card" style="margin-bottom:20px">
+      <div class="table-header"><div class="table-title">Todos os Lançamentos</div></div>
       <table>
-        <thead><tr><th>Descrição</th><th>Data</th><th>Tipo</th><th>Valor</th></tr></thead>
+        <thead><tr><th>Descrição</th><th>Categoria</th><th>Obra</th><th>Data</th><th>Tipo</th><th>Valor</th><th>Ações</th></tr></thead>
         <tbody>
-          ${[...APP.financeiro].reverse().slice(0,8).map(f=>`<tr>
-            <td><span class="strong">${trunc(f.descricao,22)}</span></td>
-            <td style="font-family:var(--mono);font-size:11px">${fmtDate(f.data)}</td>
-            <td><span class="badge ${f.tipo==='Receita'?'badge-green':'badge-red'}">${f.tipo}</span></td>
-            <td style="font-family:var(--mono);color:${f.tipo==='Receita'?'var(--green)':'var(--red)'}">${fmt(f.valor)}</td>
-          </tr>`).join('')}
+          ${[...APP.financeiro].reverse().map(f=>{
+            const o = getObra(f.obraId);
+            return `<tr>
+              <td><span class="strong">${trunc(f.descricao,28)}</span></td>
+              <td style="color:var(--text3)">${f.categoria}</td>
+              <td style="color:var(--text3);font-size:12px">${trunc(o?.nome||'—',18)}</td>
+              <td style="font-family:var(--mono);font-size:11px">${fmtDate(f.data)}</td>
+              <td><span class="badge ${f.tipo==='Receita'?'badge-green':'badge-red'}">${f.tipo}</span></td>
+              <td style="font-family:var(--mono);color:${f.tipo==='Receita'?'var(--green)':'var(--red)'}">${fmt(f.valor)}</td>
+              <td style="white-space:nowrap">
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormFinanceiro('${f.id}')">✏️</button>
+                <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirFinanceiro('${f.id}')">🗑</button>
+              </td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
-    </div>
-  </div>`;
+    </div>`;
 }
 
-function openFormFinanceiro() {
+function openFormFinanceiro(id) {
+  const f = id ? APP.financeiro.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
-    <div class="form-title">Novo Lançamento</div>
+    <div class="form-title">${f ? 'Editar Lançamento' : 'Novo Lançamento'}</div>
     <div class="form-grid">
       <div class="form-group"><label>Tipo</label>
-        <select id="f-tipo"><option>Receita</option><option>Despesa</option></select>
+        <select id="f-tipo">
+          <option ${f?.tipo==='Receita'?'selected':''}>Receita</option>
+          <option ${f?.tipo==='Despesa'?'selected':''}>Despesa</option>
+        </select>
       </div>
       <div class="form-group"><label>Categoria</label>
         <select id="f-cat">
-          <option>Faturamento</option><option>Pessoal</option><option>Materiais</option>
-          <option>Serviços</option><option>Equipamentos</option><option>Impostos</option><option>Outros</option>
+          <option ${f?.categoria==='Faturamento'?'selected':''}>Faturamento</option>
+          <option ${f?.categoria==='Pessoal'?'selected':''}>Pessoal</option>
+          <option ${f?.categoria==='Materiais'?'selected':''}>Materiais</option>
+          <option ${f?.categoria==='Serviços'?'selected':''}>Serviços</option>
+          <option ${f?.categoria==='Equipamentos'?'selected':''}>Equipamentos</option>
+          <option ${f?.categoria==='Impostos'?'selected':''}>Impostos</option>
+          <option ${f?.categoria==='Outros'?'selected':''}>Outros</option>
         </select>
       </div>
-      <div class="form-group full"><label>Descrição</label><input id="f-desc"></div>
-      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor"></div>
-      <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-group full"><label>Descrição</label><input id="f-desc" value="${f?.descricao||''}"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor" value="${f?.valor||''}"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${f?.data||new Date().toISOString().split('T')[0]}"></div>
       <div class="form-group full"><label>Obra (opcional)</label>
-        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}" ${f?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}</select>
       </div>
     </div>
     <div class="form-actions">
+      ${f ? `<button class="btn btn-danger" onclick="excluirFinanceiro('${f.id}')">🗑 Excluir</button><div style="flex:1"></div>` : ''}
       <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarFinanceiro()">Salvar</button>
+      <button class="btn btn-primary" onclick="salvarFinanceiro('${f?.id||''}')">Salvar</button>
     </div>`;
   document.getElementById('form-overlay').classList.add('open');
 }
 
-async function salvarFinanceiro() {
+async function salvarFinanceiro(id) {
   const desc = document.getElementById('f-desc').value.trim();
   if (!desc) return alert('Informe a descrição');
   const body = {
@@ -1606,8 +1705,22 @@ async function salvarFinanceiro() {
     categoria: document.getElementById('f-cat').value,
     obraId: document.getElementById('f-obra').value||null,
   };
-  const novo = await apiPost('financeiro', body);
-  APP.financeiro.unshift(normalizeFin(novo));
+  if (id) {
+    await apiPut(`financeiro/${id}`, body);
+    const f = APP.financeiro.find(x=>x.id==id);
+    if (f) Object.assign(f, body);
+  } else {
+    const novo = await apiPost('financeiro', body);
+    APP.financeiro.unshift(normalizeFin(novo));
+  }
+  closeForm();
+  navigate('financeiro');
+}
+
+async function excluirFinanceiro(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  await apiDelete(`financeiro/${id}`);
+  APP.financeiro = APP.financeiro.filter(f=>f.id!=id);
   closeForm();
   navigate('financeiro');
 }
