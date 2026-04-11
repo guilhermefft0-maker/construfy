@@ -3,993 +3,1573 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - ConstruFY</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#f59e0b">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; font-src https://fonts.gstatic.com;">
-  <link rel="manifest" href="manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>ConstruPRO — Painel de Gestão</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
     :root {
-      --bg: #0a0c12;
-      --bg-card: #111621;
-      --bg-hover: #151a25;
-      --glass: rgba(255,255,255,0.03);
-      --border: rgba(255,255,255,0.08);
-      --border-glow: rgba(100,116,139,0.2);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --accent: #f59e0b;
-      --accent-glow: #f59e0b33;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --gradient: linear-gradient(135deg, #0a0c12 0%, #1a1f2e 100%);
-      --shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-      --shadow-card: 0 10px 25px rgba(0,0,0,0.3);
-      --radius: 16px;
-      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --bg: #0d0f12;
+      --bg2: #13161b;
+      --bg3: #1a1e25;
+      --bg4: #222730;
+      --border: #2a2f3a;
+      --border2: #343b4a;
+      --text: #e8eaf0;
+      --text2: #8b92a5;
+      --text3: #5a6075;
+      --accent: #f0a500;
+      --accent2: #c87e00;
+      --green: #22c55e;
+      --green2: #166534;
+      --red: #ef4444;
+      --red2: #7f1d1d;
+      --blue: #3b82f6;
+      --blue2: #1e3a6e;
+      --purple: #a78bfa;
+      --radius: 8px;
+      --radius2: 12px;
+      --sidebar: 220px;
+      --font: 'IBM Plex Sans', sans-serif;
+      --mono: 'IBM Plex Mono', monospace;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      font-family: 'Inter', sans-serif;
-      background: var(--gradient);
-      color: var(--text);
-      overflow-x: hidden;
-    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:var(--font); font-size:14px; height:100vh; overflow:hidden; display:flex; }
 
-    /* ─── LAYOUT ─── */
-    .app-container { min-height: 100vh; }
-    .topbar {
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(20px);
-      background: rgba(10,12,18,0.95);
-      border-bottom: 1px solid var(--border);
-      z-index: 100;
-      padding: 1rem 2rem;
-    }
-    .topbar-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
-    .company-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .company-avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), #fbbf24);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #000;
-    }
-    .company-details h1 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.125rem;
-    }
-    .company-details p {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-    }
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .notification-bell {
-      position: relative;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .notification-bell:hover { background: var(--bg-hover); }
-    .notification-badge {
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: var(--danger);
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .user-menu {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      cursor: pointer;
-      padding: 0.5rem 1rem;
-      border-radius: 12px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      transition: var(--transition);
-    }
-    .user-menu:hover { background: var(--bg-hover); }
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      color: #000;
-      font-size: 0.875rem;
-    }
+    /* ── SIDEBAR ── */
+    #sidebar { width:var(--sidebar); min-width:var(--sidebar); background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100vh; overflow-y:auto; }
+    .logo { padding:20px 18px 16px; border-bottom:1px solid var(--border); }
+    .logo-mark { font-size:18px; font-weight:600; color:var(--accent); letter-spacing:-0.5px; }
+    .logo-mark span { color:var(--text); }
+    .logo-sub { font-size:10px; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; margin-top:2px; }
+    .nav-section { padding:16px 0 4px; }
+    .nav-label { font-size:9px; color:var(--text3); letter-spacing:1.8px; text-transform:uppercase; padding:0 18px 8px; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:9px 18px; cursor:pointer; color:var(--text2); font-size:13px; font-weight:400; transition:all 0.15s; border-left:2px solid transparent; }
+    .nav-item:hover { color:var(--text); background:var(--bg3); }
+    .nav-item.active { color:var(--accent); background:rgba(240,165,0,0.07); border-left-color:var(--accent); }
+    .nav-icon { width:16px; height:16px; opacity:0.7; flex-shrink:0; }
+    .nav-item.active .nav-icon { opacity:1; }
+    .sidebar-footer { margin-top:auto; padding:14px 18px; border-top:1px solid var(--border); }
+    .user-pill { display:flex; align-items:center; gap:10px; }
+    .user-avatar { width:30px; height:30px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#000; flex-shrink:0; }
+    .user-name { font-size:12px; color:var(--text2); }
+    .user-name-hi { font-size:12px; color:var(--text); font-weight:500; }
 
-    /* ─── SIDEBAR ─── */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 280px;
-      max-width: 280px;
-      background: var(--bg-card);
-      border-right: 1px solid var(--border);
-      overflow-y: auto;
-      z-index: 90;
-      backdrop-filter: blur(20px);
-    }
-    .logo-section {
-      padding: 2rem 1.5rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
-    }
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), #fbbf24);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .nav-section {
-      padding: 0 1.5rem;
-    }
-    .nav-title {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 1rem 0 0.5rem;
-      margin-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.875rem 1rem;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 0.25rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .nav-item:hover, .nav-item.active {
-      background: var(--glass);
-      color: var(--text);
-      border: 1px solid var(--accent);
-    }
-    .nav-icon { 
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-    }
+    /* ── MAIN ── */
+    #main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+    #topbar { height:52px; background:var(--bg2); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 24px; gap:12px; }
+    .topbar-title { font-size:15px; font-weight:500; color:var(--text); flex:1; }
+    .topbar-badge { background:var(--bg4); border:1px solid var(--border2); color:var(--text2); font-size:11px; padding:3px 10px; border-radius:20px; }
+    #content { flex:1; overflow-y:auto; padding:24px; }
 
-    /* ─── MAIN CONTENT ─── */
-    .main-content {
-      margin-left: 280px;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2.5rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .page-title {
-      font-size: 2rem;
-      font-weight: 700;
-    }
-    .page-actions {
-      display: flex;
-      gap: 1rem;
-    }
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition);
-      border: none;
-      font-size: 0.875rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #fbbf24);
-      color: #000;
-      box-shadow: var(--shadow-glow);
-    }
-    .btn-primary:hover { transform: translateY(-1px); }
-    .btn-secondary {
-      background: var(--glass);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
+    /* ── BUTTONS ── */
+    .btn { display:inline-flex; align-items:center; gap:7px; padding:7px 14px; border-radius:var(--radius); font-size:12px; font-weight:500; cursor:pointer; border:none; font-family:var(--font); transition:all 0.15s; }
+    .btn-primary { background:var(--accent); color:#000; }
+    .btn-primary:hover { background:var(--accent2); }
+    .btn-outline { background:transparent; border:1px solid var(--border2); color:var(--text2); }
+    .btn-outline:hover { background:var(--bg4); color:var(--text); }
+    .btn-danger { background:transparent; border:1px solid var(--red2); color:var(--red); }
+    .btn-success { background:rgba(34,197,94,0.1); border:1px solid var(--green2); color:var(--green); }
+    .btn-success:hover { background:rgba(34,197,94,0.18); }
 
-    /* ─── CARDS ─── */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2.5rem;
-    }
-    .stat-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      backdrop-filter: blur(20px);
-      transition: var(--transition);
-    }
-    .stat-card:hover {
-      border-color: var(--border-glow);
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-card);
-    }
-    .stat-primary {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-    }
-    .stat-secondary {
-      color: var(--text-muted);
-      font-size: 0.875rem;
-    }
-    .stat-change {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      margin-top: 0.75rem;
-      font-weight: 500;
-    }
-    .change-positive { color: var(--success); }
-    .change-negative { color: var(--danger); }
+    /* ── KPI CARDS ── */
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .kpi-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:18px; }
+    .kpi-label { font-size:11px; color:var(--text3); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:8px; }
+    .kpi-value { font-size:24px; font-weight:500; color:var(--text); font-variant-numeric:tabular-nums; }
+    .kpi-value.green { color:var(--green); }
+    .kpi-value.amber { color:var(--accent); }
+    .kpi-value.red   { color:var(--red); }
+    .kpi-change { font-size:11px; color:var(--text3); margin-top:6px; }
 
-    /* ─── TABLES ─── */
-    .data-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 1.5rem;
-    }
-    .table-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      backdrop-filter: blur(20px);
-    }
-    .table-header {
-      padding: 1.5rem 2rem;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .table-title {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-    .table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .table th, .table td {
-      padding: 1rem 2rem 1rem 1.5rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border);
-    }
-    .table th {
-      font-weight: 600;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .table td {
-      font-size: 0.875rem;
-    }
-    .table tr:hover {
-      background: var(--glass);
-    }
-    .status {
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-    .status.em-andamento { background: rgba(34,197,94,0.2); color: var(--success); }
-    .status.concluida { background: rgba(34,197,94,0.1); color: var(--success); }
-    .status.aprovada { background: rgba(59,130,246,0.2); color: #60a5fa; }
-    .status.faturada { background: var(--accent-glow); color: var(--accent); }
-    .status.pendente { background: rgba(239,68,68,0.1); color: var(--danger); }
-    .status.vencida { background: rgba(239,68,68,0.2); color: var(--danger); }
+    /* ── TABLES ── */
+    .table-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); overflow:hidden; margin-bottom:20px; }
+    .table-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .table-title { font-size:13px; font-weight:500; color:var(--text); }
+    .table-sub { font-size:11px; color:var(--text3); margin-top:2px; }
+    table { width:100%; border-collapse:collapse; }
+    th { text-align:left; padding:10px 16px; font-size:10px; color:var(--text3); letter-spacing:1.2px; text-transform:uppercase; border-bottom:1px solid var(--border); font-weight:500; }
+    td { padding:11px 16px; font-size:13px; color:var(--text2); border-bottom:1px solid var(--border); }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--bg3); }
+    td .strong { color:var(--text); font-weight:500; }
 
-    /* ─── FORMS ─── */
-    .form-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(8px);
-      z-index: 200;
-      opacity: 0;
-      visibility: hidden;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .form-overlay.open {
-      opacity: 1;
-      visibility: visible;
-    }
-    .form-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      max-width: 500px;
-      width: 90vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      backdrop-filter: blur(20px);
-      transform: scale(0.9) translateY(20px);
-      transition: var(--transition);
-    }
-    .form-overlay.open .form-box {
-      transform: scale(1) translateY(0);
-    }
-    .form-title {
-      padding: 2rem 2.5rem 1rem;
-      font-size: 1.5rem;
-      font-weight: 600;
-      border-bottom: 1px solid var(--border);
-    }
-    .form-actions {
-      padding: 2rem;
-      display: flex;
-      gap: 1rem;
-      justify-content: flex-end;
-      border-top: 1px solid var(--border);
-    }
+    /* ── BADGES ── */
+    .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:500; }
+    .badge-green  { background:rgba(34,197,94,0.12);  color:var(--green);  }
+    .badge-amber  { background:rgba(240,165,0,0.12);  color:var(--accent); }
+    .badge-red    { background:rgba(239,68,68,0.12);  color:var(--red);    }
+    .badge-blue   { background:rgba(59,130,246,0.12); color:var(--blue);   }
+    .badge-purple { background:rgba(167,139,250,0.12);color:var(--purple); }
+    .badge-gray   { background:var(--bg4);            color:var(--text3);  }
 
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 1024px) {
-      .sidebar { transform: translateX(-100%); }
-      .main-content { margin-left: 0; }
-      .topbar-content { padding: 0 1rem; }
-    }
-    @media (max-width: 768px) {
-      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
-      .data-grid { grid-template-columns: 1fr; }
-    }
+    /* ── FORM OVERLAY ── */
+    .form-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; align-items:center; justify-content:center; }
+    .form-overlay.open { display:flex; }
+    .form-box { background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius2); padding:24px; width:560px; max-height:85vh; overflow-y:auto; }
+    .form-title { font-size:15px; font-weight:500; color:var(--text); margin-bottom:18px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-group { display:flex; flex-direction:column; gap:5px; }
+    .form-group.full { grid-column:1/-1; }
+    label { font-size:11px; color:var(--text3); letter-spacing:0.5px; }
+    input, select, textarea { background:var(--bg3); border:1px solid var(--border2); color:var(--text); border-radius:var(--radius); padding:8px 12px; font-size:13px; font-family:var(--font); outline:none; transition:border 0.15s; width:100%; }
+    input:focus, select:focus, textarea:focus { border-color:var(--accent); }
+    select option { background:var(--bg3); }
+    .form-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:16px; border-top:1px solid var(--border); }
 
-    .hidden { display: none !important; }
+    /* ── PROGRESS ── */
+    .progress-bar { height:5px; background:var(--bg4); border-radius:3px; overflow:hidden; }
+    .progress-fill { height:100%; border-radius:3px; background:var(--accent); transition:width 0.3s; }
+    .progress-fill.green { background:var(--green); }
+    .progress-fill.red { background:var(--red); }
+
+    /* ── LAYOUTS ── */
+    .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+    /* ── MINI CHART ── */
+    .mini-chart { display:flex; align-items:flex-end; gap:4px; height:60px; }
+    .bar-col { flex:1; background:rgba(240,165,0,0.15); border-radius:3px 3px 0 0; border-top:2px solid var(--accent); min-height:4px; transition:height 0.3s; }
+    .bar-col.green { background:rgba(34,197,94,0.15); border-top-color:var(--green); }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
+
+    /* ── DETAIL / FOLHA ── */
+    .detail-panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:20px; }
+    .folha-box { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; }
+    .folha-item { display:flex; justify-content:space-between; padding:5px 0; font-size:12px; color:var(--text2); }
+    .folha-item.total { border-top:1px solid var(--border2); margin-top:6px; padding-top:10px; font-weight:500; font-size:13px; color:var(--text); }
+    .folha-deduct { color:var(--red); }
+    .folha-plus { color:var(--green); }
+
+    /* ── OBRA CARDS ── */
+    .obra-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:20px; }
+    .obra-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:16px; cursor:pointer; transition:all 0.15s; }
+    .obra-card:hover { border-color:var(--border2); background:var(--bg3); }
+    .obra-card.selected { border-color:var(--accent); }
+    .obra-name { font-size:13px; font-weight:500; color:var(--text); margin-bottom:4px; }
+    .obra-client { font-size:11px; color:var(--text3); margin-bottom:12px; }
+    .obra-stats { display:flex; justify-content:space-between; margin-bottom:10px; }
+    .obra-stat-val { font-size:16px; font-weight:500; color:var(--accent); }
+    .obra-stat-label { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; }
+
+    /* ── DOT ── */
+    .dot { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; }
+    .dot.green { background:var(--green); }
+    .dot.amber { background:var(--accent); }
+
+    /* ── SECTION TITLE ── */
+    .section-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:12px; }
+
+    /* ── ANIMATION ── */
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .page { animation:fadeIn 0.2s ease; }
+
+    /* ── PRINT ── */
+    @media print {
+      #sidebar, #topbar { display:none; }
+      #content { padding:0; overflow:visible; }
+      body { height:auto; overflow:visible; }
+    }
   </style>
 </head>
 <body>
-  <div class="app-container">
-    <!-- Topbar -->
-    <div class="topbar" id="topbar">
-      <div class="topbar-content">
-        <div class="company-info" id="company-info">
-          <div class="company-avatar" id="company-avatar">CF</div>
-          <div class="company-details">
-            <h1 id="company-name">Carregando...</h1>
-            <p id="company-plan">Plano FREE</p>
-          </div>
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Constru<span>PRO</span></div>
+    <div class="logo-sub">Gestão Completa</div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Visão Geral</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.5"/></svg>
+      Dashboard
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Operações</div>
+    <div class="nav-item" onclick="navigate('obras')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.5"/></svg>
+      Obras
+    </div>
+    <div class="nav-item" onclick="navigate('medicoes')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="1.5"/></svg>
+      Medições
+    </div>
+    <div class="nav-item" onclick="navigate('faturamento')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" stroke-width="1.5"/><path d="M9 4h6v4H9z" stroke-width="1.5"/></svg>
+      Faturamento
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Pessoas</div>
+    <div class="nav-item" onclick="navigate('colaboradores')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.5"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85" stroke-width="1.5"/></svg>
+      Colaboradores
+    </div>
+    <div class="nav-item" onclick="navigate('ponto')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 11.08V9a2 2 0 0 0-2-2h-6.08" stroke-width="1.5"/><path d="M11 11h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" stroke-width="1.5"/><path d="M20 20v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2" stroke-width="1.5"/><path d="M2 18V8a2 2 0 0 1 2-2h4" stroke-width="1.5"/></svg>
+      Controle de Ponto
+    </div>
+    <div class="nav-item" onclick="navigate('folha')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" stroke-width="1.5"/><path d="M2 10h20" stroke-width="1.5"/></svg>
+      Folha de Pagamento
+    </div>
+    <div class="nav-item" onclick="navigate('epis')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke-width="1.5"/></svg>
+      EPIs
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Financeiro</div>
+    <div class="nav-item" onclick="navigate('financeiro')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/></svg>
+      Financeiro
+    </div>
+    <div class="nav-item" onclick="navigate('relatorios')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-width="1.5"/></svg>
+      Relatórios / PDF
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-pill">
+      <div class="user-avatar">AD</div>
+      <div>
+        <div class="user-name-hi">Admin</div>
+        <div class="user-name">construpro.com</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">Dashboard</div>
+    <div class="topbar-badge" id="empresa-badge">Construtora Alfa LTDA</div>
+    <div style="display:flex;gap:8px;margin-left:12px">
+      <button class="btn btn-outline" onclick="navigate('relatorios')">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke-width="2"/></svg>
+        Exportar PDF
+      </button>
+    </div>
+  </div>
+  <div id="content"></div>
+</div>
+
+<!-- FORM OVERLAY -->
+<div class="form-overlay" id="form-overlay">
+  <div class="form-box" id="form-box"></div>
+</div>
+
+<script>
+const APP = {
+  pontos: [
+    {id:'ponto1', colaborador_id:'col1', data:new Date().toISOString().split('T')[0], hora_entrada:'08:15', hora_saida:'17:45', status:'presente', obs:'Engenheiro principal', colaborador_nome:'COLABORADOR DEMO 1', cargo:'Engenheiro Civil'},
+    {id:'ponto2', colaborador_id:'col2', data:new Date().toISOString().split('T')[0], hora_entrada:'07:30', hora_saida:'18:00', status:'presente', obs:'Mestre de obras', colaborador_nome:'COLABORADOR DEMO 2', cargo:'Mestre de Obras'},
+    {id:'ponto3', colaborador_id:'col3', data:new Date().toISOString().split('T')[0], hora_entrada:'08:00', hora_saida:null, status:'presente', obs:'Pedreiro - ainda na obra', colaborador_nome:'COLABORADOR DEMO 3', cargo:'Pedreiro Oficial'},
+    {id:'ponto4', colaborador_id:'col4', data:new Date().toISOString().split('T')[0], hora_entrada:'09:20', hora_saida:'16:30', status:'presente', obs:'Engenheira estrutural', colaborador_nome:'COLABORADOR DEMO 4', cargo:'Engenheira Civil'},
+    {id:'ponto5', colaborador_id:'col5', data:new Date().toISOString().split('T')[0], hora_entrada:null, hora_saida:null, status:'ausente', obs:'Ajudante aguardando chamado', colaborador_nome:'COLABORADOR DEMO 5', cargo:'Ajudante Geral'}
+  ],
+  currentPage: 'dashboard',
+  empresa: { nome: 'Construtora Alfa LTDA', cnpj: '12.345.678/0001-99', regime: 'Lucro Presumido' },
+  obras: [
+    { id:1, nome:'Residencial Vista Verde', cliente:'João Matos SA', contrato:'R$ 2.800.000', inicio:'2024-03-01', prevFim:'2025-02-28', status:'Em andamento', avanco:62, medicoes:8, faturado:1540000, despesas:890000 },
+    { id:2, nome:'Galpão Industrial Norte', cliente:'LogTech LTDA', contrato:'R$ 980.000', inicio:'2024-06-10', prevFim:'2024-12-30', status:'Concluída', avanco:100, medicoes:5, faturado:980000, despesas:560000 },
+    { id:3, nome:'Condomínio Parque Sul', cliente:'Inv. Parque Sul', contrato:'R$ 5.200.000', inicio:'2024-09-01', prevFim:'2026-08-31', status:'Em andamento', avanco:18, medicoes:3, faturado:936000, despesas:480000 },
+  ],
+  medicoes: [
+    { id:1, obraId:1, numero:'MED-001', data:'2024-03-31', valor:320000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:2, obraId:1, numero:'MED-002', data:'2024-04-30', valor:310000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:3, obraId:1, numero:'MED-003', data:'2024-05-31', valor:280000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:4, obraId:1, numero:'MED-004', data:'2024-06-30', valor:210000, status:'Faturada', responsavel:'Eng. Ana Paula' },
+    { id:5, obraId:2, numero:'MED-001', data:'2024-06-30', valor:196000, status:'Aprovada', responsavel:'Eng. Carlos Lima' },
+    { id:6, obraId:3, numero:'MED-001', data:'2024-09-30', valor:312000, status:'Faturada', responsavel:'Eng. João Ferreira' },
+  ],
+  faturamentos: [
+    { id:1, obraId:1, numero:'NF-0142', data:'2024-04-05', valor:320000, vencimento:'2024-05-05', status:'Recebida', formaPgto:'TED' },
+    { id:2, obraId:1, numero:'NF-0155', data:'2024-05-07', valor:310000, vencimento:'2024-06-07', status:'Recebida', formaPgto:'TED' },
+    { id:3, obraId:1, numero:'NF-0168', data:'2024-06-06', valor:280000, vencimento:'2024-07-06', status:'Vencida', formaPgto:'TED' },
+    { id:4, obraId:2, numero:'NF-0173', data:'2024-07-10', valor:196000, vencimento:'2024-08-10', status:'Recebida', formaPgto:'Boleto' },
+    { id:5, obraId:3, numero:'NF-0190', data:'2024-10-05', valor:312000, vencimento:'2024-11-05', status:'Pendente', formaPgto:'TED' },
+  ],
+  colaboradores: [
+    { id:1, nome:'Carlos Eduardo Lima', cpf:'123.456.789-00', cargo:'Engenheiro Civil', tipo:'CLT', salario:8500, obraId:1, admissao:'2022-05-10', status:'Ativo' },
+    { id:2, nome:'Marcos Antonio Silva', cpf:'234.567.890-11', cargo:'Mestre de Obras', tipo:'CLT', salario:4800, obraId:1, admissao:'2021-03-15', status:'Ativo' },
+    { id:3, nome:'João Pedro Costa', cpf:'345.678.901-22', cargo:'Pedreiro Oficial', tipo:'CLT', salario:2800, obraId:1, admissao:'2023-01-20', status:'Ativo' },
+    { id:4, nome:'Ana Paula Ferreira', cpf:'456.789.012-33', cargo:'Engenheira Civil', tipo:'CLT', salario:7200, obraId:3, admissao:'2023-07-01', status:'Ativo' },
+    { id:5, nome:'Pedro Henrique Nunes', cpf:'567.890.123-44', cargo:'Ajudante Geral', tipo:'Diarista', salario:220, obraId:1, admissao:'2024-03-01', status:'Ativo', diasTrabalhados:18 },
+    { id:6, nome:'Roberto Carlos Souza', cpf:'678.901.234-55', cargo:'Eletricista', tipo:'Diarista', salario:280, obraId:2, admissao:'2024-06-10', status:'Inativo', diasTrabalhados:22 },
+    { id:7, nome:'Luiz Fernando Mendes', cpf:'789.012.345-66', cargo:'Armador', tipo:'CLT', salario:3200, obraId:3, admissao:'2024-09-01', status:'Ativo' },
+  ],
+  epis: [
+    { id:1, nome:'Capacete de Segurança', categoria:'Proteção Craniana', estoque:48, minimo:20, validade:'2026-12-31', ca:'12345' },
+    { id:2, nome:'Botina de Segurança Bico Aço', categoria:'Proteção dos Pés', estoque:12, minimo:15, validade:'2027-06-30', ca:'23456' },
+    { id:3, nome:'Óculos de Proteção', categoria:'Proteção Ocular', estoque:35, minimo:20, validade:'2026-08-31', ca:'34567' },
+    { id:4, nome:'Luva de Raspa de Couro', categoria:'Proteção das Mãos', estoque:8, minimo:25, validade:'2026-03-31', ca:'45678' },
+    { id:5, nome:'Protetor Auricular', categoria:'Proteção Auditiva', estoque:60, minimo:30, validade:'2027-01-31', ca:'56789' },
+    { id:6, nome:'Cinto de Segurança Paraquedista', categoria:'Proteção Queda', estoque:6, minimo:8, validade:'2025-11-30', ca:'67890' },
+    { id:7, nome:'Máscara PFF2', categoria:'Proteção Respiratória', estoque:120, minimo:50, validade:'2025-12-31', ca:'78901' },
+  ],
+  entregasEPI: [
+    { id:1, epiId:1, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:2, epiId:2, colaboradorId:1, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:3, epiId:1, colaboradorId:2, data:'2024-03-15', quantidade:1, devolvida:false },
+    { id:4, epiId:4, colaboradorId:3, data:'2024-03-20', quantidade:2, devolvida:false },
+    { id:5, epiId:6, colaboradorId:4, data:'2024-09-05', quantidade:1, devolvida:false },
+  ],
+  financeiro: [
+    { id:1, tipo:'Receita', descricao:'NF-0142 – Vista Verde', valor:320000, data:'2024-04-05', categoria:'Faturamento', obraId:1 },
+    { id:2, tipo:'Receita', descricao:'NF-0155 – Vista Verde', valor:310000, data:'2024-05-07', categoria:'Faturamento', obraId:1 },
+    { id:3, tipo:'Despesa', descricao:'Folha CLT – Abril', valor:38200, data:'2024-04-30', categoria:'Pessoal', obraId:1 },
+    { id:4, tipo:'Despesa', descricao:'Material – Vista Verde', valor:145000, data:'2024-04-15', categoria:'Materiais', obraId:1 },
+    { id:5, tipo:'Despesa', descricao:'Subempreiteiro elétrica', valor:42000, data:'2024-04-22', categoria:'Serviços', obraId:1 },
+    { id:6, tipo:'Receita', descricao:'NF-0173 – Galpão', valor:196000, data:'2024-07-10', categoria:'Faturamento', obraId:2 },
+    { id:7, tipo:'Despesa', descricao:'Equipamentos aluguel', valor:18500, data:'2024-07-05', categoria:'Equipamentos', obraId:2 },
+    { id:8, tipo:'Receita', descricao:'NF-0168 – Vista Verde', valor:280000, data:'2024-06-06', categoria:'Faturamento', obraId:1 },
+    { id:9, tipo:'Despesa', descricao:'Folha CLT – Junho', valor:41600, data:'2024-06-30', categoria:'Pessoal', obraId:1 },
+    { id:10, tipo:'Despesa', descricao:'ISS / Impostos', valor:29400, data:'2024-06-30', categoria:'Impostos', obraId:null },
+  ]
+};
+
+function calcularINSS(salario) {
+  const limites = [1412.00, 2666.68, 4000.03, 7786.02];
+  const aliq = [0.075, 0.09, 0.12, 0.14];
+  let inss = 0;
+  for (let i = 0; i < limites.length; i++) {
+    const prev = i === 0 ? 0 : limites[i-1];
+    if (salario > prev) inss += (Math.min(salario, limites[i]) - prev) * aliq[i];
+    if (salario <= limites[i]) break;
+  }
+  return Math.min(inss, 7786.02 * 0.14);
+}
+
+function calcularIRRF(salarioBruto, inss) {
+  const base = salarioBruto - inss;
+  const faixas = [
+    { ate: 2259.20, aliq: 0, ded: 0 },
+    { ate: 2826.65, aliq: 0.075, ded: 169.44 },
+    { ate: 3751.05, aliq: 0.15, ded: 381.44 },
+    { ate: 4664.68, aliq: 0.225, ded: 662.77 },
+    { ate: Infinity, aliq: 0.275, ded: 896.00 },
+  ];
+  for (const f of faixas) {
+    if (base <= f.ate) return Math.max(0, base * f.aliq - f.ded);
+  }
+  return 0;
+}
+
+function calcularLiquidoCLT(salario) {
+  const inss = calcularINSS(salario);
+  const irrf = calcularIRRF(salario, inss);
+  const fgts = salario * 0.08;
+  const prov13 = salario / 12;
+  const provFerias = (salario / 12) * (1 + 1/3);
+  const liquido = salario - inss - irrf;
+  const custoTotal = salario + fgts + prov13 + provFerias;
+  return { inss, irrf, fgts, prov13, provFerias, liquido, custoTotal };
+}
+
+const fmt = n => new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(n);
+const fmtN = n => new Intl.NumberFormat('pt-BR').format(n);
+const fmtDate = d => new Date(d + 'T00:00:00').toLocaleDateString('pt-BR');
+const trunc = (s, n) => s && s.length > n ? s.substring(0, n) + '…' : (s || '—');
+
+function getObra(id) { return APP.obras.find(o => o.id === id); }
+function getColaborador(id) { return APP.colaboradores.find(c => c.id === id); }
+function getEPI(id) { return APP.epis.find(e => e.id === id); }
+
+const pageTitles = {
+  dashboard: 'Dashboard',
+  obras: 'Obras',
+  medicoes: 'Medições',
+  faturamento: 'Faturamento',
+  colaboradores: 'Colaboradores',
+  ponto: 'Controle de Ponto',
+  folha: 'Folha de Pagamento',
+  epis: 'EPIs',
+  financeiro: 'Financeiro',
+  relatorios: 'Relatórios'
+};
+
+function navigate(page) {
+  APP.currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => {
+    if (el.getAttribute('onclick')?.includes(`'${page}'`)) el.classList.add('active');
+  });
+  document.getElementById('page-title').textContent = pageTitles[page] || page;
+  const pages = { 
+    dashboard:renderDashboard, 
+    obras:renderObras, 
+    medicoes:renderMedicoes, 
+    faturamento:renderFaturamento, 
+    colaboradores:renderColaboradores, 
+    ponto:renderPonto, 
+    folha:renderFolha, 
+    epis:renderEPIs, 
+    financeiro:renderFinanceiro, 
+    relatorios:renderRelatorios 
+  };
+  document.getElementById('content').innerHTML = `<div class="page">${(pages[page] || (() => '<p style="color:var(--text3)">Em desenvolvimento</p>'))()}</div>`;
+}
+
+function renderDashboard() {
+  const totalFaturado = APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
+  const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente'||f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
+  const totalDespesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  const obrasAtivas = APP.obras.filter(o=>o.status==='Em andamento').length;
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out'];
+  const receitasMes = [0,0,320000,630000,310000,280000,196000,0,312000,0];
+  const maxR = Math.max(...receitasMes) || 1;
+  const barsRec = receitasMes.map((v,i) => `<div class="bar-col green" style="height:${Math.round((v/maxR)*56)+4}px" title="${meses[i]}: ${fmt(v)}"></div>`).join('');
+
+  return `
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Receitas Recebidas</div><div class="kpi-value green">${fmt(totalFaturado)}</div><div class="kpi-change">▲ Confirmadas no período</div></div>
+    <div class="kpi-card"><div class="kpi-label">A Receber / Vencido</div><div class="kpi-value amber">${fmt(totalPendente)}</div><div class="kpi-change">⚠ Verificar vencimentos</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total de Despesas</div><div class="kpi-value red">${fmt(totalDespesas)}</div><div class="kpi-change">Consolidado período</div></div>
+    <div class="kpi-card"><div class="kpi-label">Obras em Andamento</div><div class="kpi-value">${obrasAtivas}</div><div class="kpi-change">${APP.obras.length} obras no total</div></div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:20px">
+    <div class="table-card">
+      <div class="table-header"><div><div class="table-title">Receitas por mês</div><div class="table-sub">Valores faturados e recebidos</div></div></div>
+      <div style="padding:18px 18px 14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          ${meses.map(m => `<span style="font-size:9px;color:var(--text3);flex:1;text-align:center">${m}</span>`).join('')}
         </div>
-        <div class="topbar-actions">
-          <div class="notification-bell" title="Notificações">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
-            <div class="notification-badge">3</div>
-          </div>
-          <div class="user-menu" onclick="toggleUserMenu()">
-            <div class="user-avatar">JS</div>
-            <span id="user-name">João Silva</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><polyline points="6 9 12 15 18 9"></polyline></svg>
-          </div>
+        <div class="mini-chart">${barsRec}</div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div><div class="table-title">Avanço das obras</div><div class="table-sub">% físico concluído</div></div></div>
+      <div style="padding:18px">
+        ${APP.obras.map(o => `
+          <div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;color:var(--text)">${trunc(o.nome, 28)}</span>
+              <span style="font-size:12px;color:var(--accent);font-weight:500">${o.avanco}%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div></div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Últimas Medições</div></div>
+      <table>
+        <thead><tr><th>Obra</th><th>Nº</th><th>Valor</th><th>Status</th></tr></thead>
+        <tbody>
+          ${APP.medicoes.slice(-5).reverse().map(m => {
+            const o = getObra(m.obraId);
+            return `<tr>
+              <td><span class="strong">${trunc(o?.nome,18)}</span></td>
+              <td>${m.numero}</td>
+              <td style="color:var(--accent);font-family:var(--mono)">${fmt(m.valor)}</td>
+              <td><span class="badge ${m.status==='Aprovada'?'badge-green':'badge-blue'}">${m.status}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Alertas de EPIs</div></div>
+      <table>
+        <thead><tr><th>EPI</th><th>Estoque</th><th>Mínimo</th><th>Status</th></tr></thead>
+        <tbody>
+          ${APP.epis.filter(e=>e.estoque<e.minimo*1.3).map(e=>`<tr>
+            <td><span class="strong">${trunc(e.nome,20)}</span></td>
+            <td style="font-family:var(--mono)">${e.estoque}</td>
+            <td style="font-family:var(--mono)">${e.minimo}</td>
+            <td><span class="badge ${e.estoque<e.minimo?'badge-red':'badge-amber'}">${e.estoque<e.minimo?'Crítico':'Baixo'}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+// ── estado do filtro de data do ponto
+if (!window.PONTO_DATA_FILTRO) window.PONTO_DATA_FILTRO = new Date().toISOString().split('T')[0];
+
+function renderPonto() {
+  const dataFiltro = window.PONTO_DATA_FILTRO;
+  const dataFiltroFmt = new Date(dataFiltro + 'T00:00:00').toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+  const isHoje = dataFiltro === new Date().toISOString().split('T')[0];
+
+  const pontosDia = APP.pontos.filter(p => p.data === dataFiltro);
+  const totalPresentes = pontosDia.filter(p => p.status === 'presente').length;
+  const totalAusentes  = pontosDia.filter(p => p.status === 'ausente').length;
+  const horasTotais    = pontosDia.filter(p => p.hora_saida && p.hora_entrada).reduce((total, p) => {
+    return total + (new Date('2000-01-01T' + p.hora_saida) - new Date('2000-01-01T' + p.hora_entrada)) / 3600000;
+  }, 0);
+
+  // Dias com registro para o mini-calendário de navegação rápida
+  const diasComRegistro = [...new Set(APP.pontos.map(p => p.data))].sort();
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:20px;font-weight:500;color:var(--text)">Controle de Ponto</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px;text-transform:capitalize">${dataFiltroFmt}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <!-- Navegação de data -->
+        <div style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:4px 10px">
+          <button onclick="navegarDia(-1)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0 4px;line-height:1" title="Dia anterior">‹</button>
+          <input type="date" id="ponto-data-picker" value="${dataFiltro}"
+            onchange="filtrarPontoPorData(this.value)"
+            style="background:transparent;border:none;color:var(--text);font-size:13px;font-family:var(--font);outline:none;cursor:pointer;width:130px">
+          <button onclick="navegarDia(1)" style="background:none;border:none;color:${isHoje?'var(--text3)':'var(--text2)'};cursor:${isHoje?'default':'pointer'};font-size:16px;padding:0 4px;line-height:1" title="Próximo dia" ${isHoje?'disabled':''}>›</button>
         </div>
+        ${!isHoje ? `<button class="btn btn-outline" onclick="filtrarPontoPorData('${new Date().toISOString().split('T')[0]}')">Hoje</button>` : ''}
+        <button class="btn btn-outline" onclick="exportPontoCSV()">📥 CSV</button>
+        <button class="btn btn-primary" onclick="openFormPonto()">+ Registrar Ponto</button>
       </div>
     </div>
 
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="logo-section">
-        <div class="logo">ConstruFY</div>
-      </div>
-      
-      <!-- Dashboard -->
-      <div class="nav-section">
-        <div class="nav-item active" onclick="loadSection('dashboard')">
-          <div class="nav-icon">📊</div>
-          <span>Dashboard</span>
-        </div>
-      </div>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Presentes</div><div class="kpi-value green">${totalPresentes}</div><div class="kpi-change">${dataFiltro}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Ausentes</div><div class="kpi-value red">${totalAusentes}</div><div class="kpi-change">${dataFiltro}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Registros no dia</div><div class="kpi-value">${pontosDia.length}</div><div class="kpi-change">Total geral: ${APP.pontos.length}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Horas Trabalhadas</div><div class="kpi-value amber">${horasTotais.toFixed(1)}h</div><div class="kpi-change">Soma das saídas registradas</div></div>
+    </div>
 
-      <!-- Obras (FREE) -->
-      <div class="nav-section">
-        <div class="nav-title">Obras &amp; Medições (FREE)</div>
-        <div class="nav-item" onclick="loadSection('obras')">
-          <div class="nav-icon">🏗️</div>
-          <span>Obras</span>
-        </div>
-        <div class="nav-item" onclick="loadSection('medicoes')">
-          <div class="nav-icon">📏</div>
-          <span>Medições</span>
-        </div>
-        <div class="nav-item" onclick="loadSection('colaboradores')">
-          <div class="nav-icon">👥</div>
-          <span>Colaboradores (até 5)</span>
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Registros — ${pontosDia.length ? pontosDia.length + ' colaborador(es)' : 'Nenhum registro neste dia'}</div>
+          ${diasComRegistro.length > 1 ? `<div class="table-sub">Dias com registro: ${diasComRegistro.map(d => `<span onclick="filtrarPontoPorData('${d}')" style="cursor:pointer;margin-right:6px;color:${d===dataFiltro?'var(--accent)':'var(--text3)'};text-decoration:${d===dataFiltro?'underline':'none'}">${new Date(d+'T00:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</span>`).join('')}</div>` : ''}
         </div>
       </div>
+      ${pontosDia.length === 0 ? `
+        <div style="padding:40px;text-align:center">
+          <div style="font-size:32px;margin-bottom:12px">📅</div>
+          <div style="color:var(--text2);margin-bottom:6px">Nenhum ponto registrado em ${new Date(dataFiltro+'T00:00:00').toLocaleDateString('pt-BR')}</div>
+          <div style="color:var(--text3);font-size:12px;margin-bottom:16px">Use o botão abaixo para registrar pontos retroativos nesta data</div>
+          <button class="btn btn-primary" onclick="openFormPonto()">+ Registrar Ponto nesta Data</button>
+        </div>
+      ` : `
+      <table>
+        <thead><tr><th>Colaborador</th><th>Cargo</th><th>Data</th><th>Entrada</th><th>Saída</th><th>Total</th><th>Status</th><th>Observações</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${pontosDia.map(p => {
+            let horasP = '—';
+            if (p.hora_entrada && p.hora_saida) {
+              const diff = (new Date('2000-01-01T'+p.hora_saida) - new Date('2000-01-01T'+p.hora_entrada)) / 3600000;
+              horasP = diff.toFixed(1) + 'h';
+            }
+            return `<tr>
+              <td><span class="strong">${p.colaborador_nome}</span></td>
+              <td>${p.cargo}</td>
+              <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${new Date(p.data+'T00:00:00').toLocaleDateString('pt-BR')}</td>
+              <td style="font-family:var(--mono);color:${p.hora_entrada ? 'var(--green)' : 'var(--red)'}">${p.hora_entrada || '—'}</td>
+              <td style="font-family:var(--mono);color:${p.hora_saida ? 'var(--green)' : 'var(--text3)'}">${p.hora_saida || '—'}</td>
+              <td style="font-family:var(--mono);color:var(--accent)">${horasP}</td>
+              <td><span class="badge ${p.status === 'presente' ? 'badge-green' : 'badge-red'}">${p.status.toUpperCase()}</span></td>
+              <td style="color:var(--text3);font-size:12px">${p.obs}</td>
+              <td style="white-space:nowrap">
+                ${!p.hora_entrada ? `<button class="btn btn-success" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="editarBatida('${p.id}','entrada')">▶ Entrada</button>` : ''}
+                ${p.hora_entrada && !p.hora_saida ? `<button class="btn btn-primary" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="editarBatida('${p.id}','saida')">■ Saída</button>` : ''}
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px" onclick="openEditPonto('${p.id}')" title="Editar registro">✏️</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`}
+    </div>`;
+}
 
-      <!-- PRO Features (Hidden on FREE) -->
-      <div class="nav-section hidden" id="nav-faturamento">
-        <div class="nav-title">Faturamento PRO</div>
-        <div class="nav-item" onclick="loadSection('faturamentos')">
-          <div class="nav-icon">💰</div>
-          <span>Faturamentos</span>
-        </div>
-      </div>
+function filtrarPontoPorData(data) {
+  window.PONTO_DATA_FILTRO = data;
+  navigate('ponto');
+}
 
-      <div class="nav-section hidden" id="nav-financeiro">
-        <div class="nav-title">Financeiro PRO</div>
-        <div class="nav-item" onclick="loadSection('financeiro')">
-          <div class="nav-icon">💹</div>
-          <span>Fluxo de Caixa</span>
-        </div>
-      </div>
+function navegarDia(delta) {
+  const atual = new Date(window.PONTO_DATA_FILTRO + 'T00:00:00');
+  atual.setDate(atual.getDate() + delta);
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  if (atual > hoje) return; // não permite ir além de hoje
+  window.PONTO_DATA_FILTRO = atual.toISOString().split('T')[0];
+  navigate('ponto');
+}
 
-      <div class="nav-section hidden" id="nav-epis">
-        <div class="nav-title">EPIs PRO</div>
-        <div class="nav-item" onclick="loadSection('epis')">
-          <div class="nav-icon">🦺</div>
-          <span>Estoque EPIs</span>
-        </div>
-        <div class="nav-item" onclick="loadSection('entregas_epi')">
-          <div class="nav-icon">📦</div>
-          <span>Entregas</span>
-        </div>
-      </div>
+function editarBatida(id, tipo) {
+  const ponto = APP.pontos.find(p => p.id === id);
+  if (!ponto) return;
+  const agora = new Date().toTimeString().slice(0,5);
+  if (tipo === 'entrada') {
+    ponto.hora_entrada = agora;
+    ponto.status = 'presente';
+  } else {
+    ponto.hora_saida = agora;
+  }
+  navigate('ponto');
+}
 
-      <!-- Config -->
-      <div class="nav-section">
-        <div class="nav-title">Configurações</div>
-        <div class="nav-item" onclick="loadSection('perfil')">
-          <div class="nav-icon">⚙️</div>
-          <span>Perfil</span>
-        </div>
-        <div class="nav-item" onclick="loadSection('plan')">
-          <div class="nav-icon">💎</div>
-          <span>Plano &amp; Faturamento</span>
-        </div>
-        <div class="nav-item" onclick="logout()">
-          <div class="nav-icon">🚪</div>
-          <span>Sair</span>
-        </div>
+function openEditPonto(id) {
+  const p = APP.pontos.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">✏️ Editar Registro de Ponto</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--text);font-weight:500">${p.colaborador_nome}</div>
+      <div style="font-size:11px;color:var(--text3)">${p.cargo} · ${new Date(p.data+'T00:00:00').toLocaleDateString('pt-BR')}</div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Hora de Entrada</label><input type="time" id="fe-entrada" value="${p.hora_entrada||''}"></div>
+      <div class="form-group"><label>Hora de Saída</label><input type="time" id="fe-saida" value="${p.hora_saida||''}"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="fe-status">
+          <option value="presente" ${p.status==='presente'?'selected':''}>Presente</option>
+          <option value="ausente"  ${p.status==='ausente'?'selected':''}>Ausente</option>
+        </select>
       </div>
-    </nav>
+      <div class="form-group"><label>Observações</label><input id="fe-obs" value="${p.obs||''}"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger" onclick="excluirPonto('${p.id}')">🗑 Excluir</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicaoPonto('${p.id}')">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
 
-    <!-- Main Content -->
-    <main class="main-content" id="main-content">
-      <!-- Loading -->
-      <div style="display:flex;align-items:center;justify-content:center;height:60vh;flex-direction:column;gap:1rem;">
-        <div style="width:48px;height:48px;border:3px solid var(--glass);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;"></div>
-        <div style="color:var(--text-muted);">Carregando dashboard...</div>
+function salvarEdicaoPonto(id) {
+  const p = APP.pontos.find(x => x.id === id);
+  if (!p) return;
+  p.hora_entrada = document.getElementById('fe-entrada').value || null;
+  p.hora_saida   = document.getElementById('fe-saida').value   || null;
+  p.status       = document.getElementById('fe-status').value;
+  p.obs          = document.getElementById('fe-obs').value.trim();
+  closeForm();
+  navigate('ponto');
+}
+
+function excluirPonto(id) {
+  if (!confirm('Excluir este registro de ponto?')) return;
+  APP.pontos = APP.pontos.filter(p => p.id !== id);
+  closeForm();
+  navigate('ponto');
+}
+
+function openFormPonto() {
+  const dataAtual = window.PONTO_DATA_FILTRO;
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Registrar Ponto</div>
+    <div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.2);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--text2)">
+      💡 <strong style="color:var(--accent)">Registro Administrativo</strong> — você pode registrar o ponto de qualquer dia, inclusive datas retroativas.
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Colaborador</label>
+        <select id="f-colaborador">
+          ${APP.colaboradores.filter(c => c.status === 'Ativo').map(c =>
+            `<option value="${c.id}">${c.nome} — ${c.cargo}</option>`
+          ).join('')}
+        </select>
       </div>
-    </main>
+      <div class="form-group">
+        <label>Data do Ponto</label>
+        <input type="date" id="f-data" value="${dataAtual}" max="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-status" onchange="toggleHorasForm(this.value)">
+          <option value="presente">Presente</option>
+          <option value="ausente">Ausente</option>
+        </select>
+      </div>
+      <div class="form-group" id="grupo-entrada">
+        <label>Hora de Entrada</label>
+        <input type="time" id="f-entrada" value="08:00">
+      </div>
+      <div class="form-group" id="grupo-saida">
+        <label>Hora de Saída <span style="color:var(--text3);font-weight:400">(opcional)</span></label>
+        <input type="time" id="f-saida">
+      </div>
+      <div class="form-group full">
+        <label>Observações</label>
+        <textarea rows="2" id="f-obs" placeholder="Motivo da falta, observação, ajuste retroativo..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPonto()">Registrar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function toggleHorasForm(status) {
+  const show = status === 'presente';
+  document.getElementById('grupo-entrada').style.display = show ? '' : 'none';
+  document.getElementById('grupo-saida').style.display   = show ? '' : 'none';
+}
+
+function salvarPonto() {
+  const colId  = document.getElementById('f-colaborador').value;
+  const data   = document.getElementById('f-data').value;
+  const status = document.getElementById('f-status').value;
+  const obs    = document.getElementById('f-obs').value.trim();
+  const col    = APP.colaboradores.find(c => c.id == colId);
+  if (!col)  return alert('Selecione um colaborador');
+  if (!data) return alert('Informe a data');
+
+  // Verificar se já existe registro deste colaborador nessa data
+  const jaExiste = APP.pontos.find(p => p.colaborador_id == colId && p.data === data);
+  if (jaExiste) {
+    if (!confirm(`Já existe um registro de ${col.nome} em ${new Date(data+'T00:00:00').toLocaleDateString('pt-BR')}. Deseja substituir?`)) return;
+    APP.pontos = APP.pontos.filter(p => !(p.colaborador_id == colId && p.data === data));
+  }
+
+  const novoPonto = {
+    id: 'ponto' + Date.now(),
+    colaborador_id: colId,
+    data,
+    hora_entrada: status === 'presente' ? (document.getElementById('f-entrada').value || null) : null,
+    hora_saida:   status === 'presente' ? (document.getElementById('f-saida').value   || null) : null,
+    status,
+    obs: obs || (status === 'presente' ? 'Registro administrativo' : 'Falta registrada pelo administrador'),
+    colaborador_nome: col.nome,
+    cargo: col.cargo
+  };
+
+  APP.pontos.unshift(novoPonto);
+  // Atualiza o filtro para o dia que foi registrado
+  window.PONTO_DATA_FILTRO = data;
+  closeForm();
+  navigate('ponto');
+}
+
+function exportPontoCSV() {
+  const data = window.PONTO_DATA_FILTRO;
+  const pontos = APP.pontos.filter(p => p.data === data);
+  let csv = 'Data,Colaborador,Cargo,Entrada,Saída,Status,Observações\n';
+  pontos.forEach(p => {
+    csv += `"${p.data}","${p.colaborador_nome}","${p.cargo}","${p.hora_entrada || ''}","${p.hora_saida || ''}","${p.status}","${p.obs}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ponto_${data}.csv`;
+  a.click();
+}
+
+function renderObras() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Gestão de Obras</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.obras.length} obras · ${APP.obras.filter(o=>o.status==='Em andamento').length} em execução</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormObra()">+ Nova Obra</button>
   </div>
 
-  <!-- Form Overlay -->
-  <div class="form-overlay" id="form-overlay">
-    <div class="form-box" id="form-box"></div>
+  <div class="obra-grid">
+    ${APP.obras.map(o => `
+    <div class="obra-card" onclick="verDetalheObra(${o.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+        <span class="badge ${o.status==='Em andamento'?'badge-green':'badge-gray'}">${o.status}</span>
+        <span style="font-size:11px;color:var(--text3)">${o.avanco}% concluído</span>
+      </div>
+      <div class="obra-name">${o.nome}</div>
+      <div class="obra-client">${o.cliente}</div>
+      <div class="progress-bar" style="margin-bottom:14px">
+        <div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div>
+      </div>
+      <div class="obra-stats">
+        <div><div class="obra-stat-val">${fmt(o.faturado)}</div><div class="obra-stat-label">Faturado</div></div>
+        <div><div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas)}</div><div class="obra-stat-label">Despesas</div></div>
+        <div><div class="obra-stat-val" style="color:var(--green)">${fmt(o.faturado-o.despesas)}</div><div class="obra-stat-label">Resultado</div></div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+        <span>Contrato: <span style="color:var(--text)">${o.contrato}</span></span>
+        <span>${o.medicoes} medições</span>
+      </div>
+    </div>`).join('')}
   </div>
 
-  <script>
-    // ─── CONSTANTS ───
-    const API_BASE = '/api';
-    let APP = {
-      user: null,
-      empresa: null,
-      sections: {}
-    };
+  <div class="table-card" id="detalhe-obra-panel" style="display:none">
+    <div class="table-header">
+      <div class="table-title" id="detalhe-obra-title">Detalhes da Obra</div>
+      <button class="btn btn-outline" onclick="document.getElementById('detalhe-obra-panel').style.display='none'">Fechar</button>
+    </div>
+    <div id="detalhe-obra-body" style="padding:20px"></div>
+  </div>`;
+}
 
-    // ─── INIT ───
-    async function init() {
-      await authCheck();
-      await loadEmpresa();
-      renderTopbar();
-      loadSection('dashboard');
-    }
+// ── FORM HELPERS ──
+function closeForm() {
+  document.getElementById('form-overlay').classList.remove('open');
+}
 
-    // ─── AUTH CHECK ───
-    async function authCheck() {
-      try {
-        const res = await fetch(API_BASE + '/auth/me', { credentials: 'include' });
-        const data = await res.json();
-        if (!data.ok) {
-          window.location.href = 'login.html';
-          return false;
-        }
-        APP.user = data.user;
-        return true;
-      } catch {
-        window.location.href = 'login.html';
-        return false;
-      }
-    }
+// ── OBRAS ──
+function openFormObra(id) {
+  const o = id ? APP.obras.find(x=>x.id===id) : null;
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">${o ? 'Editar Obra' : 'Nova Obra'}</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome da Obra</label><input id="f-nome" value="${o?.nome||''}"></div>
+      <div class="form-group"><label>Cliente</label><input id="f-cliente" value="${o?.cliente||''}"></div>
+      <div class="form-group"><label>Contrato</label><input id="f-contrato" value="${o?.contrato||''}"></div>
+      <div class="form-group"><label>Início</label><input type="date" id="f-inicio" value="${o?.inicio||''}"></div>
+      <div class="form-group"><label>Previsão Fim</label><input type="date" id="f-prevfim" value="${o?.prevFim||''}"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status">
+          <option ${o?.status==='Em andamento'?'selected':''}>Em andamento</option>
+          <option ${o?.status==='Concluída'?'selected':''}>Concluída</option>
+          <option ${o?.status==='Paralisada'?'selected':''}>Paralisada</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Avanço (%)</label><input type="number" id="f-avanco" min="0" max="100" value="${o?.avanco||0}"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarObra(${o?.id||'null'})">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
 
-// ─── LOAD EMPRESA ───
-    async function loadEmpresa() {
-      try {
-        const res = await fetch(API_BASE + '/auth/me', { credentials: 'include' });
-        const data = await res.json();
-        APP.empresa = data.user;
-      } catch {
-        window.location.href = 'login.html';
-      }
-      applyFreePlanUI();
-    }
+function salvarObra(id) {
+  const nome = document.getElementById('f-nome').value.trim();
+  if (!nome) return alert('Informe o nome da obra');
+  if (id) {
+    const o = APP.obras.find(x=>x.id===id);
+    o.nome = nome;
+    o.cliente = document.getElementById('f-cliente').value.trim();
+    o.contrato = document.getElementById('f-contrato').value.trim();
+    o.inicio = document.getElementById('f-inicio').value;
+    o.prevFim = document.getElementById('f-prevfim').value;
+    o.status = document.getElementById('f-status').value;
+    o.avanco = parseInt(document.getElementById('f-avanco').value)||0;
+  } else {
+    APP.obras.push({
+      id: Date.now(), nome,
+      cliente: document.getElementById('f-cliente').value.trim(),
+      contrato: document.getElementById('f-contrato').value.trim(),
+      inicio: document.getElementById('f-inicio').value,
+      prevFim: document.getElementById('f-prevfim').value,
+      status: document.getElementById('f-status').value,
+      avanco: parseInt(document.getElementById('f-avanco').value)||0,
+      medicoes:0, faturado:0, despesas:0
+    });
+  }
+  closeForm();
+  navigate('obras');
+}
 
+function verDetalheObra(id) {
+  const o = getObra(id);
+  if (!o) return;
+  const panel = document.getElementById('detalhe-obra-panel');
+  document.getElementById('detalhe-obra-title').textContent = o.nome;
+  const meds = APP.medicoes.filter(m=>m.obraId===id);
+  const cols = APP.colaboradores.filter(c=>c.obraId===id && c.status==='Ativo');
+  document.getElementById('detalhe-obra-body').innerHTML = `
+    <div class="three-col" style="margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Cliente</div><div style="color:var(--text)">${o.cliente}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Contrato</div><div style="color:var(--accent)">${o.contrato}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Período</div><div style="color:var(--text)">${fmtDate(o.inicio)} → ${fmtDate(o.prevFim)}</div></div>
+    </div>
+    <div class="three-col" style="margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Faturado</div><div style="color:var(--green);font-weight:500">${fmt(o.faturado)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Despesas</div><div style="color:var(--red);font-weight:500">${fmt(o.despesas)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Resultado</div><div style="color:${o.faturado-o.despesas>=0?'var(--green)':'var(--red)'};font-weight:500">${fmt(o.faturado-o.despesas)}</div></div>
+    </div>
+    <div class="two-col">
+      <div>
+        <div class="section-title">Medições (${meds.length})</div>
+        ${meds.length ? `<table><thead><tr><th>Nº</th><th>Data</th><th>Valor</th><th>Status</th></tr></thead><tbody>
+          ${meds.map(m=>`<tr><td>${m.numero}</td><td>${fmtDate(m.data)}</td><td style="color:var(--accent)">${fmt(m.valor)}</td><td><span class="badge ${m.status==='Aprovada'?'badge-green':'badge-blue'}">${m.status}</span></td></tr>`).join('')}
+        </tbody></table>` : '<div style="color:var(--text3);font-size:12px">Nenhuma medição</div>'}
+      </div>
+      <div>
+        <div class="section-title">Equipe (${cols.length})</div>
+        ${cols.length ? cols.map(c=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><div class="user-avatar" style="width:28px;height:28px;font-size:10px">${c.nome.split(' ').map(x=>x[0]).slice(0,2).join('')}</div><div><div style="font-size:12px;color:var(--text)">${c.nome}</div><div style="font-size:11px;color:var(--text3)">${c.cargo}</div></div></div>`).join('') : '<div style="color:var(--text3);font-size:12px">Nenhum colaborador</div>'}
+      </div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="openFormObra(${o.id})">✏️ Editar</button>
+    </div>`;
+  panel.style.display = 'block';
+  panel.scrollIntoView({ behavior:'smooth' });
+}
 
-    // ─── RENDER TOPBAR ───
-    function renderTopbar() {
-      document.getElementById('company-avatar').textContent = APP.empresa.razao_social?.[0] || 'C';
-      document.getElementById('company-name').textContent = APP.empresa.razao_social || 'Demo Construtora';
-      document.getElementById('user-name').textContent = APP.user?.nome?.split(' ')[0] || 'Usuário';
-      document.getElementById('company-plan').textContent = `Plano ${APP.empresa.plano?.toUpperCase() || 'FREE'}`;
-    }
+// ── MEDIÇÕES ──
+function renderMedicoes() {
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Medições</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.medicoes.length} medições registradas</div>
+    </div>
+    <button class="btn btn-primary" onclick="openFormMedicao()">+ Nova Medição</button>
+  </div>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>Nº</th><th>Obra</th><th>Data</th><th>Valor</th><th>Responsável</th><th>Status</th></tr></thead>
+      <tbody>
+        ${APP.medicoes.map(m => {
+          const o = getObra(m.obraId);
+          return `<tr>
+            <td><span class="strong">${m.numero}</span></td>
+            <td>${trunc(o?.nome,25)}</td>
+            <td style="font-family:var(--mono);font-size:12px">${fmtDate(m.data)}</td>
+            <td style="color:var(--accent);font-family:var(--mono)">${fmt(m.valor)}</td>
+            <td>${m.responsavel}</td>
+            <td><span class="badge ${m.status==='Aprovada'?'badge-green':m.status==='Faturada'?'badge-blue':'badge-amber'}">${m.status}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
 
-    // ─── FREE PLAN UI ───
-    function applyFreePlanUI() {
-      if (APP.empresa.plano !== 'free') return;
-      
-      // Hide PRO sections
-      ['nav-faturamento', 'nav-financeiro', 'nav-epis', 'nav-folha', 'nav-relatorios'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-      });
+function openFormMedicao() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Nova Medição</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Obra</label>
+        <select id="f-obra">
+          ${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label>Número</label><input id="f-numero" placeholder="MED-009"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor" placeholder="0"></div>
+      <div class="form-group"><label>Responsável</label><input id="f-resp" placeholder="Eng. Nome"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status"><option>Pendente</option><option>Aprovada</option><option>Faturada</option></select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMedicao()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
 
-      // Add upgrade banner to topbar
-      const topbar = document.getElementById('topbar-content');
-      const banner = document.createElement('div');
-      banner.innerHTML = `
-        <div style="background:var(--accent-glow);border:1px solid var(--accent);border-radius:var(--radius);padding:0.75rem 1rem;font-size:0.875rem;color:var(--accent);display:flex;align-items:center;gap:0.75rem;">
-          🔒 <strong>Plano FREE</strong> - <span>Upgrade PRO libera Faturamento, EPIs, Financeiro & Relatórios</span>
-          <button onclick="showUpgrade()" style="background:var(--accent);color:#000;border:none;border-radius:8px;padding:0.375rem 1rem;font-size:0.75rem;font-weight:600;cursor:pointer;">Upgrade →</button>
-        </div>`;
-      topbar.appendChild(banner);
-    }
+function salvarMedicao() {
+  const obraId = parseInt(document.getElementById('f-obra').value);
+  const numero = document.getElementById('f-numero').value.trim();
+  const valor = parseFloat(document.getElementById('f-valor').value)||0;
+  if (!numero) return alert('Informe o número da medição');
+  APP.medicoes.push({
+    id: Date.now(), obraId, numero,
+    data: document.getElementById('f-data').value,
+    valor,
+    responsavel: document.getElementById('f-resp').value.trim(),
+    status: document.getElementById('f-status').value
+  });
+  closeForm();
+  navigate('medicoes');
+}
 
-    // ─── NAVIGATION ───
-    function loadSection(section) {
-      // Update sidebar
-      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-      event?.target.closest('.nav-item')?.classList.add('active');
+// ── FATURAMENTO ──
+function renderFaturamento() {
+  const totalRecebido = APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
+  const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente').reduce((a,b)=>a+b.valor,0);
+  const totalVencido  = APP.faturamentos.filter(f=>f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div><div style="font-size:20px;font-weight:500;color:var(--text)">Faturamento</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.faturamentos.length} notas fiscais</div></div>
+    <button class="btn btn-primary" onclick="openFormFaturamento()">+ Nova NF</button>
+  </div>
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+    <div class="kpi-card"><div class="kpi-label">Recebido</div><div class="kpi-value green">${fmt(totalRecebido)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">A Receber</div><div class="kpi-value amber">${fmt(totalPendente)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Vencido</div><div class="kpi-value red">${fmt(totalVencido)}</div></div>
+  </div>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>NF</th><th>Obra</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Status</th></tr></thead>
+      <tbody>
+        ${APP.faturamentos.map(f => {
+          const o = getObra(f.obraId);
+          const badgeClass = f.status==='Recebida'?'badge-green':f.status==='Vencida'?'badge-red':'badge-amber';
+          return `<tr>
+            <td><span class="strong">${f.numero}</span></td>
+            <td>${trunc(o?.nome,22)}</td>
+            <td style="font-family:var(--mono);font-size:12px">${fmtDate(f.data)}</td>
+            <td style="font-family:var(--mono);font-size:12px">${fmtDate(f.vencimento)}</td>
+            <td style="color:var(--accent);font-family:var(--mono)">${fmt(f.valor)}</td>
+            <td style="color:var(--text3)">${f.formaPgto}</td>
+            <td><span class="badge ${badgeClass}">${f.status}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
 
-      // Load content
-      const content = document.getElementById('main-content');
-      content.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:center;height:60vh;color:var(--text-muted);">
-          <div style="text-align:center;">
-            <div style="font-size:3rem;margin-bottom:1rem;">📊</div>
-            <h2 style="font-size:1.5rem;margin-bottom:0.5rem;color:var(--text);">${getSectionTitle(section)}</h2>
-            <p>Carregando ${getSectionTitle(section, true).toLowerCase()}...</p>
-          </div>
-        </div>`;
-      
-      loadSectionData(section);
-    }
+function openFormFaturamento() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Nova Nota Fiscal</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Obra</label>
+        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Número NF</label><input id="f-numero" placeholder="NF-0200"></div>
+      <div class="form-group"><label>Data Emissão</label><input type="date" id="f-data"></div>
+      <div class="form-group"><label>Vencimento</label><input type="date" id="f-venc"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor"></div>
+      <div class="form-group"><label>Forma de Pagamento</label>
+        <select id="f-forma"><option>TED</option><option>Boleto</option><option>PIX</option><option>Cheque</option></select>
+      </div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status"><option>Pendente</option><option>Recebida</option><option>Vencida</option></select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarFaturamento()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
 
-    function getSectionTitle(section, short = false) {
-      const titles = {
-        dashboard: short ? 'Dashboard' : 'Dashboard Principal',
-        obras: short ? 'Obras' : 'Gestão de Obras',
-        medicoes: short ? 'Medições' : 'Medições de Obras',
-        colaboradores: short ? 'Colaboradores' : 'Gestão de Colaboradores',
-        faturamentos: short ? 'Faturamentos' : 'Controle de Faturamentos',
-        financeiro: short ? 'Financeiro' : 'Fluxo de Caixa & Financeiro',
-        epis: short ? 'EPIs' : 'Estoque de EPIs',
-        entregas_epi: short ? 'Entregas EPI' : 'Entregas de EPIs',
-        perfil: short ? 'Perfil' : 'Meu Perfil',
-        plan: short ? 'Plano' : 'Meu Plano & Faturamento'
-      };
-      return titles[section] || section;
-    }
+function salvarFaturamento() {
+  const numero = document.getElementById('f-numero').value.trim();
+  if (!numero) return alert('Informe o número da NF');
+  APP.faturamentos.push({
+    id: Date.now(),
+    obraId: parseInt(document.getElementById('f-obra').value),
+    numero,
+    data: document.getElementById('f-data').value,
+    vencimento: document.getElementById('f-venc').value,
+    valor: parseFloat(document.getElementById('f-valor').value)||0,
+    formaPgto: document.getElementById('f-forma').value,
+    status: document.getElementById('f-status').value
+  });
+  closeForm();
+  navigate('faturamento');
+}
 
-    // ─── DATA LOADING ───
-    async function loadSectionData(section) {
-      try {
-        const res = await fetch(`${API_BASE}/${section}`, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` }
-        });
-        const data = await res.json();
-        
-        if (res.status === 402) {
-          showUpgradePrompt(section);
-          return;
-        }
-        
-        renderSection(section, data);
-      } catch (err) {
-        document.getElementById('main-content').innerHTML = `
-          <div style="text-align:center;padding:4rem 2rem;color:var(--text-muted);">
-            <div style="font-size:4rem;margin-bottom:1rem;">⚠️</div>
-            <h2>Erro ao carregar</h2>
-            <p>Tente novamente em alguns segundos ou contate o suporte.</p>
-            <button onclick="loadSection('${section}')" class="btn btn-primary" style="margin-top:2rem;">Tentar Novamente</button>
+// ── COLABORADORES ──
+function renderColaboradores() {
+  const ativos = APP.colaboradores.filter(c=>c.status==='Ativo').length;
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div><div style="font-size:20px;font-weight:500;color:var(--text)">Colaboradores</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.colaboradores.length} registros · ${ativos} ativos</div></div>
+    <button class="btn btn-primary" onclick="openFormColaborador()">+ Novo Colaborador</button>
+  </div>
+  <div class="table-card">
+    <table>
+      <thead><tr><th>Nome</th><th>CPF</th><th>Cargo</th><th>Tipo</th><th>Salário</th><th>Obra</th><th>Admissão</th><th>Status</th></tr></thead>
+      <tbody>
+        ${APP.colaboradores.map(c => {
+          const o = getObra(c.obraId);
+          return `<tr>
+            <td><span class="strong">${c.nome}</span></td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${c.cpf}</td>
+            <td>${c.cargo}</td>
+            <td><span class="badge ${c.tipo==='CLT'?'badge-blue':'badge-amber'}">${c.tipo}</span></td>
+            <td style="font-family:var(--mono);color:var(--accent)">${c.tipo==='Diarista'?fmt(c.salario)+'/dia':fmt(c.salario)}</td>
+            <td style="color:var(--text3)">${trunc(o?.nome,18)}</td>
+            <td style="font-family:var(--mono);font-size:12px">${fmtDate(c.admissao)}</td>
+            <td><span class="badge ${c.status==='Ativo'?'badge-green':'badge-gray'}">${c.status}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function openFormColaborador() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Novo Colaborador</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome Completo</label><input id="f-nome"></div>
+      <div class="form-group"><label>CPF</label><input id="f-cpf" placeholder="000.000.000-00"></div>
+      <div class="form-group"><label>Cargo</label><input id="f-cargo"></div>
+      <div class="form-group"><label>Tipo</label>
+        <select id="f-tipo"><option>CLT</option><option>Diarista</option><option>PJ</option></select>
+      </div>
+      <div class="form-group"><label>Salário / Diária (R$)</label><input type="number" id="f-salario"></div>
+      <div class="form-group"><label>Obra</label>
+        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Data de Admissão</label><input type="date" id="f-admissao"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="f-status"><option>Ativo</option><option>Inativo</option></select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarColaborador()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarColaborador() {
+  const nome = document.getElementById('f-nome').value.trim();
+  if (!nome) return alert('Informe o nome');
+  APP.colaboradores.push({
+    id: Date.now(), nome,
+    cpf: document.getElementById('f-cpf').value.trim(),
+    cargo: document.getElementById('f-cargo').value.trim(),
+    tipo: document.getElementById('f-tipo').value,
+    salario: parseFloat(document.getElementById('f-salario').value)||0,
+    obraId: parseInt(document.getElementById('f-obra').value)||null,
+    admissao: document.getElementById('f-admissao').value,
+    status: document.getElementById('f-status').value
+  });
+  closeForm();
+  navigate('colaboradores');
+}
+
+// ── FOLHA ──
+function renderFolha() {
+  const cltAtivos = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
+  const diaristas = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='Diarista');
+  const totalBruto = cltAtivos.reduce((a,c)=>a+c.salario,0) + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
+  const totalLiq = cltAtivos.reduce((a,c)=>{ const r=calcularLiquidoCLT(c.salario); return a+r.liquido; },0)
+                 + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
+  const totalCusto = cltAtivos.reduce((a,c)=>{ const r=calcularLiquidoCLT(c.salario); return a+r.custoTotal; },0)
+                   + diaristas.reduce((a,c)=>a+(c.salario*(c.diasTrabalhados||22)),0);
+
+  return `
+  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Folha de Pagamento</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</div>
+
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Total Bruto</div><div class="kpi-value amber">${fmt(totalBruto)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Líquido</div><div class="kpi-value green">${fmt(totalLiq)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Custo Total Empresa</div><div class="kpi-value red">${fmt(totalCusto)}</div></div>
+  </div>
+
+  <div class="table-card" style="margin-bottom:20px">
+    <div class="table-header"><div class="table-title">CLT — Holerites</div></div>
+    <table>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Bruto</th><th>INSS</th><th>IRRF</th><th>Líquido</th><th>FGTS</th><th>Custo Empresa</th></tr></thead>
+      <tbody>
+        ${cltAtivos.map(c => {
+          const r = calcularLiquidoCLT(c.salario);
+          return `<tr>
+            <td><span class="strong">${c.nome}</span></td>
+            <td>${c.cargo}</td>
+            <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
+            <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.inss)}</td>
+            <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.irrf)}</td>
+            <td style="font-family:var(--mono);color:var(--green);font-weight:500">${fmt(r.liquido)}</td>
+            <td style="font-family:var(--mono);color:var(--text3)">${fmt(r.fgts)}</td>
+            <td style="font-family:var(--mono);color:var(--accent)">${fmt(r.custoTotal)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  ${diaristas.length ? `
+  <div class="table-card">
+    <div class="table-header"><div class="table-title">Diaristas</div></div>
+    <table>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Diária</th><th>Dias</th><th>Total</th></tr></thead>
+      <tbody>
+        ${diaristas.map(c => `<tr>
+          <td><span class="strong">${c.nome}</span></td>
+          <td>${c.cargo}</td>
+          <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
+          <td>${c.diasTrabalhados||22}</td>
+          <td style="font-family:var(--mono);color:var(--accent)">${fmt(c.salario*(c.diasTrabalhados||22))}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>` : ''}`;
+}
+
+// ── EPIs ──
+function renderEPIs() {
+  const criticos = APP.epis.filter(e=>e.estoque<e.minimo).length;
+  const baixos   = APP.epis.filter(e=>e.estoque>=e.minimo&&e.estoque<e.minimo*1.3).length;
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div><div style="font-size:20px;font-weight:500;color:var(--text)">EPIs — Estoque e Entregas</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.epis.length} itens · ${criticos} críticos · ${baixos} baixos</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="openFormEntregaEPI()">📦 Registrar Entrega</button>
+      <button class="btn btn-primary" onclick="openFormEPI()">+ Novo EPI</button>
+    </div>
+  </div>
+
+  <div class="table-card" style="margin-bottom:20px">
+    <div class="table-header"><div class="table-title">Estoque de EPIs</div></div>
+    <table>
+      <thead><tr><th>EPI</th><th>Categoria</th><th>CA</th><th>Estoque</th><th>Mínimo</th><th>Validade</th><th>Status</th></tr></thead>
+      <tbody>
+        ${APP.epis.map(e => {
+          const status = e.estoque < e.minimo ? 'Crítico' : e.estoque < e.minimo*1.3 ? 'Baixo' : 'OK';
+          const badge  = status==='Crítico' ? 'badge-red' : status==='Baixo' ? 'badge-amber' : 'badge-green';
+          return `<tr>
+            <td><span class="strong">${e.nome}</span></td>
+            <td>${e.categoria}</td>
+            <td style="font-family:var(--mono);font-size:11px;color:var(--text3)">${e.ca}</td>
+            <td style="font-family:var(--mono);color:${e.estoque<e.minimo?'var(--red)':'var(--text)'}">${e.estoque}</td>
+            <td style="font-family:var(--mono)">${e.minimo}</td>
+            <td style="font-size:12px;color:var(--text3)">${fmtDate(e.validade)}</td>
+            <td><span class="badge ${badge}">${status}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header"><div class="table-title">Histórico de Entregas</div></div>
+    <table>
+      <thead><tr><th>EPI</th><th>Colaborador</th><th>Data</th><th>Qtd</th><th>Devolvida</th></tr></thead>
+      <tbody>
+        ${APP.entregasEPI.map(e => {
+          const epi = getEPI(e.epiId);
+          const col = getColaborador(e.colaboradorId);
+          return `<tr>
+            <td><span class="strong">${epi?.nome}</span></td>
+            <td>${col?.nome}</td>
+            <td style="font-family:var(--mono);font-size:12px">${fmtDate(e.data)}</td>
+            <td>${e.quantidade}</td>
+            <td><span class="badge ${e.devolvida?'badge-green':'badge-gray'}">${e.devolvida?'Sim':'Não'}</span></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function openFormEPI() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Novo EPI</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Nome</label><input id="f-nome"></div>
+      <div class="form-group"><label>Categoria</label><input id="f-cat" placeholder="Proteção Craniana"></div>
+      <div class="form-group"><label>CA (Nº Certificado)</label><input id="f-ca"></div>
+      <div class="form-group"><label>Estoque Inicial</label><input type="number" id="f-estoque" value="0"></div>
+      <div class="form-group"><label>Estoque Mínimo</label><input type="number" id="f-minimo" value="10"></div>
+      <div class="form-group"><label>Validade</label><input type="date" id="f-validade"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEPI()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarEPI() {
+  const nome = document.getElementById('f-nome').value.trim();
+  if (!nome) return alert('Informe o nome do EPI');
+  APP.epis.push({
+    id: Date.now(), nome,
+    categoria: document.getElementById('f-cat').value.trim(),
+    ca: document.getElementById('f-ca').value.trim(),
+    estoque: parseInt(document.getElementById('f-estoque').value)||0,
+    minimo: parseInt(document.getElementById('f-minimo').value)||10,
+    validade: document.getElementById('f-validade').value
+  });
+  closeForm();
+  navigate('epis');
+}
+
+function openFormEntregaEPI() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Registrar Entrega de EPI</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>EPI</label>
+        <select id="f-epi">${APP.epis.map(e=>`<option value="${e.id}">${e.nome} (estoque: ${e.estoque})</option>`).join('')}</select>
+      </div>
+      <div class="form-group full"><label>Colaborador</label>
+        <select id="f-col">${APP.colaboradores.filter(c=>c.status==='Ativo').map(c=>`<option value="${c.id}">${c.nome}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label>Quantidade</label><input type="number" id="f-qtd" value="1" min="1"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${new Date().toISOString().split('T')[0]}"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEntregaEPI()">Registrar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+function salvarEntregaEPI() {
+  const epiId = parseInt(document.getElementById('f-epi').value);
+  const qtd = parseInt(document.getElementById('f-qtd').value)||1;
+  const epi = getEPI(epiId);
+  if (epi.estoque < qtd) return alert('Estoque insuficiente!');
+  epi.estoque -= qtd;
+  APP.entregasEPI.push({
+    id: Date.now(), epiId,
+    colaboradorId: parseInt(document.getElementById('f-col').value),
+    data: document.getElementById('f-data').value,
+    quantidade: qtd, devolvida: false
+  });
+  closeForm();
+  navigate('epis');
+}
+
+// ── FINANCEIRO ──
+function renderFinanceiro() {
+  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
+  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  const saldo = receitas - despesas;
+
+  const cats = {};
+  APP.financeiro.filter(f=>f.tipo==='Despesa').forEach(f=>{ cats[f.categoria]=(cats[f.categoria]||0)+f.valor; });
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div><div style="font-size:20px;font-weight:500;color:var(--text)">Financeiro</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.financeiro.length} lançamentos</div></div>
+    <button class="btn btn-primary" onclick="openFormFinanceiro()">+ Novo Lançamento</button>
+  </div>
+
+  <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-label">Total Receitas</div><div class="kpi-value green">${fmt(receitas)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Despesas</div><div class="kpi-value red">${fmt(despesas)}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Saldo do Período</div><div class="kpi-value ${saldo>=0?'green':'red'}">${fmt(saldo)}</div></div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:20px">
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Despesas por Categoria</div></div>
+      <div style="padding:16px">
+        ${Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,val])=>{
+          const pct = Math.round((val/despesas)*100);
+          return `<div style="margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font-size:12px;color:var(--text)">${cat}</span>
+              <span style="font-size:12px;color:var(--red)">${fmt(val)}</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill red" style="width:${pct}%"></div></div>
           </div>`;
-      }
-    }
+        }).join('')}
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Últimos Lançamentos</div></div>
+      <table>
+        <thead><tr><th>Descrição</th><th>Data</th><th>Tipo</th><th>Valor</th></tr></thead>
+        <tbody>
+          ${[...APP.financeiro].reverse().slice(0,8).map(f=>`<tr>
+            <td><span class="strong">${trunc(f.descricao,22)}</span></td>
+            <td style="font-family:var(--mono);font-size:11px">${fmtDate(f.data)}</td>
+            <td><span class="badge ${f.tipo==='Receita'?'badge-green':'badge-red'}">${f.tipo}</span></td>
+            <td style="font-family:var(--mono);color:${f.tipo==='Receita'?'var(--green)':'var(--red)'}">${fmt(f.valor)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
 
-// ─── RENDER SECTIONS ───
-    async function renderSection(section, data) {
-      const content = document.getElementById('main-content');
-      
-      if (section === 'dashboard') {
-        // Real data only
-        content.innerHTML = renderDashboard(data);
-        return;
-      }
+function openFormFinanceiro() {
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">Novo Lançamento</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo</label>
+        <select id="f-tipo"><option>Receita</option><option>Despesa</option></select>
+      </div>
+      <div class="form-group"><label>Categoria</label>
+        <select id="f-cat">
+          <option>Faturamento</option><option>Pessoal</option><option>Materiais</option>
+          <option>Serviços</option><option>Equipamentos</option><option>Impostos</option><option>Outros</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Descrição</label><input id="f-desc"></div>
+      <div class="form-group"><label>Valor (R$)</label><input type="number" id="f-valor"></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-group full"><label>Obra (opcional)</label>
+        <select id="f-obra"><option value="">— Sem obra —</option>${APP.obras.map(o=>`<option value="${o.id}">${o.nome}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarFinanceiro()">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
 
-      try {
-        const res = await fetch(API_BASE + `/${section}`, {
-          credentials: 'include'
-        });
-        if (res.status === 402) {
-          showUpgradePrompt(section);
-          return;
-        }
-        const realData = await res.json();
-        content.innerHTML = renderGenericTable(section, realData);
-      } catch {
-        content.innerHTML = `<div style="padding:4rem;text-align:center;color:var(--text-muted);">
-          <h3>Erro ao carregar ${getSectionTitle(section)}</h3>
-          <button class="btn btn-primary" onclick="loadSection('${section}')">Tentar novamente</button>
-        </div>`;
-      }
-    }
+function salvarFinanceiro() {
+  const desc = document.getElementById('f-desc').value.trim();
+  if (!desc) return alert('Informe a descrição');
+  APP.financeiro.push({
+    id: Date.now(),
+    tipo: document.getElementById('f-tipo').value,
+    descricao: desc,
+    valor: parseFloat(document.getElementById('f-valor').value)||0,
+    data: document.getElementById('f-data').value,
+    categoria: document.getElementById('f-cat').value,
+    obraId: parseInt(document.getElementById('f-obra').value)||null
+  });
+  closeForm();
+  navigate('financeiro');
+}
 
+// ── RELATÓRIOS ──
+function renderRelatorios() {
+  return `
+  <div style="font-size:20px;font-weight:500;color:var(--text);margin-bottom:4px">Relatórios & Exportações</div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Gere PDFs e CSVs dos módulos</div>
 
-function renderDashboard(data) {
-      const { obras = [], medicoes = [], colaboradores = [], stats = {} } = data || {};
-      
-      const totalValor = obras.reduce((sum, o) => sum + (o.valor || 0), 0);
-      const avgAvanco = obras.length ? Math.round(obras.reduce((sum, o) => sum + (o.avanco || 0), 0) / obras.length) : 0;
-      
-      return `
-        <div class="page-header">
-          <div>
-            <h1 class="page-title">Dashboard - ${APP.empresa.razao_social}</h1>
-            <p>Dados reais da sua empresa • ${new Date().toLocaleString('pt-BR')}</p>
-          </div>
-          <div class="page-actions">
-            <button class="btn btn-secondary" onclick="exportData('dashboard')">📄 PDF</button>
-            <button class="btn btn-primary" onclick="loadSection('obras')">+ Nova Obra</button>
-          </div>
-        </div>
+  <div class="three-col">
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="gerarPDFObras()">
+      <div style="font-size:28px;margin-bottom:10px">🏗️</div>
+      <div class="section-title">Relatório de Obras</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Status, avanço, faturado e resultado de todas as obras</div>
+      <button class="btn btn-primary" style="width:100%">Gerar PDF</button>
+    </div>
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="gerarPDFFolha()">
+      <div style="font-size:28px;margin-bottom:10px">💰</div>
+      <div class="section-title">Folha de Pagamento</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Holerites com INSS, IRRF, FGTS e custo total</div>
+      <button class="btn btn-primary" style="width:100%">Gerar PDF</button>
+    </div>
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="gerarPDFFinanceiro()">
+      <div style="font-size:28px;margin-bottom:10px">📊</div>
+      <div class="section-title">DRE Simplificado</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Receitas, despesas e resultado por categoria</div>
+      <button class="btn btn-primary" style="width:100%">Gerar PDF</button>
+    </div>
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="exportPontoCSV()">
+      <div style="font-size:28px;margin-bottom:10px">⏱️</div>
+      <div class="section-title">Ponto — CSV</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Exportar controle de ponto em planilha</div>
+      <button class="btn btn-outline" style="width:100%">Exportar CSV</button>
+    </div>
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="gerarPDFEPIs()">
+      <div style="font-size:28px;margin-bottom:10px">🦺</div>
+      <div class="section-title">EPIs — Estoque</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Situação atual do estoque de equipamentos</div>
+      <button class="btn btn-primary" style="width:100%">Gerar PDF</button>
+    </div>
+    <div class="table-card" style="padding:20px;cursor:pointer" onclick="gerarPDFColaboradores()">
+      <div style="font-size:28px;margin-bottom:10px">👷</div>
+      <div class="section-title">Colaboradores</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Lista completa com cargo, tipo e vínculo</div>
+      <button class="btn btn-primary" style="width:100%">Gerar PDF</button>
+    </div>
+  </div>`;
+}
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-primary">${obras.length}</div>
-            <div class="stat-secondary">Obras</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-primary">R$ ${formatCurrency(totalValor)}</div>
-            <div class="stat-secondary">Valor Total</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-primary">${avgAvanco}%</div>
-            <div class="stat-secondary">Média Avanço</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-primary">${colaboradores.length}</div>
-            <div class="stat-secondary">Colaboradores</div>
-          </div>
-        </div>
+// ── PDF GENERATORS ──
+function _initPDF(titulo) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFillColor(13,15,18);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.setTextColor(240,165,0);
+  doc.text('ConstruPRO', 14, 18);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11);
+  doc.setTextColor(180,180,180);
+  doc.text(titulo, 14, 26);
+  doc.setFontSize(9);
+  doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 32);
+  doc.setDrawColor(50,50,60);
+  doc.line(14, 35, 196, 35);
+  return doc;
+}
 
+function gerarPDFObras() {
+  const doc = _initPDF('Relatório de Obras');
+  doc.autoTable({
+    startY: 40,
+    head: [['Obra','Cliente','Status','Avanço','Faturado','Despesas','Resultado']],
+    body: APP.obras.map(o => [o.nome, o.cliente, o.status, o.avanco+'%',
+      fmt(o.faturado), fmt(o.despesas), fmt(o.faturado-o.despesas)]),
+    styles: { fontSize:9, textColor:[200,200,210] },
+    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
+    alternateRowStyles: { fillColor:[22,26,33] },
+  });
+  doc.save('obras.pdf');
+}
 
-        <div class="data-grid">
-          <div class="table-card">
-            <div class="table-header">
-              <div class="table-title">🏗️ Obras em Andamento</div>
-              <button class="btn btn-primary" onclick="loadSection('obras')">Ver Todas</button>
-            </div>
-            ${renderObrasTable(obras.slice(0,4))}
-          </div>
-          
-          <div class="table-card">
-            <div class="table-header">
-              <div class="table-title">📏 Próximas Medições</div>
-              <button class="btn btn-primary" onclick="loadSection('medicoes')">Ver Todas</button>
-            </div>
-            ${renderMedicoesTable(medicoes.slice(0,4))}
-          </div>
-        </div>
+function gerarPDFFolha() {
+  const doc = _initPDF('Folha de Pagamento — ' + new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}));
+  const clt = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
+  doc.autoTable({
+    startY: 40,
+    head: [['Colaborador','Cargo','Bruto','INSS','IRRF','Líquido','FGTS','Custo Empresa']],
+    body: clt.map(c => {
+      const r = calcularLiquidoCLT(c.salario);
+      return [c.nome, c.cargo, fmt(c.salario), fmt(r.inss), fmt(r.irrf), fmt(r.liquido), fmt(r.fgts), fmt(r.custoTotal)];
+    }),
+    styles: { fontSize:8, textColor:[200,200,210] },
+    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
+    alternateRowStyles: { fillColor:[22,26,33] },
+  });
+  doc.save('folha.pdf');
+}
 
-        <div style="margin-top:2rem;padding:2rem;background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border);">
-          <h3 style="margin-bottom:1rem;">💡 Dicas Rápidas</h3>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;">
-            <div>
-              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Cadastre sua primeira obra</h4>
-              <p style="color:var(--text-muted);font-size:0.875rem;">Acesse "Obras" → "+ Nova Obra" para começar</p>
-            </div>
-            <div>
-              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Configure EPIs (PRO)</h4>
-              <p style="color:var(--text-muted);font-size:0.875rem;">Upgrade para PRO e gerencie estoque de EPIs automaticamente</p>
-            </div>
-            <div>
-              <h4 style="color:var(--accent);margin-bottom:0.5rem;">Folha automática (PRO)</h4>
-              <p style="color:var(--text-muted);font-size:0.875rem;">Calcule INSS/IRRF/FGTS com um clique</p>
-            </div>
-          </div>
-        </div>
-      `;
-    }
+function gerarPDFFinanceiro() {
+  const doc = _initPDF('DRE Simplificado');
+  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
+  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  doc.autoTable({
+    startY: 40,
+    head: [['Descrição','Categoria','Tipo','Data','Valor']],
+    body: APP.financeiro.map(f=>[f.descricao, f.categoria, f.tipo, fmtDate(f.data), fmt(f.valor)]),
+    styles: { fontSize:9, textColor:[200,200,210] },
+    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
+    alternateRowStyles: { fillColor:[22,26,33] },
+  });
+  const y = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(10); doc.setTextColor(180,220,180);
+  doc.text(`Total Receitas: ${fmt(receitas)}`, 14, y);
+  doc.setTextColor(220,100,100);
+  doc.text(`Total Despesas: ${fmt(despesas)}`, 14, y+7);
+  doc.setTextColor(240,165,0);
+  doc.text(`Resultado: ${fmt(receitas-despesas)}`, 14, y+14);
+  doc.save('financeiro.pdf');
+}
 
-    function renderObrasTable(obras) {
-      return `
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Obra</th>
-              <th>Valor</th>
-              <th>Avanço</th>
-              <th>Status</th>
-              <th>Faturado</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${obras.map(obra => `
-              <tr onclick="loadSection('obras')">
-                <td><strong>${obra.nome || 'N/D'}</strong><br><small style="color:var(--text-dim);">${obra.cliente || ''}</small></td>
-                <td>${formatCurrency(obra.valor || 0)}</td>
-                <td>
-                  <div style="display:flex;align-items:center;gap:0.5rem;">
-                    <div style="width:40px;height:8px;background:var(--glass);border-radius:4px;overflow:hidden;">
-                      <div style="height:100%;background:var(--accent);width:${obra.avanco || 0}%"></div>
-                    </div>
-                    <span>${obra.avanco || 0}%</span>
-                  </div>
-                </td>
-                <td><span class="status ${obra.status?.toLowerCase().replace(' ','-') || 'pendente'}">${obra.status || 'Pendente'}</span></td>
-                <td>R$ ${formatCurrency(obra.faturado || 0)}</td>
-              </tr>
-            `).join('')}
-            ${obras.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem;">Nenhuma obra cadastrada. <button onclick="loadSection(\'obras\')" class="btn btn-primary" style="margin-top:1rem;">Criar Primeira</button></td></tr>' : ''}
-          </tbody>
-        </table>
-      `;
-    }
+function gerarPDFEPIs() {
+  const doc = _initPDF('Estoque de EPIs');
+  doc.autoTable({
+    startY: 40,
+    head: [['EPI','Categoria','CA','Estoque','Mínimo','Validade','Status']],
+    body: APP.epis.map(e=>[e.nome, e.categoria, e.ca, e.estoque, e.minimo, fmtDate(e.validade),
+      e.estoque<e.minimo?'CRÍTICO':e.estoque<e.minimo*1.3?'Baixo':'OK']),
+    styles: { fontSize:9, textColor:[200,200,210] },
+    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
+    alternateRowStyles: { fillColor:[22,26,33] },
+  });
+  doc.save('epis.pdf');
+}
 
-    function renderMedicoesTable(medicoes) {
-      return `
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Obra</th>
-              <th>Nº</th>
-              <th>Data</th>
-              <th>Valor</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${medicoes.map(m => `
-              <tr onclick="loadSection('medicoes')">
-                <td style="min-width:180px;"><strong>${m.obra_nome || 'N/D'}</strong></td>
-                <td>${m.numero || 'N/D'}</td>
-                <td>${new Date(m.data || 0).toLocaleDateString('pt-BR')}</td>
-                <td>R$ ${formatCurrency(m.valor || 0)}</td>
-                <td><span class="status ${m.status?.toLowerCase() || 'pendente'}">${m.status || 'Pendente'}</span></td>
-              </tr>
-            `).join('')}
-            ${medicoes.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:3rem;">Nenhuma medição. <button onclick="loadSection(\'medicoes\')" class="btn btn-primary" style="margin-top:1rem;">Criar Nova</button></td></tr>' : ''}
-          </tbody>
-        </table>
-      `;
-    }
+function gerarPDFColaboradores() {
+  const doc = _initPDF('Colaboradores');
+  doc.autoTable({
+    startY: 40,
+    head: [['Nome','CPF','Cargo','Tipo','Salário','Admissão','Status']],
+    body: APP.colaboradores.map(c=>[c.nome, c.cpf, c.cargo, c.tipo,
+      c.tipo==='Diarista'?fmt(c.salario)+'/dia':fmt(c.salario),
+      fmtDate(c.admissao), c.status]),
+    styles: { fontSize:8, textColor:[200,200,210] },
+    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
+    alternateRowStyles: { fillColor:[22,26,33] },
+  });
+  doc.save('colaboradores.pdf');
+}
 
-    function renderGenericTable(section, data) {
-      const titles = {
-        obras: 'Obras',
-        medicoes: 'Medições',
-        colaboradores: 'Colaboradores',
-        faturamentos: 'Faturamentos',
-        financeiro: 'Financeiro',
-        epis: 'EPIs',
-        entregas_epi: 'Entregas EPI'
-      };
-      
-      return `
-        <div class="page-header">
-          <h1 class="page-title">${titles[section] || section}</h1>
-          <div class="page-actions">
-            <button class="btn btn-secondary">🔄 Atualizar</button>
-            <button class="btn btn-secondary">📄 PDF</button>
-            <button class="btn btn-primary">+ Novo ${section === 'obras' ? 'Obra' : section === 'medicoes' ? 'Medição' : 'Item'}</button>
-          </div>
-        </div>
-        <div class="data-grid">
-          <div class="table-card">
-            <div class="table-header">
-              <div class="table-title">${titles[section] || section}</div>
-              <button class="btn btn-primary" onclick="loadSection('${section}')">Ver Todos</button>
-            </div>
-            ${renderTable(data.data || data, section)}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderTable(items, section) {
-      if (!items.length) {
-        return `
-          <div style="padding:4rem 2rem;text-align:center;color:var(--text-muted);">
-            <div style="font-size:4rem;margin-bottom:1rem;">📭</div>
-            <h3>Nenhum ${section} encontrado</h3>
-            <p>Seja o primeiro a cadastrar!</p>
-            <button onclick="showForm('${section}')" class="btn btn-primary" style="margin-top:2rem;">+ Criar ${getSectionTitle(section, true)}</button>
-          </div>
-        `;
-      }
-
-      return `
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nome/Descrição</th>
-              <th>Data</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${items.slice(0,10).map(item => `
-              <tr>
-                <td style="font-family:monospace;font-size:0.75rem;color:var(--text-dim);">${item.id?.slice(-8) || '-'}</td>
-                <td>${item.nome || item.descricao || 'N/D'}</td>
-                <td>${new Date(item.created_at || item.data || 0).toLocaleDateString('pt-BR')}</td>
-                <td><span class="status pendente">${item.status || 'Ativo'}</span></td>
-                <td>
-                  <button class="btn btn-secondary" style="padding:0.5rem;font-size:0.75rem;">Editar</button>
-                  <button class="btn btn-secondary" style="padding:0.5rem;font-size:0.75rem;background:var(--danger);color:white;">Excluir</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-    }
-
-    // ─── UTILS ───
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-        minimumFractionDigits: 0
-      }).format(value / 100);
-    }
-
-    function showUpgradePrompt(section) {
-      document.getElementById('main-content').innerHTML = `
-        <div style="max-width:600px;margin:4rem auto;text-align:center;padding:4rem;background:var(--bg-card);border-radius:var(--radius);border:2px solid var(--accent);">
-          <div style="font-size:4rem;margin-bottom:1.5rem;">🔒</div>
-          <h2 style="font-size:2rem;margin-bottom:1rem;color:var(--accent);">Feature PRO</h2>
-          <p style="color:var(--text-muted);font-size:1.125rem;margin-bottom:2rem;line-height:1.6;">
-            Esta funcionalidade está disponível apenas nos planos <strong>Starter</strong> e <strong>Pro</strong>.
-          </p>
-          <div style="background:var(--accent-glow);border-radius:var(--radius);padding:1.5rem;margin:2rem 0;">
-            <h4 style="margin-bottom:1rem;color:var(--accent);">Upgrade Rápido</h4>
-            <p style="margin-bottom:1.5rem;color:var(--text);">De R$ 0 → R$ 197/mês</p>
-            <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-              <button onclick="showUpgrade()" class="btn btn-primary" style="padding:1rem 2rem;font-size:1rem;">🚀 Fazer Upgrade</button>
-              <button onclick="loadSection('dashboard')" class="btn btn-secondary" style="padding:1rem 2rem;font-size:1rem;">← Voltar Dashboard</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function showUpgrade() {
-      document.getElementById('form-box').innerHTML = `
-        <div class="form-title">🚀 Upgrade para Pro</div>
-        <div style="padding:2rem 3rem 3rem;text-align:center;">
-          <div style="font-size:3.5rem;margin-bottom:1rem;">⭐</div>
-          <h3 style="font-size:1.75rem;margin-bottom:0.5rem;">Plano Pro</h3>
-          <div style="font-size:2rem;font-weight:700;color:var(--accent);margin-bottom:1.5rem;">R$ 497/mês</div>
-          <div style="max-width:400px;margin:0 auto 2.5rem;color:var(--text-muted);">
-            ✅ Todas features ilimitadas<br>
-            ✅ Relatórios avançados + PDF<br>
-            ✅ EPIs + entregas automáticas<br>
-            ✅ Financeiro completo + DRE<br>
-            ✅ Suporte prioritário 24/7
-          </div>
-          <div class="form-actions">
-            <button class="btn btn-primary" onclick="window.open('https://construfy.app/pricing')">Ir para Pagamento</button>
-            <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
-          </div>
-        </div>
-      `;
-      document.getElementById('form-overlay').classList.add('open');
-    }
-
-    function toggleUserMenu() {
-      // Implement user dropdown
-      console.log('User menu');
-    }
-
-    function logout() {
-      localStorage.removeItem('access_token');
-      window.location.href = 'login.html';
-    }
-
-    function exportData(type) {
-      // jsPDF integration placeholder
-      alert('Export PDF em desenvolvimento... (usa jsPDF)');
-    }
-
-    // ─── START ───
-    window.addEventListener('load', init);
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
-  </script>
+// INICIALIZAR
+navigate('dashboard');
+</script>
 </body>
 </html>
-

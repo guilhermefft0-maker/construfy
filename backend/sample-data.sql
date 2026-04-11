@@ -1,15 +1,12 @@
--- ⚠️ SECURITY: FULLY ANONYMIZED SAMPLE DATA ONLY
--- NEVER commit real company/PII data. Use this for testing only.
-construFY
+
 
 -- Empresa DEMO (COMPLETELY FAKE DATA)
 INSERT OR IGNORE INTO companies (id, razao_social, cnpj, ie, telefone, setor, porte, endereco, slug, plano, status) VALUES
-('demo-alfa', 'CONSTRUTORA DEMO LTDA', '00.000.000/0001-00', '00000000-0', '(11) 00000-0000', 'residencial', 'epp', 'Rua Exemplo, 123 - Cidade-SP', 'demo-alfa', 'free', 'active');
-
+('demo-alfa', 'CONSTRUTORA DEMO LTDA', '00.000.000/0001-00', '00000000-0', '(11) 00000-0000', 'residencial', 'epp', 'Rua Exemplo, 123 - Cidade-SP', 'demo-alfa', 'pro', 'active');
 
 -- Admin demo
 INSERT OR IGNORE INTO users (id, company_id, nome, cargo, email, password_hash, role, status, email_verified_at) VALUES
-construfy
+('demo-admin', 'demo-alfa', 'ADMIN DEMO', 'Administrador', 'admin@demo.construpro', '$pbkdf2$310000$demo-salt-here$demo-hash-here', 'admin', 'active', CURRENT_TIMESTAMP);
 
 -- 3 Obras (matching frontend APP.obras)
 INSERT OR IGNORE INTO obras (id, company_id, nome, cliente, contrato, valor, inicio, prev_fim, status, avanco, faturado, despesas, responsavel) VALUES
@@ -40,7 +37,9 @@ INSERT OR IGNORE INTO colaboradores (id, company_id, obra_id, nome, cpf, cargo, 
 ('col2', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 2', '000.000.000-01', 'Mestre de Obras', 'CLT', 4800, '2021-03-15', 'Ativo'),
 ('col3', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 3', '000.000.000-02', 'Pedreiro Oficial', 'CLT', 2800, '2023-01-20', 'Ativo'),
 ('col4', 'demo-alfa', 'obra3', 'COLABORADOR DEMO 4', '000.000.000-03', 'Engenheira Civil', 'CLT', 7200, '2023-07-01', 'Ativo'),
-('col5', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 5', '000.000.000-04', 'Ajudante Geral', 'Diarista', 220, '2024-03-01', 'Ativo');
+('col5', 'demo-alfa', 'obra1', 'COLABORADOR DEMO 5', '000.000.000-04', 'Ajudante Geral', 'Diarista', 220, '2024-03-01', 'Ativo'),
+('col6', 'demo-alfa', 'obra2', 'COLABORADOR DEMO 6', '000.000.000-05', 'Eletricista', 'Diarista', 280, '2024-06-10', 'Inativo', 22 ),
+('col7', 'demo-alfa', 'obra3', 'COLABORADOR DEMO 7', '000.000.000-06', 'Armador', 'CLT', 3200, '2024-09-01', 'Ativo');
 
 -- EPIs (matching APP.epis)
 INSERT OR IGNORE INTO epis (id, company_id, nome, categoria, ca, estoque, minimo, validade) VALUES
@@ -60,8 +59,17 @@ INSERT OR IGNORE INTO entregas_epi (id, company_id, epi_id, colaborador_id, data
 
 -- Financeiro (matching APP.financeiro)
 INSERT OR IGNORE INTO financeiro (id, company_id, obra_id, tipo, descricao, categoria, valor, data) VALUES
-('fin1', 'demo-alfa', 'obra1', 'Receita', 'NF-0142 – Vista Verde', 'Faturamento', 320000, '2024-04-05'),
-('fin2', 'demo-alfa', 'obra1', 'Receita', 'NF-0155 – Vista Verde', 'Faturamento', 310000, '2024-05-07'),
+('fin1', 'demo-alfa', 'obra1', 'Receita', 'NF-0001 – OBRA RESIDENCIAL DEMO 1', 'Faturamento', 320000, '2024-04-05'),
+('fin2', 'demo-alfa', 'obra1', 'Receita', 'NF-0002 – OBRA RESIDENCIAL DEMO 1', 'Faturamento', 310000, '2024-05-07'),
 ('fin3', 'demo-alfa', 'obra1', 'Despesa', 'Folha CLT – Abril', 'Pessoal', 38200, '2024-04-30'),
-('fin4', 'demo-alfa', 'obra1', 'Despesa', 'Material – Vista Verde', 'Materiais', 145000, '2024-04-15'),
+('fin4', 'demo-alfa', 'obra1', 'Despesa', 'Material – OBRA RESIDENCIAL DEMO 1', 'Materiais', 145000, '2024-04-15'),
 ('fin5', 'demo-alfa', 'obra1', 'Despesa', 'Subempreiteiro elétrica', 'Serviços', 42000, '2024-04-22');
+
+-- Sample data para pontos (5 colaboradores hoje)
+INSERT OR IGNORE INTO pontos (id, company_id, colaborador_id, data, hora_entrada, hora_saida, status, obs) VALUES
+('ponto1', 'demo-alfa', 'col1', DATE('now'), '08:15', '17:45', 'presente', 'Engenheiro principal'),
+('ponto2', 'demo-alfa', 'col2', DATE('now'), '07:30', '18:00', 'presente', 'Mestre de obras'),
+('ponto3', 'demo-alfa', 'col3', DATE('now'), '08:00', NULL, 'presente', 'Pedreiro - ainda na obra'),
+('ponto4', 'demo-alfa', 'col4', DATE('now'), '09:20', '16:30', 'presente', 'Engenheira estrutural'),
+('ponto5', 'demo-alfa', 'col5', DATE('now'), NULL, NULL, 'ausente', 'Ajudante aguardando chamado');
+

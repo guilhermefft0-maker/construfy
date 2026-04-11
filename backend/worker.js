@@ -140,7 +140,13 @@ if (!['free','starter','pro','enterprise'].includes(plano)) errs.push('Plano inv
   if (errs.length) return jsonResponse({ ok: false, message: errs[0] }, 422, headers);
 
   // Verificar duplicatas
-  const existing = await env.DB.prepare(\n    'SELECT id FROM companies WHERE slug = ? LIMIT 1'\n  ).bind(company.slug).first();\n\n  if (existing) {\n    return jsonResponse({ ok: false, message: 'Subdomínio já cadastrado na plataforma.' }, 409, headers);\n  }
+  const existing = await env.DB.prepare(
+    'SELECT id FROM companies WHERE slug = ? LIMIT 1'
+  ).bind(company.slug).first();
+
+  if (existing) {
+    return jsonResponse({ ok: false, message: 'Subdomínio já cadastrado na plataforma.' }, 409, headers);
+  }
 
   const emailExists = await env.DB.prepare(
     'SELECT id FROM users WHERE email = ? LIMIT 1'
@@ -162,7 +168,11 @@ if (!['free','starter','pro','enterprise'].includes(plano)) errs.push('Plano inv
 
   // Transação D1
   await env.DB.batch([
-    env.DB.prepare(`\n      INSERT INTO companies (id, razao_social, cnpj, ie, telefone, setor, porte, endereco, slug, plano, status, created_at)\n      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP)\n    `).bind(companyId, company.razao_social, company.cnpj||null, company.ie||null, company.telefone,\n            company.setor, company.porte, company.endereco, company.slug, plano),
+    env.DB.prepare(`
+      INSERT INTO companies (id, razao_social, cnpj, ie, telefone, setor, porte, endereco, slug, plano, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', CURRENT_TIMESTAMP)
+    `).bind(companyId, company.razao_social, company.cnpj||null, company.ie||null, company.telefone,
+            company.setor, company.porte, company.endereco, company.slug, plano),
 
     env.DB.prepare(`
       INSERT INTO users (id, company_id, nome, cargo, email, password_hash, role, status, email_verified_at, created_at)

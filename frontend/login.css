@@ -1,0 +1,138 @@
+/* ─────────────────────────────────────────────────────────
+   ConstruPRO — Login Page CSS
+   Extends: global.css
+   ───────────────────────────────────────────────────────── */
+
+/* ── Card Header ── */
+.card-head {
+  padding: 36px 36px 28px;
+  border-bottom: 1px solid var(--border-lo);
+  position: relative;
+}
+
+.card-head::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 36px;
+  width: 48px;
+  height: 2px;
+  background: var(--amber);
+  border-radius: 2px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--text-md);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── Card Body ── */
+.card-body {
+  padding: 28px 36px 32px;
+}
+
+/* ── Password field with toggle ── */
+.pass-wrap { position: relative; }
+.pass-wrap .form-input { padding-right: 42px; }
+
+.pass-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-lo);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+.pass-toggle:hover { color: var(--text-md); }
+
+/* ── Forgot link row ── */
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.link-muted {
+  font-size: 11px;
+  color: var(--text-lo);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.link-muted:hover { color: var(--amber); }
+
+/* ── Divider with text ── */
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+.or-divider::before,
+.or-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-lo);
+}
+.or-divider span {
+  font-size: 11px;
+  color: var(--text-lo);
+  font-family: var(--font-mono);
+  letter-spacing: 0.8px;
+}
+
+/* ── Demo credentials box ── */
+.demo-box {
+  background: var(--bg-3);
+  border: 1px solid var(--border-md);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.demo-box-label {
+  font-size: 9.5px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.demo-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  padding: 3px 0;
+  color: var(--text-md);
+}
+
+.demo-val {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-hi);
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .card-head,
+  .card-body { padding-left: 24px; padding-right: 24px; }
+  .auth-footer { padding-left: 24px; padding-right: 24px; }
+  .card-title { font-size: 22px; }
+}

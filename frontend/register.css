@@ -1,0 +1,68 @@
+/* ─────────────────────────────────────────────────────────
+   ConstruPRO — Register Page CSS
+   Extends: global.css
+   ───────────────────────────────────────────────────────── */
+
+/* ── Card Header ── */
+.card-head {
+  padding: 36px 36px 28px;
+  border-bottom: 1px solid var(--border-lo);
+  position: relative;
+}
+
+.card-head::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 36px;
+  width: 48px;
+  height: 2px;
+  background: var(--amber);
+  border-radius: 2px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--text-md);
+  font-weight: 300;
+  line-height: 1.6;
+}
+
+/* ── Card Body ── */
+.card-body {
+  padding: 28px 36px 32px;
+}
+
+/* ── Feature list ── */
+.feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 18px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-lo);
+}
+
+.feature-item svg { flex-shrink: 0; color: var(--green); }
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .card-head, .card-body { padding-left: 24px; padding-right: 24px; }
+  .auth-footer { padding-left: 24px; padding-right: 24px; }
+  .card-title { font-size: 22px; }
+}

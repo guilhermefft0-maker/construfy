@@ -10,13 +10,13 @@ ENVIRONMENT = "production"
 # ── D1 Database (multi-tenant SQLite)
 [[d1_databases]]
 binding    = "DB"
-database_name = "construpro-db"
-database_id   = "YOUR_NEW_D1_DATABASE_ID"  # **SECURITY: Replace before deploy**
+database_name = "construFY-db"
+database_id   = "87050e49-29d9-459a-a7d4-4cdfe42e4484"  # **SECURITY: Replace before deploy**
 
 # ── KV Namespace (rate limiting)
 [[kv_namespaces]]
 binding = "RATE_KV"
-id      = "YOUR_NEW_KV_NAMESPACE_ID"  # **SECURITY: Replace before deploy**
+id      = "32d4a3cb8a4c4f909064d0f8654cc88c"  # **SECURITY: Replace before deploy**
 
 # ── Secrets (configurar via: wrangler secret put NOME)
 # JWT_SECRET     → string aleatória ≥ 64 caracteres
