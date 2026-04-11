@@ -52,16 +52,18 @@
       <form id="login-form" novalidate>
         <div class="form-group">
           <label class="form-label" for="email">E-mail <span class="req">*</span></label>
-          <input class="form-input" type="email" id="email" name="email" required maxlength="254" autocomplete="email" placeholder="admin@suaconstrutora.com">
+          <input class="form-input" type="email" id="email" name="email" required maxlength="254"
+                 autocomplete="email" placeholder="admin@suaconstrutora.com">
         </div>
 
         <div class="form-group">
           <div class="row-between">
             <label class="form-label" for="password" style="margin-bottom:0">Senha <span class="req">*</span></label>
-            <a href="#" class="link-muted" onclick="return false;">Esqueceu a senha?</a>
+            <a href="forgot-password.html" class="link-muted">Esqueceu a senha?</a>
           </div>
           <div class="pass-wrap">
-            <input class="form-input" type="password" id="password" name="password" required minlength="8" autocomplete="current-password" placeholder="••••••••••••">
+            <input class="form-input" type="password" id="password" name="password" required
+                   autocomplete="current-password" placeholder="••••••••••••">
             <button type="button" class="pass-toggle" id="toggle-pass" aria-label="Mostrar senha">
               <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
@@ -84,34 +86,43 @@
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn      = document.getElementById('submit-btn');
-      const label    = document.getElementById('btn-label');
-      const errorEl  = document.getElementById('error-msg');
-      const successEl= document.getElementById('success-msg');
+      const btn       = document.getElementById('submit-btn');
+      const label     = document.getElementById('btn-label');
+      const errorEl   = document.getElementById('error-msg');
+      const successEl = document.getElementById('success-msg');
 
-      errorEl.style.display = 'none';
+      errorEl.style.display   = 'none';
       successEl.style.display = 'none';
       btn.disabled = true;
       label.innerHTML = '<span class="spinner"></span> Verificando...';
 
+      const email    = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        errorEl.textContent = 'Preencha e-mail e senha.';
+        errorEl.style.display = 'block';
+        btn.disabled = false;
+        label.textContent = 'Entrar na plataforma';
+        return;
+      }
+
       try {
-        const res  = await fetch(`${API_BASE}/auth/login`, {
+        const res = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',   // necessário para o cookie refresh_token
-          body: JSON.stringify({
-            email:    document.getElementById('email').value.trim().toLowerCase(),
-            password: document.getElementById('password').value,
-          }),
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
         });
 
         const data = await res.json();
 
         if (data.ok) {
-          // Salva JWT e dados do usuário
           localStorage.setItem('access_token', data.access_token);
-          localStorage.setItem('token_exp', String(Date.now() + data.expires_in * 1000));
-          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('token_exp', String(Date.now() + (data.expires_in || 900) * 1000));
+          // Normaliza user: worker retorna .nome, dashboard lê .nome || .name
+          const user = { ...data.user, name: data.user?.nome || data.user?.name };
+          localStorage.setItem('user', JSON.stringify(user));
           successEl.textContent = '✓ Login realizado! Redirecionando...';
           successEl.style.display = 'block';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);

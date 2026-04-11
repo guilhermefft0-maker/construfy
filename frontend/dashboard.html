@@ -343,13 +343,13 @@
         <span class="support-sublabel">(11) 91518-8474</span>
       </div>
     </a>
-    <a href="mailto:suport@fynext.site" class="support-option">
+    <a href="/cdn-cgi/l/email-protection#522127223d202612342b3c372a267c213b2637" class="support-option">
       <div class="support-option-icon em">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       </div>
       <div>
         <span>E-mail</span>
-        <span class="support-sublabel">suport@fynext.site</span>
+        <span class="support-sublabel"><span class="__cf_email__" data-cfemail="90e3e5e0ffe2e4d0f6e9fef5e8e4bee3f9e4f5">[email&#160;protected]</span></span>
       </div>
     </a>
   </div>
@@ -358,7 +358,7 @@
   </button>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── AUTH CHECK ──
 const _user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } })();
 if (!_user) { window.location.href = 'login.html'; }
@@ -369,7 +369,7 @@ const CID = _user?.company_id || '';
 const APP = {
   pontos: [],
   currentPage: 'dashboard',
-  empresa: { nome: (_user?.company_name || _user?.name || 'Minha Empresa'), cnpj: '', regime: '' },
+  empresa: { nome: (_user?.razao_social || _user?.company_name || _user?.nome || _user?.name || 'Minha Empresa'), cnpj: '', regime: '' },
   obras: [],
   medicoes: [],
   faturamentos: [],
@@ -1363,22 +1363,7 @@ async function excluirFaturamento(id) {
   closeForm();
   navigate('faturamento');
 }
-function _salvarFaturamento_old() {
-  const numero = document.getElementById('f-numero').value.trim();
-  if (!numero) return alert('Informe o número da NF');
-  APP.faturamentos.push({
-    id: Date.now(),
-    obraId: parseInt(document.getElementById('f-obra').value),
-    numero,
-    data: document.getElementById('f-data').value,
-    vencimento: document.getElementById('f-venc').value,
-    valor: parseFloat(document.getElementById('f-valor').value)||0,
-    formaPgto: document.getElementById('f-forma').value,
-    status: document.getElementById('f-status').value
-  });
-  closeForm();
-  navigate('faturamento');
-}
+
 
 // ── COLABORADORES ──
 function renderColaboradores() {
@@ -1952,7 +1937,8 @@ async function gerarPDFFinanceiro() {
   doc.save('financeiro.pdf');
 }
 
-function gerarPDFEPIs() {
+async function gerarPDFEPIs() {
+  await _ensureJsPDF();
   const doc = _initPDF('Estoque de EPIs');
   doc.autoTable({
     startY: 40,
@@ -1966,7 +1952,8 @@ function gerarPDFEPIs() {
   doc.save('epis.pdf');
 }
 
-function gerarPDFColaboradores() {
+async function gerarPDFColaboradores() {
+  await _ensureJsPDF();
   const doc = _initPDF('Colaboradores');
   doc.autoTable({
     startY: 40,
@@ -2120,7 +2107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 (function initUser() {
   const u = _user;
   if (!u) return;
-  const name = u.name || u.email || 'Usuário';
+  const name = u.nome || u.name || u.razao_social || u.email || 'Usuário';
   const email = u.email || '';
   const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('user-initials').textContent = initials;
@@ -2133,13 +2120,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function logout() {
   // Revoga o refresh token no servidor (invalida a sessão)
   fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
-  localStorage.removeItem('user');
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('token_exp');
+  localStorage.clear();
   window.location.href = 'login.html';
 }
 
-// Carregar dados do banco
 loadAll();
 </script>
 </body>
