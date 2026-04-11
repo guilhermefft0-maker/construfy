@@ -280,6 +280,9 @@
 const _user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } })();
 if (!_user) { window.location.href = 'login.html'; }
 
+const API = 'https://construpro-worker.guilhermefft0.workers.dev/api';
+const CID = _user?.company_id || '';
+
 const APP = {
   pontos: [],
   currentPage: 'dashboard',
@@ -290,8 +293,88 @@ const APP = {
   colaboradores: [],
   epis: [],
   entregasEPI: [],
-  financeiro: []
+  financeiro: [],
+  loading: false,
 };
+
+// ── API HELPER ─────────────────────────────────────────
+async function apiGet(endpoint) {
+  const res = await fetch(`${API}/data/${endpoint}`, {
+    headers: { 'X-Company-ID': CID }
+  });
+  return res.json();
+}
+
+async function apiPost(endpoint, body) {
+  const res = await fetch(`${API}/data/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-Company-ID': CID },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function apiPut(endpoint, body) {
+  const res = await fetch(`${API}/data/${endpoint}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Company-ID': CID },
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
+
+async function apiDelete(endpoint) {
+  const res = await fetch(`${API}/data/${endpoint}`, {
+    method: 'DELETE',
+    headers: { 'X-Company-ID': CID }
+  });
+  return res.json();
+}
+
+// ── LOADING STATE ──────────────────────────────────────
+function showLoading() {
+  document.getElementById('content').innerHTML = '<div class="page" style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text3)"><div>Carregando...</div></div>';
+}
+
+// ── LOAD ALL DATA ──────────────────────────────────────
+async function loadAll() {
+  showLoading();
+  const [obras, medicoes, faturamentos, colaboradores, epis, entregasEPI, financeiro, pontos] = await Promise.all([
+    apiGet('obras'), apiGet('medicoes'), apiGet('faturamentos'),
+    apiGet('colaboradores'), apiGet('epis'), apiGet('entregas-epi'),
+    apiGet('financeiro'), apiGet('pontos')
+  ]);
+  APP.obras         = (obras || []).map(normalizeObra);
+  APP.medicoes      = (medicoes || []).map(normalizeMedicao);
+  APP.faturamentos  = (faturamentos || []).map(normalizeFat);
+  APP.colaboradores = (colaboradores || []).map(normalizeColab);
+  APP.epis          = (epis || []).map(normalizeEPI);
+  APP.entregasEPI   = entregasEPI || [];
+  APP.financeiro    = (financeiro || []).map(normalizeFin);
+  APP.pontos        = (pontos || []).map(normalizePonto);
+  navigate(APP.currentPage);
+}
+
+// ── NORMALIZERS (DB snake_case → JS camelCase) ─────────
+function normalizeObra(o) {
+  return { ...o, prevFim: o.prev_fim, medicoes: o.medicoes_count };
+}
+function normalizeMedicao(m) {
+  return { ...m, obraId: m.obra_id };
+}
+function normalizeFat(f) {
+  return { ...f, obraId: f.obra_id, formaPgto: f.forma_pgto };
+}
+function normalizeColab(c) {
+  return { ...c, obraId: c.obra_id, diasTrabalhados: c.dias_trabalhados };
+}
+function normalizeEPI(e) { return e; }
+function normalizeFin(f) {
+  return { ...f, obraId: f.obra_id };
+}
+function normalizePonto(p) {
+  return { ...p, colaborador_id: p.colaborador_id, hora_entrada: p.hora_entrada, hora_saida: p.hora_saida };
+}
 
 function calcularINSS(salario) {
   const limites = [1412.00, 2666.68, 4000.03, 7786.02];
@@ -915,18 +998,18 @@ function openFormMedicao() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarMedicao() {
-  const obraId = parseInt(document.getElementById('f-obra').value);
+async function salvarMedicao() {
+  const obraId = document.getElementById('f-obra').value;
   const numero = document.getElementById('f-numero').value.trim();
   const valor = parseFloat(document.getElementById('f-valor').value)||0;
   if (!numero) return alert('Informe o número da medição');
-  APP.medicoes.push({
-    id: Date.now(), obraId, numero,
+  const nova = await apiPost('medicoes', {
+    obraId, numero, valor,
     data: document.getElementById('f-data').value,
-    valor,
     responsavel: document.getElementById('f-resp').value.trim(),
     status: document.getElementById('f-status').value
   });
+  APP.medicoes.unshift(normalizeMedicao(nova));
   closeForm();
   navigate('medicoes');
 }
@@ -994,7 +1077,23 @@ function openFormFaturamento() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarFaturamento() {
+async function salvarFaturamento() {
+  const numero = document.getElementById('f-numero').value.trim();
+  if (!numero) return alert('Informe o número da NF');
+  const nova = await apiPost('faturamentos', {
+    obraId: document.getElementById('f-obra').value,
+    numero,
+    data: document.getElementById('f-data').value,
+    vencimento: document.getElementById('f-venc').value,
+    valor: parseFloat(document.getElementById('f-valor').value)||0,
+    formaPgto: document.getElementById('f-forma').value,
+    status: document.getElementById('f-status').value,
+  });
+  APP.faturamentos.unshift(normalizeFat(nova));
+  closeForm();
+  navigate('faturamento');
+}
+function _salvarFaturamento_old() {
   const numero = document.getElementById('f-numero').value.trim();
   if (!numero) return alert('Informe o número da NF');
   APP.faturamentos.push({
@@ -1353,18 +1452,19 @@ function openFormFinanceiro() {
   document.getElementById('form-overlay').classList.add('open');
 }
 
-function salvarFinanceiro() {
+async function salvarFinanceiro() {
   const desc = document.getElementById('f-desc').value.trim();
   if (!desc) return alert('Informe a descrição');
-  APP.financeiro.push({
-    id: Date.now(),
+  const body = {
     tipo: document.getElementById('f-tipo').value,
     descricao: desc,
     valor: parseFloat(document.getElementById('f-valor').value)||0,
     data: document.getElementById('f-data').value,
     categoria: document.getElementById('f-cat').value,
-    obraId: parseInt(document.getElementById('f-obra').value)||null
-  });
+    obraId: document.getElementById('f-obra').value||null,
+  };
+  const novo = await apiPost('financeiro', body);
+  APP.financeiro.unshift(normalizeFin(novo));
   closeForm();
   navigate('financeiro');
 }
@@ -1527,7 +1627,6 @@ function gerarPDFColaboradores() {
   document.getElementById('user-initials').textContent = initials;
   document.getElementById('user-display-name').textContent = name;
   document.getElementById('user-display-email').textContent = email;
-  // Update empresa badge if present
   const badge = document.getElementById('empresa-badge');
   if (badge) badge.textContent = name;
 })();
@@ -1537,7 +1636,8 @@ function logout() {
   window.location.href = 'login.html';
 }
 
-navigate('dashboard');
+// Carregar dados do banco
+loadAll();
 </script>
 </body>
 </html>
