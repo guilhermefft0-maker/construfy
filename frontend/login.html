@@ -24,32 +24,8 @@
       <rect x="332" y="515" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="388" y="515" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="444" y="515" width="40" height="50" fill="none" stroke="black" stroke-width="2"/>
       <rect x="712" y="60" width="18" height="760"/>
       <rect x="600" y="60" width="400" height="14"/>
-      <rect x="770" y="74" width="22" height="16" rx="2"/>
-      <line x1="781" y1="90" x2="781" y2="270" stroke="white" stroke-width="3"/>
-      <path d="M773 270 Q781 290 789 270" stroke="white" stroke-width="3" fill="none"/>
-      <rect x="706" y="42" width="30" height="22" rx="3"/>
-      <line x1="721" y1="68" x2="600" y2="74" stroke="white" stroke-width="2"/>
-      <line x1="721" y1="68" x2="1000" y2="74" stroke="white" stroke-width="2"/>
-      <line x1="721" y1="180" x2="692" y2="280" stroke="white" stroke-width="2"/><line x1="721" y1="180" x2="750" y2="280" stroke="white" stroke-width="2"/>
-      <line x1="721" y1="280" x2="692" y2="380" stroke="white" stroke-width="2"/><line x1="721" y1="280" x2="750" y2="380" stroke="white" stroke-width="2"/>
-      <line x1="546" y1="820" x2="546" y2="390" stroke="white" stroke-width="3"/><line x1="586" y1="820" x2="586" y2="390" stroke="white" stroke-width="3"/><line x1="626" y1="820" x2="626" y2="390" stroke="white" stroke-width="3"/>
-      <line x1="546" y1="420" x2="626" y2="420" stroke="white" stroke-width="2"/><line x1="546" y1="500" x2="626" y2="500" stroke="white" stroke-width="2"/><line x1="546" y1="580" x2="626" y2="580" stroke="white" stroke-width="2"/><line x1="546" y1="660" x2="626" y2="660" stroke="white" stroke-width="2"/>
-      <line x1="546" y1="420" x2="586" y2="500" stroke="white" stroke-width="1.5"/><line x1="586" y1="420" x2="546" y2="500" stroke="white" stroke-width="1.5"/>
       <rect x="1010" y="220" width="210" height="600"/>
-      <rect x="1032" y="245" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1088" y="245" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1144" y="245" width="40" height="50" fill="none" stroke="black" stroke-width="2"/>
-      <rect x="1032" y="315" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1088" y="315" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1144" y="315" width="40" height="50" fill="none" stroke="black" stroke-width="2"/>
-      <rect x="1032" y="385" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1088" y="385" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1144" y="385" width="40" height="50" fill="none" stroke="black" stroke-width="2"/>
-      <rect x="1032" y="455" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1088" y="455" width="40" height="50" fill="none" stroke="black" stroke-width="2"/><rect x="1144" y="455" width="40" height="50" fill="none" stroke="black" stroke-width="2"/>
       <rect x="1265" y="400" width="175" height="420"/>
-      <circle cx="855" cy="783" r="9"/><line x1="855" y1="792" x2="855" y2="815" stroke="white" stroke-width="4"/><line x1="843" y1="799" x2="867" y2="799" stroke="white" stroke-width="3"/><path d="M846 783 Q855 773 864 783" fill="white"/>
-      <circle cx="896" cy="785" r="9"/><line x1="896" y1="794" x2="896" y2="817" stroke="white" stroke-width="4"/><line x1="884" y1="801" x2="908" y2="801" stroke="white" stroke-width="3"/><path d="M887 785 Q896 775 905 785" fill="white"/>
-      <rect x="1095" y="768" width="125" height="52" rx="4"/>
-      <rect x="1115" y="743" width="85" height="30" rx="3"/>
-      <line x1="1145" y1="743" x2="1095" y2="697" stroke="white" stroke-width="6"/>
-      <line x1="1095" y1="697" x2="1055" y2="738" stroke="white" stroke-width="5"/>
-      <path d="M1043 736 L1055 738 L1050 758 L1038 756 Z" fill="white"/>
-      <rect x="1090" y="818" width="135" height="12" rx="4"/>
-      <rect x="132" y="758" width="94" height="62" rx="4"/><ellipse cx="179" cy="753" rx="37" ry="30"/><circle cx="148" cy="820" r="14"/><circle cx="210" cy="820" r="14"/>
       <line x1="0" y1="24" x2="1440" y2="24" stroke="white" stroke-width="0.5" stroke-dasharray="6 14"/>
       <line x1="24" y1="0" x2="24" y2="900" stroke="white" stroke-width="0.5" stroke-dasharray="6 14"/>
     </svg>
@@ -72,12 +48,6 @@
     <div class="card-body">
       <div class="alert alert-error"   id="error-msg"   role="alert"></div>
       <div class="alert alert-success" id="success-msg" role="status"></div>
-
-      <div class="demo-box">
-        <div class="demo-box-label">▸ Ambiente de demonstração</div>
-        <div class="demo-row"><span>E-mail</span><span class="demo-val">admin@construtora.com</span></div>
-        <div class="demo-row"><span>Senha</span><span class="demo-val">demo123456789</span></div>
-      </div>
 
       <form id="login-form" novalidate>
         <div class="form-group">
@@ -110,7 +80,7 @@
   </main>
 
   <script>
-    const API_BASE = '/api';
+    const API_BASE = 'https://construpro-worker.guilhermefft0.workers.dev/api';
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -133,31 +103,23 @@
         const res = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
           body: JSON.stringify(payload),
         });
 
         const data = await res.json();
 
-        if (data.ok) {
+        if (data.success) {
+          localStorage.setItem('user', JSON.stringify(data.user));
           successEl.textContent = '✓ Login realizado! Redirecionando...';
           successEl.style.display = 'block';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
         } else {
-          throw new Error(data.message || 'Credenciais inválidas.');
-        }
-      } catch (err) {
-        // Demo mode: allow demo credentials to pass through to dashboard
-        const email = document.getElementById('email').value.trim().toLowerCase();
-        const pass = document.getElementById('password').value;
-        if (email === 'admin@construtora.com' && pass === 'demo123456789') {
-          successEl.textContent = '✓ Login realizado! Redirecionando...';
-          successEl.style.display = 'block';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
-        } else {
-          errorEl.textContent = 'Use as credenciais de demonstração acima para acessar.';
+          errorEl.textContent = data.error || 'Credenciais inválidas.';
           errorEl.style.display = 'block';
         }
+      } catch (err) {
+        errorEl.textContent = 'Erro de conexão. Tente novamente.';
+        errorEl.style.display = 'block';
       } finally {
         btn.disabled = false;
         label.textContent = 'Entrar na plataforma';
