@@ -954,9 +954,12 @@ function renderObras() {
         <div><div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas)}</div><div class="obra-stat-label">Despesas</div></div>
         <div><div class="obra-stat-val" style="color:var(--green)">${fmt((o.valorContrato||0)-o.despesas)}</div><div class="obra-stat-label">Margem</div></div>
       </div>
-      <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
-        <span>Nº: <span style="color:var(--text)">${o.contrato||'—'}</span></span>
-        <span>${o.medicoes} medições</span>
+      <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text3)">
+        <span>Nº: <span style="color:var(--text)">${o.contrato||'—'}</span> · ${o.medicoes} medições</span>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-outline" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();openFormObra('${o.id}')" title="Editar obra">✏️ Editar</button>
+          <button class="btn btn-danger" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();excluirObra('${o.id}')" title="Excluir obra">🗑</button>
+        </div>
       </div>
     </div>`).join('')}
   </div>
