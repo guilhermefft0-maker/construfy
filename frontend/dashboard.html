@@ -1583,163 +1583,207 @@ async function excluirColaborador(id) {
 
 // ── FOLHA ──
 function renderFolha() {
-  // Período selecionado (mês/ano)
-  const hoje = new Date();
-  const mesAtual = window.FOLHA_MES || hoje.getMonth();
-  const anoAtual = window.FOLHA_ANO || hoje.getFullYear();
-  const nomeMes = new Date(anoAtual, mesAtual, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
+  // ── PERÍODO (fix: usar !== undefined para suportar mês 0 = Janeiro)
+  const hoje    = new Date();
+  const mes     = (window.FOLHA_MES !== undefined && window.FOLHA_MES !== null) ? window.FOLHA_MES : hoje.getMonth();
+  const ano     = (window.FOLHA_ANO !== undefined && window.FOLHA_ANO !== null) ? window.FOLHA_ANO : hoje.getFullYear();
+  const nomeMes = new Date(ano, mes, 1).toLocaleDateString('pt-BR', { month:'long', year:'numeric' });
 
-  // Colaboradores ativos com tipo
-  const cltAtivos    = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'CLT');
-  const diaristas    = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'Diarista');
-  const pjColabs     = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'PJ');
+  // ── COLABORADORES ativos por tipo
+  const cltAtivos = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'CLT');
+  const diaristas = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'Diarista');
+  const pjColabs  = APP.colaboradores.filter(c => c.status === 'Ativo' && c.tipo === 'PJ');
 
-  // Pontos do mês filtrado
+  // ── PONTOS do mês
   const pontosMes = APP.pontos.filter(p => {
     if (!p.data) return false;
     const d = new Date(p.data + 'T00:00:00');
-    return d.getMonth() === mesAtual && d.getFullYear() === anoAtual;
+    return d.getMonth() === mes && d.getFullYear() === ano;
   });
 
-  // Calcula dias trabalhados reais do ponto por colaborador
-  function diasTrabalhados(colaboradorId) {
+  // ── Dias presentes reais no ponto (compara como string para evitar type mismatch)
+  function diasPresentes(cid) {
     return pontosMes.filter(p =>
-      (p.colaborador_id === colaboradorId || p.colaboradorId === colaboradorId) &&
-      p.status === 'presente'
+      String(p.colaborador_id) === String(cid) && p.status === 'presente'
     ).length;
   }
 
-  // Totais gerais
-  let totalBruto = 0, totalLiq = 0, totalCusto = 0, totalDescFolha = 0;
-
-  cltAtivos.forEach(c => {
-    const r = calcularLiquidoCLT(c.salario);
-    const adiant     = parseFloat(c.adiantamento || 0);
-    const valeTransp = parseFloat(c.vale_transporte || 0);
-    const outrosDesc = parseFloat(c.outros_descontos || 0);
-    const liquidoReal = r.liquido - adiant - valeTransp - outrosDesc;
-    totalBruto    += c.salario;
-    totalLiq      += liquidoReal;
-    totalCusto    += r.custoTotal;
-    totalDescFolha += (r.inss + r.irrf + adiant + valeTransp + outrosDesc);
-  });
-  diaristas.forEach(c => {
-    const dias = diasTrabalhados(c.id) || c.diasTrabalhados || 22;
-    const tot = c.salario * dias;
-    totalBruto += tot; totalLiq += tot; totalCusto += tot;
-  });
-  pjColabs.forEach(c => { totalBruto += c.salario; totalLiq += c.salario; totalCusto += c.salario; });
-
-  // Navegar mês
-  function navMesBtn(delta) {
-    return `<button onclick="navegarFolhaMes(${delta})" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:16px;padding:0 6px;line-height:1">${delta < 0 ? '‹' : '›'}</button>`;
+  // ── Horas totais no mês por colaborador
+  function horasMes(cid) {
+    return pontosMes
+      .filter(p => String(p.colaborador_id) === String(cid) && p.hora_entrada && p.hora_saida)
+      .reduce((t, p) => t + (new Date('2000-01-01T'+p.hora_saida) - new Date('2000-01-01T'+p.hora_entrada)) / 3600000, 0);
   }
+
+  // ── PRÉ-CALCULAR tudo para os totais e para o render da tabela
+  const dadosCLT = cltAtivos.map(c => {
+    const s          = parseFloat(c.salario) || 0;
+    const r          = calcularLiquidoCLT(s);
+    const adiant     = parseFloat(c.adiantamento)      || 0;
+    const vt         = parseFloat(c.vale_transporte)   || 0;
+    const outros     = parseFloat(c.outros_descontos)  || 0;
+    const totalDesc  = r.inss + r.irrf + adiant + vt + outros;
+    const liquido    = s - totalDesc;          // Bruto − TODOS os descontos
+    const dias       = diasPresentes(c.id);
+    const horas      = horasMes(c.id);
+    return { c, s, r, adiant, vt, outros, totalDesc, liquido, dias, horas };
+  });
+
+  const dadosDiar = diaristas.map(c => {
+    // Usa SOMENTE os dias reais do ponto — nunca estima ou usa valor do cadastro
+    const diasPonto  = diasPresentes(c.id);   // 0 se ainda não bateu nada
+    const diaria     = parseFloat(c.salario) || 0;
+    const total      = diaria * diasPonto;    // R$0 se sem ponto ainda
+    const diasCad    = parseFloat(c.diasTrabalhados) || 22; // só exibição referência
+    return { c, diaria, dias: diasPonto, total, diasCad, diasPonto };
+  });
+
+  // ── TOTAIS
+  const totBruto  = dadosCLT.reduce((a,d)=>a+d.s,0)       + dadosDiar.reduce((a,d)=>a+d.total,0) + pjColabs.reduce((a,c)=>a+(parseFloat(c.salario)||0),0);
+  const totDesc   = dadosCLT.reduce((a,d)=>a+d.totalDesc,0);
+  const totLiq    = dadosCLT.reduce((a,d)=>a+d.liquido,0)  + dadosDiar.reduce((a,d)=>a+d.total,0) + pjColabs.reduce((a,c)=>a+(parseFloat(c.salario)||0),0);
+  const totCusto  = dadosCLT.reduce((a,d)=>a+d.r.custoTotal,0) + dadosDiar.reduce((a,d)=>a+d.total,0) + pjColabs.reduce((a,c)=>a+(parseFloat(c.salario)||0),0);
 
   return `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
     <div style="font-size:20px;font-weight:500;color:var(--text)">Folha de Pagamento</div>
     <div style="display:flex;align-items:center;gap:4px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:4px 10px">
-      ${navMesBtn(-1)}
+      <button onclick="navegarFolhaMes(-1)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:0 6px;line-height:1">‹</button>
       <span style="font-size:13px;color:var(--text);font-weight:500;min-width:160px;text-align:center;text-transform:capitalize">${nomeMes}</span>
-      ${navMesBtn(1)}
+      <button onclick="navegarFolhaMes(1)" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:18px;padding:0 6px;line-height:1">›</button>
     </div>
   </div>
-  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">${cltAtivos.length} CLT · ${diaristas.length} diarista(s) · ${pjColabs.length} PJ · ${pontosMes.length} pontos registrados no mês</div>
-
-  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-label">Total Bruto</div><div class="kpi-value amber">${fmt(totalBruto)}</div><div class="kpi-change">Soma salários brutos</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Descontos</div><div class="kpi-value red">${fmt(totalDescFolha)}</div><div class="kpi-change">INSS + IRRF + outros</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total Líquido a Pagar</div><div class="kpi-value green">${fmt(totalLiq)}</div><div class="kpi-change">O que a empresa paga</div></div>
-    <div class="kpi-card"><div class="kpi-label">Custo Total Empresa</div><div class="kpi-value" style="color:var(--blue)">${fmt(totalCusto)}</div><div class="kpi-change">Inclui FGTS + provisões</div></div>
+  <div style="font-size:12px;color:var(--text3);margin-bottom:20px">
+    ${cltAtivos.length} CLT · ${diaristas.length} diarista(s) · ${pjColabs.length} PJ
+    · <span style="color:${pontosMes.length>0?'var(--green)':'var(--text3)'}">${pontosMes.length} pontos no mês</span>
   </div>
 
-  ${cltAtivos.length ? `
+  <!-- KPIs -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:24px">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Bruto</div>
+      <div class="kpi-value amber">${fmt(totBruto)}</div>
+      <div class="kpi-change">Soma dos salários brutos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Descontos CLT</div>
+      <div class="kpi-value red">${fmt(totDesc)}</div>
+      <div class="kpi-change">INSS · IRRF · adiant. · outros</div>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.03)">
+      <div class="kpi-label">💰 Total Líquido a Pagar</div>
+      <div class="kpi-value green" style="font-size:28px">${fmt(totLiq)}</div>
+      <div class="kpi-change">O que cada funcionário recebe</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Custo Total Empresa</div>
+      <div class="kpi-value" style="color:var(--blue)">${fmt(totCusto)}</div>
+      <div class="kpi-change">Inclui FGTS + provisões CLT</div>
+    </div>
+  </div>
+
+  <!-- TABELA CLT -->
+  ${dadosCLT.length ? `
   <div class="table-card" style="margin-bottom:20px">
     <div class="table-header">
       <div>
-        <div class="table-title">CLT — Holerites Detalhados</div>
-        <div class="table-sub">Clique em "Ver holerite" para ver os descontos completos do colaborador</div>
+        <div class="table-title">CLT — Resumo de Pagamento</div>
+        <div class="table-sub">Bruto − INSS − IRRF − descontos cadastrados = Líquido a pagar</div>
       </div>
     </div>
     <table>
-      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Dias Ponto</th><th>Salário Bruto</th><th>INSS</th><th>IRRF</th><th>Outros Descontos</th><th>💰 Líquido a Receber</th><th>Custo Empresa</th><th></th></tr></thead>
+      <thead>
+        <tr>
+          <th>Colaborador</th>
+          <th>Cargo</th>
+          <th style="text-align:center">Dias/h (ponto)</th>
+          <th>Salário Bruto</th>
+          <th>− INSS</th>
+          <th>− IRRF</th>
+          <th>− Outros</th>
+          <th style="background:rgba(34,197,94,0.06);color:var(--green)">💰 Líquido</th>
+          <th>Custo Empresa</th>
+          <th></th>
+        </tr>
+      </thead>
       <tbody>
-        ${cltAtivos.map(c => {
-          const r          = calcularLiquidoCLT(c.salario);
-          const adiant     = parseFloat(c.adiantamento || 0);
-          const valeTransp = parseFloat(c.vale_transporte || 0);
-          const outrosDesc = parseFloat(c.outros_descontos || 0);
-          const totalDesc  = r.inss + r.irrf + adiant + valeTransp + outrosDesc;
-          const liquidoReal = r.liquido - adiant - valeTransp - outrosDesc;
-          const diasPonto  = diasTrabalhados(c.id);
-          return `<tr>
-            <td><span class="strong">${c.nome}</span></td>
-            <td style="color:var(--text3)">${c.cargo}</td>
-            <td style="font-family:var(--mono);text-align:center">
-              <span style="color:${diasPonto>0?'var(--green)':'var(--text3)'}">${diasPonto > 0 ? diasPonto + 'd' : '—'}</span>
-            </td>
-            <td style="font-family:var(--mono)">${fmt(c.salario)}</td>
-            <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.inss)}</td>
-            <td style="font-family:var(--mono);color:var(--red)">-${fmt(r.irrf)}</td>
-            <td style="font-family:var(--mono);color:var(--red)">
-              ${adiant > 0 ? `<span class="folha-discount-tag">Adiant. -${fmt(adiant)}</span>` : ''}
-              ${valeTransp > 0 ? `<span class="folha-discount-tag">VT -${fmt(valeTransp)}</span>` : ''}
-              ${outrosDesc > 0 ? `<span class="folha-discount-tag">Outros -${fmt(outrosDesc)}</span>` : ''}
-              ${(adiant + valeTransp + outrosDesc) === 0 ? '<span style="color:var(--text3);font-size:11px">—</span>' : ''}
-            </td>
-            <td style="font-family:var(--mono);color:var(--green);font-weight:600;font-size:14px">${fmt(liquidoReal)}</td>
-            <td style="font-family:var(--mono);color:var(--accent)">${fmt(r.custoTotal)}</td>
-            <td>
-              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;white-space:nowrap" onclick="verHoleriteCLT('${c.id}','${mesAtual}','${anoAtual}')">📋 Holerite</button>
-            </td>
-          </tr>`;
-        }).join('')}
+        ${dadosCLT.map(({c,s,r,adiant,vt,outros,totalDesc,liquido,dias,horas}) => `
+        <tr>
+          <td><span class="strong">${c.nome}</span></td>
+          <td style="color:var(--text3);font-size:12px">${c.cargo}</td>
+          <td style="text-align:center;font-family:var(--mono);font-size:12px">
+            ${dias > 0
+              ? `<span style="color:var(--green)">${dias}d / ${horas.toFixed(0)}h</span>`
+              : `<span style="color:var(--text3)">sem ponto</span>`}
+          </td>
+          <td style="font-family:var(--mono)">${fmt(s)}</td>
+          <td style="font-family:var(--mono);color:var(--red)">−${fmt(r.inss)}</td>
+          <td style="font-family:var(--mono);color:var(--red)">−${fmt(r.irrf)}</td>
+          <td style="font-family:var(--mono);font-size:11px">
+            ${adiant > 0 ? `<div style="color:var(--red)">Adiant. −${fmt(adiant)}</div>` : ''}
+            ${vt     > 0 ? `<div style="color:var(--red)">VT −${fmt(vt)}</div>` : ''}
+            ${outros > 0 ? `<div style="color:var(--red)">Outros −${fmt(outros)}</div>` : ''}
+            ${(adiant+vt+outros)===0 ? `<span style="color:var(--text3)">—</span>` : ''}
+          </td>
+          <td style="background:rgba(34,197,94,0.05);font-family:var(--mono);color:var(--green);font-weight:700;font-size:15px;border-left:2px solid rgba(34,197,94,0.2)">
+            ${fmt(liquido)}
+          </td>
+          <td style="font-family:var(--mono);color:var(--accent);font-size:12px">${fmt(r.custoTotal)}</td>
+          <td>
+            <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;white-space:nowrap"
+              onclick="verHoleriteCLT('${c.id}',${mes},${ano})">📋 Holerite</button>
+          </td>
+        </tr>`).join('')}
       </tbody>
     </table>
-  </div>` : ''}
+  </div>` : '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:32px;text-align:center;color:var(--text3);margin-bottom:20px">Nenhum colaborador CLT ativo cadastrado.</div>'}
 
-  ${diaristas.length ? `
+  <!-- TABELA DIARISTAS -->
+  ${dadosDiar.length ? `
   <div class="table-card" style="margin-bottom:20px">
     <div class="table-header"><div class="table-title">Diaristas</div></div>
     <table>
-      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Dias (Ponto)</th><th>Dias (Cadastro)</th><th>Valor/Dia</th><th>💰 Total a Pagar</th></tr></thead>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th>Dias no Ponto</th><th>Dias Cadastro</th><th>Valor/Dia</th><th style="color:var(--green)">💰 Total a Pagar</th></tr></thead>
       <tbody>
-        ${diaristas.map(c => {
-          const diasPonto  = diasTrabalhados(c.id);
-          const diasBase   = c.diasTrabalhados || 22;
-          const diasUsados = diasPonto > 0 ? diasPonto : diasBase;
-          return `<tr>
-            <td><span class="strong">${c.nome}</span></td>
-            <td style="color:var(--text3)">${c.cargo}</td>
-            <td style="font-family:var(--mono);text-align:center;color:${diasPonto>0?'var(--green)':'var(--text3)'}">${diasPonto > 0 ? diasPonto : '—'}</td>
-            <td style="font-family:var(--mono);text-align:center;color:var(--text3)">${diasBase}</td>
-            <td style="font-family:var(--mono)">${fmt(c.salario)}/dia</td>
-            <td style="font-family:var(--mono);color:var(--green);font-weight:600">
-              ${fmt(c.salario * diasUsados)}
-              ${diasPonto > 0 ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">(${diasPonto}d ponto)</span>` : `<span style="font-size:10px;color:var(--text3);margin-left:4px">(${diasBase}d cadastro)</span>`}
-            </td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
-  </div>` : ''}
-
-  ${pjColabs.length ? `
-  <div class="table-card" style="margin-bottom:20px">
-    <div class="table-header"><div class="table-title">PJ — Prestadores</div></div>
-    <table>
-      <thead><tr><th>Colaborador</th><th>Cargo</th><th>💰 Valor NF a Emitir</th></tr></thead>
-      <tbody>
-        ${pjColabs.map(c => `<tr>
+        ${dadosDiar.map(({c,diaria,dias,total,diasCad,diasPonto}) => `
+        <tr>
           <td><span class="strong">${c.nome}</span></td>
-          <td style="color:var(--text3)">${c.cargo}</td>
-          <td style="font-family:var(--mono);color:var(--blue);font-weight:600">${fmt(c.salario)}</td>
+          <td style="color:var(--text3);font-size:12px">${c.cargo}</td>
+          <td style="font-family:var(--mono);text-align:center">
+            ${diasPonto > 0
+              ? `<span style="color:var(--green);font-weight:600">${diasPonto} dias</span>`
+              : `<span style="color:var(--text3);font-size:11px">sem ponto</span>`}
+          </td>
+          <td style="font-family:var(--mono);text-align:center;color:var(--text3);font-size:11px">${diasCad}d ref.</td>
+          <td style="font-family:var(--mono)">${fmt(diaria)}/dia</td>
+          <td style="font-family:var(--mono);font-weight:700;font-size:15px;color:${diasPonto>0?'var(--green)':'var(--text3)'}">
+            ${diasPonto > 0
+              ? `${fmt(total)} <span style="font-size:10px;font-weight:400;color:var(--text3)">(${diasPonto}d × ${fmt(diaria)})</span>`
+              : `<span style="font-size:12px">Aguardando pontos…</span>`}
+          </td>
         </tr>`).join('')}
       </tbody>
     </table>
   </div>` : ''}
 
-  <!-- Painel holerite individual -->
+  <!-- TABELA PJ -->
+  ${pjColabs.length ? `
+  <div class="table-card" style="margin-bottom:20px">
+    <div class="table-header"><div class="table-title">PJ — Prestadores</div></div>
+    <table>
+      <thead><tr><th>Colaborador</th><th>Cargo</th><th style="color:var(--blue)">💰 Valor NF a Emitir</th></tr></thead>
+      <tbody>
+        ${pjColabs.map(c => `
+        <tr>
+          <td><span class="strong">${c.nome}</span></td>
+          <td style="color:var(--text3);font-size:12px">${c.cargo}</td>
+          <td style="font-family:var(--mono);color:var(--blue);font-weight:700;font-size:15px">${fmt(parseFloat(c.salario)||0)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>` : ''}
+
+  <!-- Holerite individual (expandido ao clicar) -->
   <div id="holerite-panel" style="display:none;margin-top:4px"></div>
   `;
 }
