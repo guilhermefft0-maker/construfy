@@ -108,10 +108,10 @@
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      const label = document.getElementById('btn-label');
-      const errorEl = document.getElementById('error-msg');
-      const successEl = document.getElementById('success-msg');
+      const btn      = document.getElementById('submit-btn');
+      const label    = document.getElementById('btn-label');
+      const errorEl  = document.getElementById('error-msg');
+      const successEl= document.getElementById('success-msg');
 
       errorEl.style.display = 'none';
       successEl.style.display = 'none';
@@ -119,9 +119,9 @@
       label.innerHTML = '<span class="spinner"></span> Enviando...';
 
       const companyName = document.getElementById('company-name').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const adminName = document.getElementById('admin-name').value.trim();
-      const adminEmail = document.getElementById('admin-email').value.trim().toLowerCase();
+      const phone       = document.getElementById('phone').value.trim();
+      const adminName   = document.getElementById('admin-name').value.trim();
+      const adminEmail  = document.getElementById('admin-email').value.trim().toLowerCase();
       const adminPassword = document.getElementById('admin-password').value;
 
       if (!companyName || !phone || !adminName || !adminEmail || !adminPassword) {
@@ -140,35 +140,37 @@
       }
 
       try {
-        const payload = {
-          companyName,
-          phone,
-          email: adminEmail,
-          password: adminPassword,
-        };
-
         const res = await fetch(`${API_BASE}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          credentials: 'include',   // necessário para o cookie refresh_token
+          body: JSON.stringify({
+            companyName,
+            adminName,              // ← nome do admin separado do nome da empresa
+            phone,
+            email:    adminEmail,
+            password: adminPassword,
+            plan:     document.getElementById('plan').value,
+          }),
         });
 
         const data = await res.json();
 
         if (data.ok || data.success) {
-          // Salva token e usuário igual ao login — vai direto pro dashboard
+          // Salva JWT e vai direto pro dashboard (sem passar pelo login)
           localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('token_exp', String(Date.now() + (data.expires_in || 900) * 1000));
           localStorage.setItem('user', JSON.stringify(data.user));
           successEl.textContent = '✓ Conta criada! Redirecionando para o painel...';
           successEl.style.display = 'block';
           setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
         } else {
-          errorEl.textContent = data.error || 'Erro ao criar conta.';
+          errorEl.textContent = data.message || data.error || 'Erro ao criar conta.';
           errorEl.style.display = 'block';
           btn.disabled = false;
           label.textContent = 'Criar Conta Gratuitamente';
         }
-      } catch (err) {
+      } catch {
         errorEl.textContent = 'Erro de conexão. Tente novamente.';
         errorEl.style.display = 'block';
         btn.disabled = false;

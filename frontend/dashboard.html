@@ -285,7 +285,7 @@ const CID = _user?.company_id || '';
 const APP = {
   pontos: [],
   currentPage: 'dashboard',
-  empresa: { nome: (_user?.name || 'Minha Empresa'), cnpj: '', regime: '' },
+  empresa: { nome: (_user?.company_name || _user?.name || 'Minha Empresa'), cnpj: '', regime: '' },
   obras: [],
   medicoes: [],
   faturamentos: [],
@@ -296,19 +296,49 @@ const APP = {
   loading: false,
 };
 
-// ── API HELPER ─────────────────────────────────────────
-function getToken() {
-  return localStorage.getItem('access_token') || '';
-}
+// ── TOKEN MANAGER (JWT + refresh automático) ─────────────────────
+const TokenManager = {
+  get() { return localStorage.getItem('access_token') || ''; },
 
-function _headers(extra = {}) {
-  return { 'Content-Type': 'application/json', 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}`, ...extra };
-}
+  isExpired() {
+    const exp = parseInt(localStorage.getItem('token_exp') || '0');
+    return Date.now() > (exp - 60_000); // renova 60s antes
+  },
 
+  async refresh() {
+    try {
+      const res = await fetch(`${API}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) { logout(); return false; }
+      const data = await res.json();
+      if (data.ok && data.access_token) {
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('token_exp', String(Date.now() + data.expires_in * 1000));
+        return true;
+      }
+      logout();
+      return false;
+    } catch { return false; }
+  },
+
+  async getValid() {
+    if (this.isExpired()) await this.refresh();
+    return this.get();
+  }
+};
+
+// Tenta renovar ao carregar se o token está prestes a expirar
+if (TokenManager.isExpired()) TokenManager.refresh();
+
+// ── API HELPER ─────────────────────────────────────────────────────
 async function apiGet(endpoint) {
   try {
+    const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
-      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
+      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
     });
     if (res.status === 401) { logout(); return []; }
     const data = await res.json();
@@ -318,10 +348,12 @@ async function apiGet(endpoint) {
 
 async function apiPost(endpoint, body) {
   try {
+    const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'POST',
-      headers: _headers(),
-      body: JSON.stringify(body)
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
+      body: JSON.stringify(body),
     });
     if (res.status === 401) { logout(); return {}; }
     return res.json();
@@ -330,10 +362,12 @@ async function apiPost(endpoint, body) {
 
 async function apiPut(endpoint, body) {
   try {
+    const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'PUT',
-      headers: _headers(),
-      body: JSON.stringify(body)
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
+      body: JSON.stringify(body),
     });
     if (res.status === 401) { logout(); return {}; }
     return res.json();
@@ -342,9 +376,11 @@ async function apiPut(endpoint, body) {
 
 async function apiDelete(endpoint) {
   try {
+    const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/${endpoint}`, {
       method: 'DELETE',
-      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
+      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
     });
     if (res.status === 401) { logout(); return {}; }
     return res.json();
@@ -365,8 +401,10 @@ function showLoading() {
 async function loadAll() {
   showLoading();
   try {
+    const token = await TokenManager.getValid();
     const res = await fetch(`${API}/data/all`, {
-      headers: { 'X-Company-ID': CID, 'Authorization': `Bearer ${getToken()}` }
+      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
     });
     if (res.status === 401) { logout(); return; }
     const d = await res.json();
@@ -1709,7 +1747,11 @@ function gerarPDFColaboradores() {
 })();
 
 function logout() {
+  // Revoga o refresh token no servidor (invalida a sessão)
+  fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
   localStorage.removeItem('user');
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('token_exp');
   window.location.href = 'login.html';
 }
 

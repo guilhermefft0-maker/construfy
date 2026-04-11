@@ -84,10 +84,10 @@
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = document.getElementById('submit-btn');
-      const label = document.getElementById('btn-label');
-      const errorEl = document.getElementById('error-msg');
-      const successEl = document.getElementById('success-msg');
+      const btn      = document.getElementById('submit-btn');
+      const label    = document.getElementById('btn-label');
+      const errorEl  = document.getElementById('error-msg');
+      const successEl= document.getElementById('success-msg');
 
       errorEl.style.display = 'none';
       successEl.style.display = 'none';
@@ -95,40 +95,42 @@
       label.innerHTML = '<span class="spinner"></span> Verificando...';
 
       try {
-        const payload = {
-          email: document.getElementById('email').value.trim().toLowerCase(),
-          password: document.getElementById('password').value,
-        };
-
-        const res = await fetch(`${API_BASE}/auth/login`, {
+        const res  = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          credentials: 'include',   // necessário para o cookie refresh_token
+          body: JSON.stringify({
+            email:    document.getElementById('email').value.trim().toLowerCase(),
+            password: document.getElementById('password').value,
+          }),
         });
 
         const data = await res.json();
 
         if (data.ok) {
+          // Salva JWT e dados do usuário
           localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('token_exp', String(Date.now() + data.expires_in * 1000));
           localStorage.setItem('user', JSON.stringify(data.user));
           successEl.textContent = '✓ Login realizado! Redirecionando...';
           successEl.style.display = 'block';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
+          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
         } else {
           errorEl.textContent = data.message || 'Credenciais inválidas.';
           errorEl.style.display = 'block';
+          btn.disabled = false;
+          label.textContent = 'Entrar na plataforma';
         }
-      } catch (err) {
+      } catch {
         errorEl.textContent = 'Erro de conexão. Tente novamente.';
         errorEl.style.display = 'block';
-      } finally {
         btn.disabled = false;
         label.textContent = 'Entrar na plataforma';
       }
     });
 
     document.getElementById('toggle-pass').addEventListener('click', () => {
-      const inp = document.getElementById('password');
+      const inp  = document.getElementById('password');
       const icon = document.getElementById('eye-icon');
       const show = inp.type === 'password';
       inp.type = show ? 'text' : 'password';
