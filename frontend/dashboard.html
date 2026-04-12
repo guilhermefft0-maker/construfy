@@ -175,16 +175,46 @@
     .lock-text { font-size:12px; color:var(--text2); text-align:center; line-height:1.4; }
     .lock-btn { background:var(--accent); color:#000; border:none; border-radius:var(--radius); padding:7px 16px; font-size:12px; font-weight:600; cursor:pointer; font-family:var(--font); margin-top:2px; }
     .lock-btn:hover { background:var(--accent2); }
+
+    /* ── FREE PLAN: nav item bloqueado ── */
+    .nav-item.nav-locked { opacity:0.45; cursor:default; position:relative; }
+    .nav-item.nav-locked:hover { color:var(--text2); background:transparent; }
+    .nav-lock-badge { margin-left:auto; display:inline-flex; align-items:center; gap:3px; background:rgba(240,165,0,0.12); border:1px solid rgba(240,165,0,0.25); color:var(--accent); border-radius:20px; font-size:9px; font-weight:600; padding:2px 6px; letter-spacing:0.5px; font-family:var(--mono); flex-shrink:0; }
+
+    /* ── FREE PLAN: topbar badge ── */
+    .free-plan-topbar { display:flex; align-items:center; gap:8px; background:rgba(240,165,0,0.08); border:1px solid rgba(240,165,0,0.2); border-radius:var(--radius); padding:6px 12px; font-size:12px; color:var(--accent); font-weight:500; cursor:pointer; transition:all 0.15s; }
+    .free-plan-topbar:hover { background:rgba(240,165,0,0.15); }
+
+    /* ── FREE PLAN: página bloqueada ── */
+    .page-locked-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; text-align:center; padding:40px 24px; }
+    .page-locked-icon { width:72px; height:72px; border-radius:50%; background:rgba(240,165,0,0.1); border:1px solid rgba(240,165,0,0.3); display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+    .page-locked-title { font-size:18px; font-weight:600; color:var(--text); margin-bottom:8px; }
+    .page-locked-desc { font-size:13px; color:var(--text2); line-height:1.6; max-width:380px; margin-bottom:24px; }
+    .page-locked-features { display:flex; flex-direction:column; gap:8px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:16px 20px; margin-bottom:24px; width:100%; max-width:360px; text-align:left; }
+    .page-locked-feat { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text2); }
+    .page-locked-feat svg { color:var(--green); flex-shrink:0; }
+
+    /* ── FREE PLAN: sidebar banner ── */
+    .free-sidebar-banner { margin:12px 12px 4px; background:rgba(240,165,0,0.07); border:1px solid rgba(240,165,0,0.2); border-radius:var(--radius); padding:10px 12px; }
+    .free-sidebar-banner-title { font-size:10px; font-weight:600; color:var(--accent); letter-spacing:0.5px; text-transform:uppercase; margin-bottom:4px; }
+    .free-sidebar-banner-desc { font-size:10px; color:var(--text3); line-height:1.4; margin-bottom:8px; }
+    .free-sidebar-banner-btn { display:block; width:100%; background:var(--accent); color:#000; border:none; border-radius:var(--radius); padding:6px; font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font); text-align:center; }
+    .free-sidebar-banner-btn:hover { background:var(--accent2); }
+
     /* Modal de upgrade */
     .upgrade-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; }
     .upgrade-modal.open { display:flex; }
-    .upgrade-box { background:var(--bg2); border:1px solid rgba(240,165,0,0.35); border-radius:var(--radius2); padding:32px; width:440px; text-align:center; position:relative; }
-    .upgrade-box .lock-big { font-size:36px; margin-bottom:12px; }
-    .upgrade-box h3 { font-size:16px; font-weight:600; color:var(--text); margin-bottom:6px; }
-    .upgrade-box p { font-size:13px; color:var(--text2); line-height:1.5; margin-bottom:20px; }
+    .upgrade-box { background:var(--bg2); border:1px solid rgba(240,165,0,0.35); border-radius:var(--radius2); padding:32px; width:480px; text-align:center; position:relative; }
+    .upgrade-box .lock-big { font-size:40px; margin-bottom:12px; }
+    .upgrade-box h3 { font-size:18px; font-weight:600; color:var(--text); margin-bottom:8px; }
+    .upgrade-box p { font-size:13px; color:var(--text2); line-height:1.6; margin-bottom:20px; }
     .upgrade-box .limit-info { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:var(--radius); padding:10px 14px; font-size:12px; color:var(--red); margin-bottom:20px; }
     .upgrade-actions { display:flex; gap:10px; justify-content:center; }
     .upgrade-close { position:absolute; top:14px; right:14px; background:none; border:none; color:var(--text3); cursor:pointer; font-size:18px; line-height:1; }
+    /* Upgrade — feature list */
+    .upgrade-features { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:20px; text-align:left; }
+    .upgrade-feat-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text2); }
+    .upgrade-feat-item svg { color:var(--green); flex-shrink:0; }
     /* Folha — descontos extras */
     .folha-discount-tag { display:inline-flex; align-items:center; gap:4px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:20px; padding:2px 8px; font-size:10px; color:var(--red); margin-right:4px; }
   
@@ -245,7 +275,6 @@
         background:var(--bg2);
         border-top:1px solid var(--border);
         display:flex; align-items:stretch;
-        safe-area-inset-bottom: env(safe-area-inset-bottom);
         padding-bottom:env(safe-area-inset-bottom);
       }
       .bottom-nav-item {
@@ -273,6 +302,9 @@
 
       /* KPI grid mobile: 2 cols */
       .kpi-grid { grid-template-columns:1fr 1fr; gap:10px; }
+      /* Page locked screen mobile */
+      .page-locked-screen { padding:24px 16px; min-height:300px; }
+      .upgrade-features { grid-template-columns:1fr; }
       .kpi-value { font-size:18px; }
 
       /* Obra grid mobile: 1 col */
@@ -382,25 +414,30 @@
 
   <div class="nav-section">
     <div class="nav-label">Operações</div>
-    <div class="nav-item" onclick="navigate('obras')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Obras','Gerencie obras ilimitadas, acompanhe avanço físico e controle todas as informações do canteiro.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.5"/></svg>
       Obras
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-    <div class="nav-item" onclick="navigate('medicoes')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Medições','Registre e aprove medições por obra, acompanhe histórico e gere relatórios de evolução.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="1.5"/></svg>
       Medições
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-    <div class="nav-item" onclick="navigate('faturamento')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Faturamento','Emita e acompanhe faturas, controle recebimentos e visualize inadimplências.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" stroke-width="1.5"/><path d="M9 4h6v4H9z" stroke-width="1.5"/></svg>
       Faturamento
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-    <div class="nav-item" onclick="navigate('rdo')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Diário de Obra (RDO)','Registre ocorrências diárias, fotos, efetivo e condições do tempo em cada obra.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke-width="1.5"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="1.5"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="1.5"/></svg>
       Diário de Obra
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-    <div class="nav-item" onclick="navigate('cotacoes')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Cotação / Compras','Compare preços de fornecedores, aprove cotações e gere pedidos de compra automaticamente.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" stroke-width="1.5"/></svg>
       Cotação / Compras
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
   </div>
 
@@ -409,18 +446,22 @@
     <div class="nav-item" onclick="navigate('colaboradores')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.5"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.5"/><path d="M16 3.13a4 4 0 010 7.75M21 21v-2a4 4 0 00-3-3.85" stroke-width="1.5"/></svg>
       Colaboradores
+      <span id="nav-colab-badge" class="nav-lock-badge" style="display:none">3 max</span>
     </div>
     <div class="nav-item" onclick="navigate('ponto')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 11.08V9a2 2 0 0 0-2-2h-6.08" stroke-width="1.5"/><path d="M11 11h2a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1z" stroke-width="1.5"/><path d="M20 20v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2" stroke-width="1.5"/><path d="M2 18V8a2 2 0 0 1 2-2h4" stroke-width="1.5"/></svg>
       Controle de Ponto
+      <span id="nav-ponto-badge" class="nav-lock-badge" style="display:none">3 max</span>
     </div>
-    <div class="nav-item" onclick="navigate('folha')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Folha de Pagamento','Calcule folha com INSS, IRRF, FGTS e provisões automáticas. Gere holerites prontos para download.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" stroke-width="1.5"/><path d="M2 10h20" stroke-width="1.5"/></svg>
       Folha de Pagamento
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-    <div class="nav-item" onclick="navigate('epis')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('EPIs','Controle estoque de EPIs, registre entregas por colaborador e receba alertas de reposição.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke-width="1.5"/></svg>
       EPIs
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
   </div>
 
@@ -429,10 +470,12 @@
     <div class="nav-item" onclick="navigate('financeiro')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke-width="1.5"/><circle cx="12" cy="12" r="5" stroke-width="1.5"/></svg>
       Financeiro
+      <span id="nav-fin-badge" class="nav-lock-badge" style="display:none">1 lançam.</span>
     </div>
-    <div class="nav-item" onclick="navigate('relatorios')">
+    <div class="nav-item nav-locked" onclick="showPageLockedModal('Relatórios / PDF','Gere relatórios completos em PDF: obras, financeiro, folha de pagamento e muito mais.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-width="1.5"/></svg>
       Relatórios / PDF
+      <span class="nav-lock-badge">🔒 PRO</span>
     </div>
   </div>
 
@@ -442,6 +485,13 @@
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5"/></svg>
       Assinatura
     </div>
+  </div>
+
+  <!-- Banner FREE no sidebar -->
+  <div class="free-sidebar-banner" id="free-sidebar-banner" style="display:none">
+    <div class="free-sidebar-banner-title">Plano Free</div>
+    <div class="free-sidebar-banner-desc">Acesso limitado. Faça upgrade para desbloquear todas as funcionalidades.</div>
+    <button class="free-sidebar-banner-btn" onclick="navigate('assinatura')">⭐ Ver plano PRO</button>
   </div>
 
   <div class="sidebar-footer">
@@ -464,10 +514,18 @@
     </button>
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-badge" id="empresa-badge">Construtora Alfa LTDA</div>
+    <!-- FREE plan badge (shown only for free users) -->
+    <div id="free-plan-badge" style="display:none;margin-left:8px">
+      <button class="free-plan-topbar" onclick="navigate('assinatura')" title="Você está no plano Free — clique para fazer upgrade">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Upgrade para PRO
+      </button>
+    </div>
     <div style="display:flex;gap:8px;margin-left:12px">
-      <button class="btn btn-outline" onclick="navigate('relatorios')">
+      <button class="btn btn-outline" onclick="isPro() ? navigate('relatorios') : showPageLockedModal('Relatórios / PDF','Gere relatórios completos em PDF: obras, financeiro, folha de pagamento e muito mais.')">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke-width="2"/></svg>
         Exportar PDF
+        <span id="export-lock-badge" style="display:none;font-size:9px;color:var(--accent)">🔒</span>
       </button>
     </div>
   </div>
@@ -511,11 +569,24 @@
   <div class="upgrade-box">
     <button class="upgrade-close" onclick="closeUpgradeModal()">✕</button>
     <div class="lock-big">🔒</div>
-    <h3 id="upgrade-title">Limite do plano Free atingido</h3>
-    <p id="upgrade-desc">Você atingiu o limite de itens permitidos no plano Free.</p>
-    <div class="limit-info" id="upgrade-limit-info"></div>
+    <h3 id="upgrade-title">Funcionalidade exclusiva do PRO</h3>
+    <p id="upgrade-desc">Esta funcionalidade está disponível apenas no plano PRO.</p>
+    <div class="limit-info" id="upgrade-limit-info" style="display:none"></div>
+
+    <!-- Feature list -->
+    <div class="upgrade-features">
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Obras ilimitadas</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Colaboradores ilimitados</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Controle de Ponto</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Folha de Pagamento</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Gestão de EPIs</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Financeiro Completo</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Relatórios em PDF</div>
+      <div class="upgrade-feat-item"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Cotação de Materiais</div>
+    </div>
+
     <div class="upgrade-actions">
-      <button class="btn btn-outline" onclick="closeUpgradeModal()">Cancelar</button>
+      <button class="btn btn-outline" onclick="closeUpgradeModal()">Agora não</button>
       <a href="javascript:void(0)" onclick="closeUpgradeModal();navigate('assinatura')" class="btn btn-primary" style="text-decoration:none">
         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         Ver planos — Fazer upgrade
@@ -533,9 +604,9 @@
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.8"/></svg>
     <span>Início</span>
   </button>
-  <button class="bottom-nav-item" id="bn-obras" onclick="mobileNavigate('obras')">
+  <button class="bottom-nav-item" id="bn-obras" onclick="isPro() ? mobileNavigate('obras') : showPageLockedModal('Obras','Cadastre e gerencie obras ilimitadas com avanço físico e controle completo do canteiro.')">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.8"/></svg>
-    <span>Obras</span>
+    <span>Obras 🔒</span>
   </button>
   <button class="bottom-nav-item" id="bn-colaboradores" onclick="mobileNavigate('colaboradores')">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.8"/></svg>
@@ -582,40 +653,82 @@ function isPro() {
 }
 
 function showUpgradeModal(title, desc, limitInfo) {
-  document.getElementById('upgrade-title').textContent = title || 'Limite do plano Free atingido';
+  document.getElementById('upgrade-title').textContent = title || 'Funcionalidade exclusiva do PRO';
   document.getElementById('upgrade-desc').textContent  = desc  || 'Faça upgrade para continuar.';
-  document.getElementById('upgrade-limit-info').textContent = limitInfo || '';
+  const limitEl = document.getElementById('upgrade-limit-info');
+  if (limitInfo) { limitEl.textContent = limitInfo; limitEl.style.display = ''; }
+  else { limitEl.style.display = 'none'; }
   document.getElementById('upgrade-modal').classList.add('open');
+}
+
+// Mostra modal de upgrade ao clicar em item bloqueado da sidebar
+function showPageLockedModal(pageName, desc) {
+  showUpgradeModal(
+    `🔒 ${pageName} — Plano PRO`,
+    desc || `Esta seção está disponível apenas no plano PRO.`,
+    null
+  );
 }
 
 function closeUpgradeModal() {
   document.getElementById('upgrade-modal').classList.remove('open');
 }
 
-// Verifica limite antes de abrir form de obra
+// ── LIMITES DO PLANO FREE ─────────────────────────────────────────
+// Free: até 3 colaboradores | ponto de até 3 | 1 lançamento financeiro
+// Obras, Medições, Faturamento, RDO, Cotações, EPIs, Folha → PRO only
+
 function checkObrasLimit() {
   if (isPro()) return true;
-  const ativos = APP.obras.length;
-  if (ativos >= 1) {
+  // Obras é PRO-only — nunca deve chegar aqui via navigate bloqueado,
+  // mas protegemos caso alguém chame diretamente.
+  showUpgradeModal(
+    '🔒 Obras — Plano PRO',
+    'O cadastro de obras está disponível apenas no plano PRO.',
+    'Faça upgrade para gerenciar obras ilimitadas.'
+  );
+  return false;
+}
+
+// Verifica limite de colaboradores no Free (máx. 3)
+function checkColabLimit() {
+  if (isPro()) return true;
+  const total = APP.colaboradores.length;
+  if (total >= 3) {
     showUpgradeModal(
-      '🔒 Limite de obras atingido',
-      'O plano Free permite apenas 1 obra cadastrada. Faça upgrade para o plano Pro e cadastre obras ilimitadas.',
-      `Você já tem ${ativos} obra(s) cadastrada(s). Plano Free: limite de 1 obra.`
+      '🔒 Limite de colaboradores atingido',
+      'O plano Free permite até 3 colaboradores cadastrados. Faça upgrade para o PRO e cadastre colaboradores ilimitados.',
+      `Você já tem ${total} colaborador(es). Plano Free: limite de 3.`
     );
     return false;
   }
   return true;
 }
 
-// Verifica limite antes de abrir form de colaborador
-function checkColabLimit() {
+// Verifica limite de registros de ponto no Free (apenas 3 colaboradores podem bater ponto)
+function checkPontoLimit(colaboradorId) {
   if (isPro()) return true;
-  const ativos = APP.colaboradores.filter(c => c.status === 'Ativo').length;
-  if (ativos >= 4) {
+  // Conta quantos colaboradores distintos já bateram ponto
+  const colabsComPonto = new Set(APP.pontos.map(p => p.colaborador_id || p.colaboradorId));
+  if (!colabsComPonto.has(colaboradorId) && colabsComPonto.size >= 3) {
     showUpgradeModal(
-      '🔒 Limite de colaboradores atingido',
-      'O plano Free permite até 4 colaboradores ativos. Faça upgrade para o plano Pro e adicione colaboradores ilimitados.',
-      `Você já tem ${ativos} colaborador(es) ativo(s). Plano Free: limite de 4 colaboradores.`
+      '🔒 Limite de ponto atingido',
+      'O plano Free permite controle de ponto para até 3 colaboradores. Faça upgrade para o PRO e registre ponto ilimitado.',
+      `Plano Free: ponto liberado para até 3 colaboradores.`
+    );
+    return false;
+  }
+  return true;
+}
+
+// Verifica limite financeiro no Free (máx. 1 lançamento)
+function checkFinanceiroLimit() {
+  if (isPro()) return true;
+  if (APP.financeiro.length >= 1) {
+    showUpgradeModal(
+      '🔒 Limite financeiro atingido',
+      'O plano Free permite apenas 1 lançamento financeiro. Faça upgrade para o PRO e tenha controle financeiro completo e ilimitado.',
+      `Você já tem ${APP.financeiro.length} lançamento(s). Plano Free: limite de 1 lançamento.`
     );
     return false;
   }
@@ -858,7 +971,61 @@ const pageTitles = {
   cotacoes: 'Cotação de Materiais'
 };
 
+// Pages accessible on FREE plan (with limits enforced inside)
+const FREE_PAGES = new Set(['dashboard', 'assinatura', 'colaboradores', 'ponto', 'financeiro']);
+
+// Page descriptions for the locked modal
+const PAGE_LOCK_DESCS = {
+  obras:         ['Obras', 'Cadastre e gerencie obras ilimitadas, acompanhe avanço físico e controle todas as informações do canteiro.'],
+  medicoes:      ['Medições', 'Registre e aprove medições por obra, acompanhe histórico e gere relatórios de evolução.'],
+  faturamento:   ['Faturamento', 'Emita e acompanhe faturas, controle recebimentos e visualize inadimplências em tempo real.'],
+  rdo:           ['Diário de Obra (RDO)', 'Registre ocorrências diárias, fotos, efetivo e condições do tempo em cada obra.'],
+  cotacoes:      ['Cotação / Compras', 'Compare preços de fornecedores, aprove cotações e gere pedidos de compra automaticamente.'],
+  epis:          ['EPIs', 'Controle estoque de EPIs, registre entregas por colaborador e receba alertas de reposição.'],
+  relatorios:    ['Relatórios / PDF', 'Gere relatórios completos em PDF: obras, financeiro, folha de pagamento e muito mais.'],
+  folha:         ['Folha de Pagamento', 'Calcule folha com INSS, IRRF, FGTS e provisões. Gere holerites prontos para download.'],
+};
+
+function renderLockedPage(page) {
+  const [name, desc] = PAGE_LOCK_DESCS[page] || [pageTitles[page] || page, 'Esta seção está disponível apenas no plano PRO.'];
+  return `
+  <div class="page-locked-screen">
+    <div class="page-locked-icon">
+      <svg width="32" height="32" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="1.8">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+      </svg>
+    </div>
+    <div class="page-locked-title">🔒 ${name}</div>
+    <div class="page-locked-desc">${desc}</div>
+    <div class="page-locked-features">
+      <div style="font-size:10px;font-weight:600;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">O que você ganha no PRO</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Obras, Medições e Faturamento ilimitados</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Colaboradores ilimitados (Free: 3)</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Ponto ilimitado (Free: 3 colaboradores)</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Financeiro ilimitado (Free: 1 lançamento)</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Folha de Pagamento + EPIs</div>
+      <div class="page-locked-feat"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Relatórios em PDF + Cotação de materiais</div>
+    </div>
+    <button class="btn btn-primary" style="font-size:14px;padding:12px 28px;gap:9px" onclick="navigate('assinatura')">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Fazer upgrade para PRO
+    </button>
+    <div style="margin-top:12px;font-size:12px;color:var(--text3)">
+      Já é assinante? <a href="javascript:void(0)" onclick="refreshPlanFromServer().then(()=>navigate('${page}')).catch(()=>{})" style="color:var(--accent);text-decoration:none">Recarregar acesso</a>
+    </div>
+  </div>`;
+}
+
 function navigate(page) {
+  // Block locked pages for free users
+  if (!isPro() && !FREE_PAGES.has(page)) {
+    APP.currentPage = page;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('page-title').textContent = pageTitles[page] || page;
+    document.getElementById('content').innerHTML = `<div class="page">${renderLockedPage(page)}</div>`;
+    return;
+  }
   APP.currentPage = page;
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(el => {
@@ -1225,6 +1392,9 @@ async function salvarPonto() {
   const col    = APP.colaboradores.find(c => c.id == colId);
   if (!col)  return alert('Selecione um colaborador');
   if (!data) return alert('Informe a data');
+
+  // Plano Free: verifica se este colaborador já tem ponto (se não tem, checa o limite de 3)
+  if (!checkPontoLimit(colId)) return;
 
   const jaExiste = APP.pontos.find(p => (p.colaborador_id || p.colaboradorId) === colId && p.data === data);
   if (jaExiste) {
@@ -2252,6 +2422,8 @@ function renderFinanceiro() {
 }
 
 function openFormFinanceiro(id) {
+  // Plano Free: apenas 1 lançamento (bloqueio apenas ao criar novo)
+  if (!id && !checkFinanceiroLimit()) return;
   const f = id ? APP.financeiro.find(x=>x.id==id) : null;
   document.getElementById('form-box').innerHTML = `
     <div class="form-title">${f ? 'Editar Lançamento' : 'Novo Lançamento'}</div>
@@ -2384,111 +2556,272 @@ async function _ensureJsPDF() {
   });
 }
 
-// ── PDF GENERATORS ──
+// ── PDF GENERATORS ──────────────────────────────────────────────────────────
+// Modelo limpo: fundo branco, nome da empresa logada, sem branding ConstruPRO
+
+function _nomeEmpresa() {
+  const u = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+  return u?.razao_social || u?.company_name || u?.nome || APP.empresa?.nome || 'Empresa';
+}
+
+function _cnpjEmpresa() {
+  const u = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+  return u?.cnpj || APP.empresa?.cnpj || '';
+}
+
+// Estilos padrão de tabela — limpos, fundo branco
+const _tableStyles = {
+  styles:             { fontSize: 9, textColor: [30, 30, 30], cellPadding: { top:5, bottom:5, left:6, right:6 } },
+  headStyles:         { fillColor: [255,255,255], textColor: [80,80,80], fontStyle: 'bold', fontSize: 8,
+                        lineColor: [17,17,17], lineWidth: { bottom: 0.8, top: 0, left: 0, right: 0 } },
+  alternateRowStyles: { fillColor: [250,250,250] },
+  bodyStyles:         { lineColor: [230,230,230], lineWidth: { bottom: 0.3, top: 0, left: 0, right: 0 } },
+  tableLineColor:     [230,230,230],
+  tableLineWidth:     0,
+};
+
 function _initPDF(titulo) {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFillColor(13,15,18);
-  doc.setFont('helvetica','bold');
-  doc.setFontSize(16);
-  doc.setTextColor(240,165,0);
-  doc.text('ConstruPRO', 14, 18);
-  doc.setFont('helvetica','normal');
-  doc.setFontSize(11);
-  doc.setTextColor(180,180,180);
-  doc.text(titulo, 14, 26);
+  const doc        = new jsPDF();
+  const empresa    = _nomeEmpresa();
+  const cnpj       = _cnpjEmpresa();
+  const agora      = new Date().toLocaleString('pt-BR');
+  const pageW      = doc.internal.pageSize.getWidth();
+
+  // ── Cabeçalho ──────────────────────────────────────
+  // Nome da empresa (esquerda)
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(17, 17, 17);
+  doc.text(empresa, 14, 20);
+
+  // CNPJ abaixo do nome (se existir)
+  if (cnpj) {
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text(cnpj, 14, 26);
+  }
+
+  // Título do relatório (direita, alinhado ao topo)
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
-  doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 14, 32);
-  doc.setDrawColor(50,50,60);
-  doc.line(14, 35, 196, 35);
+  doc.setTextColor(80, 80, 80);
+  doc.text(titulo.toUpperCase(), pageW - 14, 18, { align: 'right' });
+
+  // Data (direita, abaixo do título)
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(170, 170, 170);
+  doc.text(`Gerado em ${agora}`, pageW - 14, 24, { align: 'right' });
+
+  // Linha divisória pesada
+  doc.setDrawColor(17, 17, 17);
+  doc.setLineWidth(0.8);
+  doc.line(14, 30, pageW - 14, 30);
+
   return doc;
+}
+
+function _addFooter(doc) {
+  const pageW  = doc.internal.pageSize.getWidth();
+  const pageH  = doc.internal.pageSize.getHeight();
+  const nPages = doc.internal.getNumberOfPages();
+
+  for (let i = 1; i <= nPages; i++) {
+    doc.setPage(i);
+    doc.setDrawColor(210, 210, 210);
+    doc.setLineWidth(0.3);
+    doc.line(14, pageH - 14, pageW - 14, pageH - 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(180, 180, 180);
+    doc.text('Documento gerado automaticamente pelo sistema de gestão.', 14, pageH - 9);
+    doc.text(`Página ${i} de ${nPages}`, pageW - 14, pageH - 9, { align: 'right' });
+  }
 }
 
 async function gerarPDFObras() {
   await _ensureJsPDF();
-  const doc = _initPDF('Relatório de Obras');
+  const doc  = _initPDF('Relatório de Obras');
+  const pageW = doc.internal.pageSize.getWidth();
+
   doc.autoTable({
-    startY: 40,
+    startY: 36,
     head: [['Obra','Cliente','Status','Avanço','Faturado','Despesas','Resultado']],
-    body: APP.obras.map(o => [o.nome, o.cliente, o.status, o.avanco+'%',
-      fmt(o.faturado), fmt(o.despesas), fmt(o.faturado-o.despesas)]),
-    styles: { fontSize:9, textColor:[200,200,210] },
-    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
-    alternateRowStyles: { fillColor:[22,26,33] },
+    body: APP.obras.map(o => {
+      const res = (o.faturado||0) - (o.despesas||0);
+      return [o.nome, o.cliente||'—', o.status||'—', (o.avanco||0)+'%',
+        fmt(o.faturado), fmt(o.despesas), fmt(res)];
+    }),
+    columnStyles: {
+      4: { halign:'right' }, 5: { halign:'right' },
+      6: { halign:'right', fontStyle:'bold',
+           textColor: (row) => {
+             const v = APP.obras[row?.rowIndex]?.faturado - APP.obras[row?.rowIndex]?.despesas;
+             return v >= 0 ? [46,125,50] : [198,40,40];
+           }
+         }
+    },
+    ..._tableStyles,
   });
-  doc.save('obras.pdf');
+
+  // Totais
+  const totalFat = APP.obras.reduce((a,o)=>a+(o.faturado||0),0);
+  const totalDes = APP.obras.reduce((a,o)=>a+(o.despesas||0),0);
+  const resultado = totalFat - totalDes;
+  const y = doc.lastAutoTable.finalY + 8;
+
+  // Linha de totais
+  doc.setDrawColor(210,210,210); doc.setLineWidth(0.3);
+  doc.line(pageW-120, y, pageW-14, y);
+
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(120,120,120);
+  doc.text('Total faturado', pageW-120, y+6);
+  doc.text('Total despesas', pageW-80, y+6);
+  doc.text('Resultado geral', pageW-38, y+6, { align:'right' });
+
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(17,17,17);
+  doc.text(fmt(totalFat), pageW-120, y+13);
+  doc.setTextColor(198,40,40);
+  doc.text(fmt(totalDes), pageW-80, y+13);
+  doc.setTextColor(resultado>=0?46:198, resultado>=0?125:40, resultado>=0?50:40);
+  doc.text(fmt(resultado), pageW-14, y+13, { align:'right' });
+
+  _addFooter(doc);
+  doc.save(`obras-${_nomeEmpresa().replace(/\s+/g,'-')}.pdf`);
 }
 
 async function gerarPDFFolha() {
   await _ensureJsPDF();
-  const doc = _initPDF('Folha de Pagamento — ' + new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'}));
-  const clt = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
+  const mes = new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const doc = _initPDF(`Folha de Pagamento — ${mes}`);
+  const pageW = doc.internal.pageSize.getWidth();
+  const clt   = APP.colaboradores.filter(c=>c.status==='Ativo'&&c.tipo==='CLT');
+
   doc.autoTable({
-    startY: 40,
-    head: [['Colaborador','Cargo','Bruto','INSS','IRRF','Líquido','FGTS','Custo Empresa']],
+    startY: 36,
+    head: [['Colaborador','Cargo','Salário Bruto','INSS','IRRF','Líquido','FGTS','Custo Total']],
     body: clt.map(c => {
       const r = calcularLiquidoCLT(c.salario);
-      return [c.nome, c.cargo, fmt(c.salario), fmt(r.inss), fmt(r.irrf), fmt(r.liquido), fmt(r.fgts), fmt(r.custoTotal)];
+      return [c.nome, c.cargo||'—', fmt(c.salario), fmt(r.inss), fmt(r.irrf),
+              fmt(r.liquido), fmt(r.fgts), fmt(r.custoTotal)];
     }),
-    styles: { fontSize:8, textColor:[200,200,210] },
-    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
-    alternateRowStyles: { fillColor:[22,26,33] },
+    columnStyles: { 2:{halign:'right'}, 3:{halign:'right'}, 4:{halign:'right'},
+                    5:{halign:'right',fontStyle:'bold'}, 6:{halign:'right'}, 7:{halign:'right'} },
+    ..._tableStyles,
   });
-  doc.save('folha.pdf');
+
+  const y = doc.lastAutoTable.finalY + 8;
+  const totalLiq   = clt.reduce((a,c)=>a+calcularLiquidoCLT(c.salario).liquido,0);
+  const totalCusto = clt.reduce((a,c)=>a+calcularLiquidoCLT(c.salario).custoTotal,0);
+
+  doc.setDrawColor(210,210,210); doc.setLineWidth(0.3);
+  doc.line(pageW-100, y, pageW-14, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(120,120,120);
+  doc.text('Total líquido', pageW-100, y+6);
+  doc.text('Custo total empresa', pageW-14, y+6, { align:'right' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(17,17,17);
+  doc.text(fmt(totalLiq), pageW-100, y+13);
+  doc.setTextColor(198,40,40);
+  doc.text(fmt(totalCusto), pageW-14, y+13, { align:'right' });
+
+  _addFooter(doc);
+  doc.save(`folha-${mes.replace(/\s+/g,'-')}.pdf`);
 }
 
 async function gerarPDFFinanceiro() {
   await _ensureJsPDF();
-  const doc = _initPDF('DRE Simplificado');
-  const receitas = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+b.valor,0);
-  const despesas = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+b.valor,0);
+  const doc    = _initPDF('DRE Simplificado');
+  const pageW  = doc.internal.pageSize.getWidth();
+  const recTot = APP.financeiro.filter(f=>f.tipo==='Receita').reduce((a,b)=>a+(b.valor||0),0);
+  const desTot = APP.financeiro.filter(f=>f.tipo==='Despesa').reduce((a,b)=>a+(b.valor||0),0);
+  const result = recTot - desTot;
+
   doc.autoTable({
-    startY: 40,
+    startY: 36,
     head: [['Descrição','Categoria','Tipo','Data','Valor']],
-    body: APP.financeiro.map(f=>[f.descricao, f.categoria, f.tipo, fmtDate(f.data), fmt(f.valor)]),
-    styles: { fontSize:9, textColor:[200,200,210] },
-    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
-    alternateRowStyles: { fillColor:[22,26,33] },
+    body: APP.financeiro.map(f => [
+      f.descricao||'—', f.categoria||'—', f.tipo||'—',
+      fmtDate(f.data), fmt(f.valor)
+    ]),
+    columnStyles: { 4: { halign:'right', fontStyle:'bold' } },
+    didParseCell(data) {
+      if (data.section==='body' && data.column.index===2) {
+        data.cell.styles.textColor = data.cell.raw==='Receita' ? [46,125,50] : [198,40,40];
+        data.cell.styles.fontStyle = 'bold';
+      }
+    },
+    ..._tableStyles,
   });
-  const y = doc.lastAutoTable.finalY + 10;
-  doc.setFontSize(10); doc.setTextColor(180,220,180);
-  doc.text(`Total Receitas: ${fmt(receitas)}`, 14, y);
-  doc.setTextColor(220,100,100);
-  doc.text(`Total Despesas: ${fmt(despesas)}`, 14, y+7);
-  doc.setTextColor(240,165,0);
-  doc.text(`Resultado: ${fmt(receitas-despesas)}`, 14, y+14);
-  doc.save('financeiro.pdf');
+
+  const y = doc.lastAutoTable.finalY + 8;
+  doc.setDrawColor(210,210,210); doc.setLineWidth(0.3);
+  doc.line(pageW-120, y, pageW-14, y);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(120,120,120);
+  doc.text('Total receitas', pageW-120, y+6);
+  doc.text('Total despesas', pageW-72, y+6);
+  doc.text('Resultado', pageW-14, y+6, { align:'right' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.setTextColor(46,125,50); doc.text(fmt(recTot), pageW-120, y+13);
+  doc.setTextColor(198,40,40); doc.text(fmt(desTot), pageW-72, y+13);
+  doc.setTextColor(result>=0?46:198, result>=0?125:40, result>=0?50:40);
+  doc.text(fmt(result), pageW-14, y+13, { align:'right' });
+
+  _addFooter(doc);
+  doc.save(`financeiro-${_nomeEmpresa().replace(/\s+/g,'-')}.pdf`);
 }
 
 async function gerarPDFEPIs() {
   await _ensureJsPDF();
   const doc = _initPDF('Estoque de EPIs');
+
   doc.autoTable({
-    startY: 40,
+    startY: 36,
     head: [['EPI','Categoria','CA','Estoque','Mínimo','Validade','Status']],
-    body: APP.epis.map(e=>[e.nome, e.categoria, e.ca, e.estoque, e.minimo, fmtDate(e.validade),
-      e.estoque<e.minimo?'CRÍTICO':e.estoque<e.minimo*1.3?'Baixo':'OK']),
-    styles: { fontSize:9, textColor:[200,200,210] },
-    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
-    alternateRowStyles: { fillColor:[22,26,33] },
+    body: APP.epis.map(e => {
+      const status = e.estoque < e.minimo ? 'CRÍTICO' : e.estoque < e.minimo*1.3 ? 'Baixo' : 'OK';
+      return [e.nome, e.categoria||'—', e.ca||'—', e.estoque, e.minimo, fmtDate(e.validade), status];
+    }),
+    columnStyles: { 3:{halign:'right'}, 4:{halign:'right'} },
+    didParseCell(data) {
+      if (data.section==='body' && data.column.index===6) {
+        const v = data.cell.raw;
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.textColor = v==='CRÍTICO'?[198,40,40]:v==='Baixo'?[230,130,0]:[46,125,50];
+      }
+    },
+    ..._tableStyles,
   });
-  doc.save('epis.pdf');
+
+  _addFooter(doc);
+  doc.save(`epis-${_nomeEmpresa().replace(/\s+/g,'-')}.pdf`);
 }
 
 async function gerarPDFColaboradores() {
   await _ensureJsPDF();
   const doc = _initPDF('Colaboradores');
+
   doc.autoTable({
-    startY: 40,
+    startY: 36,
     head: [['Nome','CPF','Cargo','Tipo','Salário','Admissão','Status']],
-    body: APP.colaboradores.map(c=>[c.nome, c.cpf, c.cargo, c.tipo,
-      c.tipo==='Diarista'?fmt(c.salario)+'/dia':fmt(c.salario),
-      fmtDate(c.admissao), c.status]),
-    styles: { fontSize:8, textColor:[200,200,210] },
-    headStyles: { fillColor:[34,40,52], textColor:[240,165,0] },
-    alternateRowStyles: { fillColor:[22,26,33] },
+    body: APP.colaboradores.map(c => [
+      c.nome, c.cpf||'—', c.cargo||'—', c.tipo||'—',
+      c.tipo==='Diarista' ? fmt(c.salario)+'/dia' : fmt(c.salario),
+      fmtDate(c.admissao), c.status||'—'
+    ]),
+    columnStyles: { 4:{halign:'right'} },
+    didParseCell(data) {
+      if (data.section==='body' && data.column.index===6) {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.textColor = data.cell.raw==='Ativo'?[46,125,50]:[198,40,40];
+      }
+    },
+    ..._tableStyles,
   });
-  doc.save('colaboradores.pdf');
+
+  _addFooter(doc);
+  doc.save(`colaboradores-${_nomeEmpresa().replace(/\s+/g,'-')}.pdf`);
 }
 
 // ── ASSINATURA ─────────────────────────────────────────────────────
@@ -3664,7 +3997,28 @@ async function refreshPlanFromServer() {
   }
 })();
 
-// INICIALIZAR
+// INICIALIZAR UI DO PLANO FREE
+(function initFreePlanUI() {
+  if (!isPro()) {
+    // Mostrar badge no topbar
+    const badge = document.getElementById('free-plan-badge');
+    if (badge) badge.style.display = '';
+    // Mostrar ícone de lock no botão exportar
+    const exportLock = document.getElementById('export-lock-badge');
+    if (exportLock) exportLock.style.display = '';
+    // Mostrar banner no sidebar
+    const sidebarBanner = document.getElementById('free-sidebar-banner');
+    if (sidebarBanner) sidebarBanner.style.display = '';
+    // Mostrar badges de limite nos itens Free com restrição
+    const colabBadge = document.getElementById('nav-colab-badge');
+    if (colabBadge) colabBadge.style.display = '';
+    const pontoBadge = document.getElementById('nav-ponto-badge');
+    if (pontoBadge) pontoBadge.style.display = '';
+    const finBadge = document.getElementById('nav-fin-badge');
+    if (finBadge) finBadge.style.display = '';
+  }
+})();
+
 (function initUser() {
   const u = _user;
   if (!u) return;
