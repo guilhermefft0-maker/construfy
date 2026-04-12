@@ -1,11 +1,15 @@
 -- ═══════════════════════════════════════════════════════════════
---  ConstruPRO — Schema FINAL (limpo, sem conflitos)
+--  ConstruPRO — Schema FINAL + RDO
 --  INSTRUÇÕES:
---  1. wrangler d1 execute construpro-db --remote --file=schema-FINAL.sql
+--  1. wrangler d1 execute construpro-db --remote --file=schema-final.sql
 --  2. (opcional) wrangler d1 execute construpro-db --remote --file=sample-data.sql
+--
+--  SE o banco já existir e só precisar adicionar RDO:
+--  → Use apenas a migration: rdo_migration.sql
 -- ═══════════════════════════════════════════════════════════════
 
 -- ─── LIMPAR TUDO (ordem importa por FK) ──────────────────────────
+DROP TABLE IF EXISTS rdos;
 DROP TABLE IF EXISTS entregas_epi;
 DROP TABLE IF EXISTS pontos;
 DROP TABLE IF EXISTS financeiro;
@@ -19,14 +23,17 @@ DROP TABLE IF EXISTS faturamentos;
 DROP TABLE IF EXISTS obras;
 DROP TABLE IF EXISTS companies;
 
+PRAGMA journal_mode = WAL;
+
 -- ─── COMPANIES ───────────────────────────────────────────────────
 CREATE TABLE companies (
   id           TEXT PRIMARY KEY,
-  razao_social TEXT NOT NULL,
+  razao_social TEXT NOT NULL DEFAULT '',
   name         TEXT NOT NULL DEFAULT '',
   cnpj         TEXT DEFAULT '',
   ie           TEXT DEFAULT '',
   telefone     TEXT NOT NULL DEFAULT '',
+  phone        TEXT DEFAULT '',
   setor        TEXT DEFAULT 'residencial',
   porte        TEXT DEFAULT 'epp',
   endereco     TEXT DEFAULT '',
@@ -41,7 +48,7 @@ CREATE TABLE companies (
 CREATE TABLE users (
   id                      TEXT PRIMARY KEY,
   company_id              TEXT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
-  nome                    TEXT NOT NULL,
+  nome                    TEXT NOT NULL DEFAULT '',
   name                    TEXT NOT NULL DEFAULT '',
   cargo                   TEXT NOT NULL DEFAULT 'Administrador',
   email                   TEXT NOT NULL UNIQUE,
@@ -157,6 +164,7 @@ CREATE TABLE pontos (
   hora_saida       TEXT,
   status           TEXT NOT NULL DEFAULT 'presente',
   obs              TEXT NOT NULL DEFAULT '',
+  updated_at       TEXT,
   created_at       TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -198,6 +206,21 @@ CREATE TABLE financeiro (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- ─── RDOs — DIÁRIO DE OBRA ───────────────────────────────────────
+CREATE TABLE rdos (
+  id               TEXT    PRIMARY KEY,
+  company_id       TEXT    NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  obra_id          TEXT    NOT NULL REFERENCES obras(id) ON DELETE CASCADE,
+  data             TEXT    NOT NULL,                          -- YYYY-MM-DD
+  clima            TEXT    NOT NULL DEFAULT 'Ensolarado',
+  equipe_presente  INTEGER NOT NULL DEFAULT 0,
+  avanco_dia       INTEGER NOT NULL DEFAULT 0,               -- % avanço no dia
+  descricao        TEXT    NOT NULL,                          -- atividades executadas
+  ocorrencias      TEXT    NOT NULL DEFAULT '',
+  observacoes      TEXT    NOT NULL DEFAULT '',
+  created_at       TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 -- ─── ÍNDICES ─────────────────────────────────────────────────────
 CREATE INDEX idx_users_email         ON users(email);
 CREATE INDEX idx_users_company_email ON users(company_id, email);
@@ -207,4 +230,10 @@ CREATE INDEX idx_obras_company       ON obras(company_id);
 CREATE INDEX idx_pontos_company_data ON pontos(company_id, data);
 CREATE INDEX idx_financeiro_company  ON financeiro(company_id, data);
 
--- ✅ Schema pronto!
+-- Índices RDO
+CREATE INDEX idx_rdos_company        ON rdos (company_id);
+CREATE INDEX idx_rdos_obra           ON rdos (company_id, obra_id);
+CREATE INDEX idx_rdos_data           ON rdos (company_id, data DESC);
+CREATE INDEX idx_rdos_obra_data      ON rdos (company_id, obra_id, data DESC);
+
+-- ✅ Schema completo com RDO pronto para produção!
