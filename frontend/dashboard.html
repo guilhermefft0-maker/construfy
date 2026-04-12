@@ -194,6 +194,125 @@
       body { height:auto; overflow:visible; }
     }
 
+    /* ── MOBILE NAVIGATION ─────────────────────────────── */
+    @media (max-width: 768px) {
+      body { overflow:hidden; flex-direction:column; }
+
+      /* Sidebar vira drawer overlay */
+      #sidebar {
+        position:fixed; top:0; left:0; z-index:500;
+        height:100vh; width:280px;
+        transform:translateX(-100%);
+        transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+        box-shadow:4px 0 32px rgba(0,0,0,0.6);
+      }
+      #sidebar.mobile-open { transform:translateX(0); }
+
+      /* Backdrop para fechar sidebar */
+      #sidebar-backdrop {
+        display:none; position:fixed; inset:0; z-index:499;
+        background:rgba(0,0,0,0.6); backdrop-filter:blur(2px);
+      }
+      #sidebar-backdrop.open { display:block; }
+
+      /* Main ocupa tela toda */
+      #main { width:100%; height:100vh; overflow:hidden; }
+
+      /* Topbar mobile */
+      #topbar {
+        padding:0 16px;
+        height:52px;
+      }
+      #topbar .topbar-badge { display:none; }
+      #topbar > div:last-child { display:none; } /* esconde btn exportar */
+
+      /* Botão hamburguer no topbar */
+      #mobile-menu-btn {
+        display:flex; align-items:center; justify-content:center;
+        width:36px; height:36px; border-radius:var(--radius);
+        background:var(--bg3); border:1px solid var(--border2);
+        cursor:pointer; flex-shrink:0; margin-right:10px;
+        color:var(--text2);
+      }
+
+      /* Content com padding-bottom para bottom nav */
+      #content { padding:16px; padding-bottom:76px; }
+
+      /* Bottom navigation bar */
+      #bottom-nav {
+        position:fixed; bottom:0; left:0; right:0; z-index:400;
+        height:60px;
+        background:var(--bg2);
+        border-top:1px solid var(--border);
+        display:flex; align-items:stretch;
+        safe-area-inset-bottom: env(safe-area-inset-bottom);
+        padding-bottom:env(safe-area-inset-bottom);
+      }
+      .bottom-nav-item {
+        flex:1; display:flex; flex-direction:column; align-items:center;
+        justify-content:center; gap:3px; cursor:pointer;
+        color:var(--text3); font-size:9px; font-weight:500;
+        letter-spacing:0.3px; text-transform:uppercase;
+        border:none; background:transparent; font-family:var(--font);
+        transition:color 0.15s;
+        -webkit-tap-highlight-color:transparent;
+        padding:6px 4px;
+      }
+      .bottom-nav-item svg { width:20px; height:20px; opacity:0.55; transition:opacity 0.15s; }
+      .bottom-nav-item.active { color:var(--accent); }
+      .bottom-nav-item.active svg { opacity:1; }
+      .bottom-nav-item span { font-size:9px; line-height:1; }
+
+      /* Botão "Mais" no bottom nav abre sidebar */
+      .bottom-nav-more {
+        width:38px; height:38px; border-radius:50%;
+        background:var(--bg4); border:1px solid var(--border2);
+        display:flex; align-items:center; justify-content:center;
+        margin-bottom:2px;
+      }
+
+      /* KPI grid mobile: 2 cols */
+      .kpi-grid { grid-template-columns:1fr 1fr; gap:10px; }
+      .kpi-value { font-size:18px; }
+
+      /* Obra grid mobile: 1 col */
+      .obra-grid { grid-template-columns:1fr; }
+      .two-col { grid-template-columns:1fr; }
+      .three-col { grid-template-columns:1fr; }
+
+      /* Form overlay fullscreen */
+      .form-overlay { align-items:flex-end; }
+      .form-box { width:100%; border-radius:var(--radius2) var(--radius2) 0 0; max-height:90vh; }
+
+      /* Tables: horizontal scroll */
+      .table-card { overflow-x:auto; }
+      table { min-width:600px; }
+
+      /* Plan cards: 1 col */
+      .plan-cards-grid { grid-template-columns:1fr; }
+      .plan-current-banner { flex-direction:column; align-items:flex-start; }
+      .support-cta-box { flex-direction:column; }
+      .support-cta-actions { width:100%; }
+      .support-cta-actions .btn { flex:1; justify-content:center; }
+
+      /* Support FAB mais acima por causa do bottom nav */
+      .support-fab { bottom:72px; right:16px; }
+
+      /* Upgrade modal */
+      .upgrade-box { width:calc(100% - 32px); }
+    }
+
+    /* Mobile menu button hidden on desktop */
+    #mobile-menu-btn { display:none; }
+    #bottom-nav { display:none; }
+    #sidebar-backdrop { display:none; }
+
+    @media (min-width: 769px) {
+      #mobile-menu-btn { display:none !important; }
+      #bottom-nav { display:none !important; }
+      #sidebar-backdrop { display:none !important; }
+    }
+
     /* ── SUPPORT FAB ── */
     .support-fab { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
     .support-fab-btn { width:48px; height:48px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.4); transition:all 0.2s; }
@@ -275,6 +394,14 @@
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" stroke-width="1.5"/><path d="M9 4h6v4H9z" stroke-width="1.5"/></svg>
       Faturamento
     </div>
+    <div class="nav-item" onclick="navigate('rdo')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke-width="1.5"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="1.5"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="1.5"/></svg>
+      Diário de Obra
+    </div>
+    <div class="nav-item" onclick="navigate('cotacoes')">
+      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" stroke-width="1.5"/></svg>
+      Cotação / Compras
+    </div>
   </div>
 
   <div class="nav-section">
@@ -332,6 +459,9 @@
 <!-- MAIN -->
 <div id="main">
   <div id="topbar">
+    <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Abrir menu">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-badge" id="empresa-badge">Construtora Alfa LTDA</div>
     <div style="display:flex;gap:8px;margin-left:12px">
@@ -394,6 +524,35 @@
   </div>
 </div>
 
+<!-- MOBILE: Sidebar backdrop -->
+<div id="sidebar-backdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- MOBILE: Bottom Navigation Bar -->
+<nav id="bottom-nav" role="navigation" aria-label="Navegação principal">
+  <button class="bottom-nav-item active" id="bn-dashboard" onclick="mobileNavigate('dashboard')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.8"/></svg>
+    <span>Início</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-obras" onclick="mobileNavigate('obras')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.8"/></svg>
+    <span>Obras</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-colaboradores" onclick="mobileNavigate('colaboradores')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.8"/></svg>
+    <span>Pessoas</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-financeiro" onclick="mobileNavigate('financeiro')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke-width="1.8"/><circle cx="12" cy="12" r="5" stroke-width="1.8"/></svg>
+    <span>Financeiro</span>
+  </button>
+  <button class="bottom-nav-item" id="bn-more" onclick="toggleMobileSidebar()">
+    <div class="bottom-nav-more">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </div>
+    <span>Menu</span>
+  </button>
+</nav>
+
 <script>
 // ── AUTH CHECK ──
 const _user = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } })();
@@ -413,6 +572,7 @@ const APP = {
   epis: [],
   entregasEPI: [],
   financeiro: [],
+  rdos: [],
   loading: false,
 };
 
@@ -578,13 +738,16 @@ async function loadAll() {
     APP.entregasEPI   = d.entregasEPI     || [];
     APP.financeiro    = (d.financeiro     || []).map(normalizeFin);
     APP.pontos        = (d.pontos         || []).map(normalizePonto);
+    APP.rdos          = (d.rdos           || []).map(normalizeRdo);
+    APP.cotacoes      = d.cotacoes        || [];
+    APP.pedidos       = d.pedidos         || [];
   } catch(e) {
     console.error('loadAll error', e);
     // Fallback: tenta individual se o batch falhar
-    const [obras, medicoes, faturamentos, colaboradores, epis, entregasEPI, financeiro, pontos] = await Promise.all([
+    const [obras, medicoes, faturamentos, colaboradores, epis, entregasEPI, financeiro, pontos, rdos] = await Promise.all([
       apiGet('obras'), apiGet('medicoes'), apiGet('faturamentos'),
       apiGet('colaboradores'), apiGet('epis'), apiGet('entregas-epi'),
-      apiGet('financeiro'), apiGet('pontos')
+      apiGet('financeiro'), apiGet('pontos'), apiGet('rdos')
     ]);
     APP.obras         = (obras         || []).map(normalizeObra);
     APP.medicoes      = (medicoes      || []).map(normalizeMedicao);
@@ -594,6 +757,9 @@ async function loadAll() {
     APP.entregasEPI   = entregasEPI    || [];
     APP.financeiro    = (financeiro    || []).map(normalizeFin);
     APP.pontos        = (pontos        || []).map(normalizePonto);
+    APP.rdos          = (rdos          || []).map(normalizeRdo);
+    APP.cotacoes      = [];
+    APP.pedidos       = [];
   }
   navigate(APP.currentPage);
 }
@@ -624,6 +790,9 @@ function normalizeFin(f) {
 }
 function normalizePonto(p) {
   return { ...p, colaborador_id: p.colaborador_id, hora_entrada: p.hora_entrada, hora_saida: p.hora_saida };
+}
+function normalizeRdo(r) {
+  return { ...r, obraId: r.obra_id, equipePresente: parseInt(r.equipe_presente) || 0 };
 }
 
 function calcularINSS(salario) {
@@ -684,7 +853,9 @@ const pageTitles = {
   epis: 'EPIs',
   financeiro: 'Financeiro',
   relatorios: 'Relatórios',
-  assinatura: 'Assinatura e Planos'
+  assinatura: 'Assinatura e Planos',
+  rdo: 'Diário de Obra — RDO',
+  cotacoes: 'Cotação de Materiais'
 };
 
 function navigate(page) {
@@ -705,7 +876,9 @@ function navigate(page) {
     epis:renderEPIs, 
     financeiro:renderFinanceiro, 
     relatorios:renderRelatorios,
-    assinatura:renderAssinatura
+    assinatura:renderAssinatura,
+    rdo:renderRDO,
+    cotacoes:renderCotacoes
   };
   document.getElementById('content').innerHTML = `<div class="page">${(pages[page] || (() => '<p style="color:var(--text3)">Em desenvolvimento</p>'))()}</div>`;
 }
@@ -2440,7 +2613,999 @@ function renderAssinatura() {
   </div>`;
 }
 
-// ── SUPPORT TOGGLE ──────────────────────────────────────────────────
+// ── RDO — DIÁRIO DE OBRA ────────────────────────────────────────────
+
+const CLIMA_OPTS = ['Ensolarado','Nublado','Parcialmente nublado','Chuvoso','Tempestade'];
+const CLIMA_ICON = { 'Ensolarado':'☀️','Nublado':'☁️','Parcialmente nublado':'⛅','Chuvoso':'🌧️','Tempestade':'⛈️' };
+
+if (!window.RDO_OBRA_FILTRO) window.RDO_OBRA_FILTRO = '';
+
+function renderRDO() {
+  const filtroObra = window.RDO_OBRA_FILTRO;
+  const rdosFiltrados = filtroObra ? APP.rdos.filter(r => r.obraId === filtroObra) : APP.rdos;
+  const rdosOrdenados = [...rdosFiltrados].sort((a,b) => b.data.localeCompare(a.data));
+  const totalRDOs   = APP.rdos.length;
+  const obrasComRDO = [...new Set(APP.rdos.map(r => r.obraId))].length;
+  const rdoHoje     = APP.rdos.filter(r => r.data === new Date().toISOString().split('T')[0]).length;
+  const rdoSemana   = (() => {
+    const inicio = new Date(); inicio.setDate(inicio.getDate() - 6); inicio.setHours(0,0,0,0);
+    return APP.rdos.filter(r => new Date(r.data + 'T00:00:00') >= inicio).length;
+  })();
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Diário de Obra</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${totalRDOs} relatório(s) registrado(s)</div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select onchange="window.RDO_OBRA_FILTRO=this.value;navigate('rdo')"
+        style="background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:var(--radius);padding:7px 12px;font-size:13px;font-family:var(--font);outline:none;cursor:pointer">
+        <option value="" ${!filtroObra?'selected':''}>Todas as obras</option>
+        ${APP.obras.map(o=>`<option value="${o.id}" ${filtroObra===o.id?'selected':''}>${trunc(o.nome,30)}</option>`).join('')}
+      </select>
+      <button class="btn btn-primary" onclick="openFormRDO()">+ Novo RDO</button>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Total de RDOs</div><div class="kpi-value">${totalRDOs}</div><div class="kpi-change">Todos os registros</div></div>
+    <div class="kpi-card"><div class="kpi-label">Obras com registro</div><div class="kpi-value amber">${obrasComRDO}</div><div class="kpi-change">de ${APP.obras.length} obra(s)</div></div>
+    <div class="kpi-card"><div class="kpi-label">Registros hoje</div><div class="kpi-value green">${rdoHoje}</div><div class="kpi-change">${new Date().toLocaleDateString('pt-BR')}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Últimos 7 dias</div><div class="kpi-value">${rdoSemana}</div><div class="kpi-change">Frequência da semana</div></div>
+  </div>
+
+  ${rdosOrdenados.length === 0 ? `
+    <div class="table-card">
+      <div style="padding:60px;text-align:center">
+        <div style="font-size:40px;margin-bottom:16px">📋</div>
+        <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhum RDO registrado ainda</div>
+        <div style="color:var(--text3);font-size:12px;margin-bottom:20px">O Diário de Obra registra o que aconteceu no canteiro a cada dia —<br>clima, equipe presente, atividades executadas e ocorrências.</div>
+        <button class="btn btn-primary" onclick="openFormRDO()">+ Criar primeiro RDO</button>
+      </div>
+    </div>
+  ` : `
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Relatórios — ${rdosOrdenados.length} registro(s)</div>
+          ${filtroObra ? `<div class="table-sub">Filtrado: ${APP.obras.find(o=>o.id===filtroObra)?.nome||''}</div>` : ''}
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Obra</th><th>Clima</th><th>Equipe</th><th>Atividades</th><th>Ocorrências</th><th>Ações</th></tr>
+        </thead>
+        <tbody>
+          ${rdosOrdenados.map(r => {
+            const o = getObra(r.obraId);
+            const temOcorrencia = r.ocorrencias && r.ocorrencias.trim();
+            return `<tr>
+              <td style="font-family:var(--mono);font-size:12px;white-space:nowrap">${fmtDate(r.data)}</td>
+              <td><span class="strong">${trunc(o?.nome||'—',22)}</span></td>
+              <td style="white-space:nowrap">${CLIMA_ICON[r.clima]||'🌤️'} <span style="font-size:12px;color:var(--text2)">${r.clima||'—'}</span></td>
+              <td style="font-family:var(--mono);color:var(--accent)">${r.equipePresente > 0 ? r.equipePresente+'p' : '—'}</td>
+              <td style="color:var(--text2);font-size:12px">${trunc(r.descricao||'',45)}</td>
+              <td>${temOcorrencia ? `<span class="badge badge-red" style="font-size:10px">⚠ Sim</span>` : `<span class="badge badge-gray" style="font-size:10px">Nenhuma</span>`}</td>
+              <td style="white-space:nowrap">
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="verDetalheRDO('${r.id}')">👁 Ver</button>
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormRDO('${r.id}')">✏️</button>
+                <button class="btn btn-danger" style="padding:3px 8px;font-size:11px" onclick="excluirRDO('${r.id}')">🗑</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `}
+
+  <div id="detalhe-rdo-panel" style="display:none;margin-top:20px">
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title" id="detalhe-rdo-title">RDO</div>
+        <button class="btn btn-outline" style="padding:3px 10px;font-size:12px" onclick="document.getElementById('detalhe-rdo-panel').style.display='none'">✕ Fechar</button>
+      </div>
+      <div id="detalhe-rdo-body" style="padding:20px"></div>
+    </div>
+  </div>`;
+}
+
+function openFormRDO(id) {
+  const r = id ? APP.rdos.find(x => x.id === id) : null;
+  const hoje = new Date().toISOString().split('T')[0];
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">${r ? 'Editar RDO' : 'Novo Relatório Diário de Obra'}</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Obra</label>
+        <select id="f-rdo-obra">
+          ${APP.obras.map(o=>`<option value="${o.id}" ${r?.obraId===o.id?'selected':''}>${o.nome}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="f-rdo-data" value="${r?.data||hoje}" max="${hoje}">
+      </div>
+      <div class="form-group">
+        <label>Condição climática</label>
+        <select id="f-rdo-clima">
+          ${CLIMA_OPTS.map(c=>`<option value="${c}" ${r?.clima===c?'selected':''}>${CLIMA_ICON[c]} ${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Equipe presente (pessoas)</label>
+        <input type="number" id="f-rdo-equipe" min="0" value="${r?.equipePresente||0}" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Avanço físico no dia (%)</label>
+        <input type="number" id="f-rdo-avanco" min="0" max="100" value="${r?.avanco_dia||0}" placeholder="0">
+      </div>
+      <div class="form-group full">
+        <label>Atividades executadas no dia *</label>
+        <textarea rows="4" id="f-rdo-descricao" placeholder="Ex: Concretagem pilar P3, assentamento alvenaria 2° pav, instalação tubulação hidráulica...">${r?.descricao||''}</textarea>
+      </div>
+      <div class="form-group full">
+        <label>Ocorrências / Problemas <span style="color:var(--text3);font-weight:400">(opcional)</span></label>
+        <textarea rows="3" id="f-rdo-ocorrencias" placeholder="Registre acidentes, atrasos de material, paralisações, autuações...">${r?.ocorrencias||''}</textarea>
+      </div>
+      <div class="form-group full">
+        <label>Observações gerais <span style="color:var(--text3);font-weight:400">(opcional)</span></label>
+        <textarea rows="2" id="f-rdo-obs" placeholder="Visitas, inspeções, recebimento de materiais, decisões tomadas...">${r?.observacoes||''}</textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      ${r ? `<button class="btn btn-danger" onclick="excluirRDO('${r.id}',true)">🗑 Excluir</button><div style="flex:1"></div>` : ''}
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarRDO('${r?.id||''}')">Salvar RDO</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+async function salvarRDO(id) {
+  const obraId    = document.getElementById('f-rdo-obra').value;
+  const data      = document.getElementById('f-rdo-data').value;
+  const descricao = document.getElementById('f-rdo-descricao').value.trim();
+  if (!data)      return alert('Informe a data do RDO');
+  if (!descricao) return alert('Descreva as atividades do dia');
+  const payload = {
+    obraId,
+    obra_id:         obraId,
+    data,
+    clima:           document.getElementById('f-rdo-clima').value,
+    equipe_presente: parseInt(document.getElementById('f-rdo-equipe').value) || 0,
+    avanco_dia:      parseInt(document.getElementById('f-rdo-avanco').value) || 0,
+    descricao,
+    ocorrencias:     document.getElementById('f-rdo-ocorrencias').value.trim(),
+    observacoes:     document.getElementById('f-rdo-obs').value.trim(),
+  };
+  if (id) {
+    await apiPut(`rdos/${id}`, payload);
+    const r = APP.rdos.find(x => x.id === id);
+    if (r) Object.assign(r, { ...payload, equipePresente: payload.equipe_presente });
+  } else {
+    const novo = await apiPost('rdos', payload);
+    if (novo?.id) APP.rdos.unshift(normalizeRdo({ ...payload, id: novo.id }));
+  }
+  closeForm();
+  navigate('rdo');
+}
+
+async function excluirRDO(id, fromForm) {
+  if (!confirm('Excluir este RDO? Esta ação não pode ser desfeita.')) return;
+  await apiDelete(`rdos/${id}`);
+  APP.rdos = APP.rdos.filter(r => r.id !== id);
+  if (fromForm) closeForm();
+  navigate('rdo');
+}
+
+function verDetalheRDO(id) {
+  const r = APP.rdos.find(x => x.id === id);
+  if (!r) return;
+  const o = getObra(r.obraId);
+  document.getElementById('detalhe-rdo-title').textContent = `RDO — ${o?.nome||'Obra'} · ${fmtDate(r.data)}`;
+  document.getElementById('detalhe-rdo-body').innerHTML = `
+    <div class="three-col" style="margin-bottom:20px">
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Data</div>
+        <div style="color:var(--text);font-size:14px;font-weight:500">${fmtDate(r.data)}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Clima</div>
+        <div style="color:var(--text);font-size:14px">${CLIMA_ICON[r.clima]||'🌤️'} ${r.clima||'—'}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Equipe presente</div>
+        <div style="color:var(--accent);font-size:20px;font-weight:500">${r.equipePresente||'—'} <span style="font-size:12px;color:var(--text3);font-weight:400">pessoa(s)</span></div>
+      </div>
+    </div>
+    ${r.avanco_dia > 0 ? `
+    <div style="margin-bottom:20px;padding:12px 16px;background:rgba(240,165,0,0.06);border:1px solid rgba(240,165,0,0.15);border-radius:var(--radius)">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Avanço físico registrado no dia</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="font-size:22px;font-weight:500;color:var(--accent)">${r.avanco_dia}%</div>
+        <div style="flex:1;background:var(--bg4);border-radius:3px;height:6px;overflow:hidden">
+          <div style="height:100%;border-radius:3px;background:var(--accent);width:${r.avanco_dia}%"></div>
+        </div>
+      </div>
+    </div>` : ''}
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Atividades executadas</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${r.descricao||'—'}</div>
+    </div>
+    ${r.ocorrencias ? `
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">⚠ Ocorrências / Problemas</div>
+      <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${r.ocorrencias}</div>
+    </div>` : ''}
+    ${r.observacoes ? `
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Observações gerais</div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7;white-space:pre-wrap">${r.observacoes}</div>
+    </div>` : ''}
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="btn btn-outline" onclick="openFormRDO('${r.id}')">✏️ Editar RDO</button>
+      <button class="btn btn-outline" onclick="imprimirRDO('${r.id}')">🖨️ Imprimir</button>
+    </div>`;
+  document.getElementById('detalhe-rdo-panel').style.display = 'block';
+  document.getElementById('detalhe-rdo-panel').scrollIntoView({ behavior:'smooth' });
+}
+
+function imprimirRDO(id) {
+  const r = APP.rdos.find(x => x.id === id);
+  if (!r) return;
+  const o = getObra(r.obraId);
+  const janela = window.open('','_blank');
+  janela.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>RDO — ${o?.nome||''} — ${fmtDate(r.data)}</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:32px;color:#222;font-size:14px}
+      h1{font-size:18px;margin-bottom:4px}
+      .sub{color:#666;font-size:12px;margin-bottom:24px}
+      .row{display:flex;gap:32px;margin-bottom:20px}
+      .field{flex:1}
+      .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:4px}
+      .val{font-size:15px;font-weight:600}
+      .box{border:1px solid #ddd;border-radius:6px;padding:14px;margin-bottom:16px;line-height:1.7;white-space:pre-wrap}
+      .box-red{border-color:#f99;background:#fff8f8}
+      .section-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px}
+      .footer{margin-top:48px;border-top:1px solid #eee;padding-top:16px;font-size:11px;color:#aaa}
+    </style>
+  </head><body>
+    <h1>Relatório Diário de Obra</h1>
+    <div class="sub">${o?.nome||''} ${o?.cliente ? '— ' + o.cliente : ''}</div>
+    <div class="row">
+      <div class="field"><div class="lbl">Data</div><div class="val">${fmtDate(r.data)}</div></div>
+      <div class="field"><div class="lbl">Clima</div><div class="val">${r.clima||'—'}</div></div>
+      <div class="field"><div class="lbl">Equipe presente</div><div class="val">${r.equipePresente||0} pessoa(s)</div></div>
+      ${r.avanco_dia > 0 ? `<div class="field"><div class="lbl">Avanço do dia</div><div class="val">${r.avanco_dia}%</div></div>` : ''}
+    </div>
+    <div class="section-label">Atividades executadas</div>
+    <div class="box">${(r.descricao||'—')}</div>
+    ${r.ocorrencias ? `<div class="section-label" style="color:#c00">⚠ Ocorrências / Problemas</div><div class="box box-red">${r.ocorrencias}</div>` : ''}
+    ${r.observacoes ? `<div class="section-label">Observações gerais</div><div class="box">${r.observacoes}</div>` : ''}
+    <div class="footer">Gerado pelo ConstruFY em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  </body></html>`);
+  janela.document.close();
+  janela.print();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ── COTAÇÕES DE MATERIAIS ─────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+
+if (!window.COT_TAB) window.COT_TAB = 'cotacoes'; // 'cotacoes' | 'pedidos'
+
+const UNIDADES = ['un','kg','g','m','m²','m³','l','ml','saco','cx','rolo','barra','par','pç','hr'];
+const STATUS_COT_COLOR = { 'Aberta':'badge-blue', 'Aprovada':'badge-green', 'Cancelada':'badge-red' };
+const STATUS_PED_COLOR = { 'Pendente':'badge-amber', 'Aprovado':'badge-blue', 'Entregue':'badge-green', 'Cancelado':'badge-red' };
+
+function renderCotacoes() {
+  const tab = window.COT_TAB;
+  const totalCot = APP.cotacoes.length;
+  const totalPed = APP.pedidos.length;
+  const cotAbertas = APP.cotacoes.filter(c => c.status === 'Aberta').length;
+  const pedPendentes = APP.pedidos.filter(p => p.status === 'Pendente').length;
+  const totalCompras = APP.pedidos.filter(p => p.status !== 'Cancelado').reduce((a,b) => a + (b.total||0), 0);
+
+  return `
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:16px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Cotação de Materiais</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">Compare preços, escolha o melhor e gere pedidos de compra</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      ${tab === 'cotacoes'
+        ? `<button class="btn btn-primary" onclick="openFormCotacao()">+ Nova Cotação</button>`
+        : `<button class="btn btn-primary" onclick="openFormPedido()">+ Novo Pedido</button>`}
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Cotações</div><div class="kpi-value">${totalCot}</div><div class="kpi-change">${cotAbertas} em aberto</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pedidos de Compra</div><div class="kpi-value">${totalPed}</div><div class="kpi-change">${pedPendentes} pendente(s)</div></div>
+    <div class="kpi-card"><div class="kpi-label">Total Compras</div><div class="kpi-value amber">${fmt(totalCompras)}</div><div class="kpi-change">Pedidos não cancelados</div></div>
+    <div class="kpi-card"><div class="kpi-label">Aprovadas→Pedido</div><div class="kpi-value green">${APP.cotacoes.filter(c=>c.status==='Aprovada').length}</div><div class="kpi-change">Cotações convertidas</div></div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px">
+    <button onclick="window.COT_TAB='cotacoes';navigate('cotacoes')"
+      style="padding:10px 20px;background:none;border:none;border-bottom:2px solid ${tab==='cotacoes'?'var(--accent)':'transparent'};color:${tab==='cotacoes'?'var(--accent)':'var(--text2)'};font-size:13px;font-family:var(--font);cursor:pointer;font-weight:${tab==='cotacoes'?'500':'400'}">
+      📋 Cotações (${totalCot})
+    </button>
+    <button onclick="window.COT_TAB='pedidos';navigate('cotacoes')"
+      style="padding:10px 20px;background:none;border:none;border-bottom:2px solid ${tab==='pedidos'?'var(--accent)':'transparent'};color:${tab==='pedidos'?'var(--accent)':'var(--text2)'};font-size:13px;font-family:var(--font);cursor:pointer;font-weight:${tab==='pedidos'?'500':'400'}">
+      🛒 Pedidos de Compra (${totalPed})
+    </button>
+  </div>
+
+  ${tab === 'cotacoes' ? renderTabCotacoes() : renderTabPedidos()}`;
+}
+
+function renderTabCotacoes() {
+  if (APP.cotacoes.length === 0) return `
+    <div class="table-card">
+      <div style="padding:60px;text-align:center">
+        <div style="font-size:40px;margin-bottom:16px">📋</div>
+        <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhuma cotação ainda</div>
+        <div style="color:var(--text3);font-size:12px;margin-bottom:20px">Crie uma cotação, adicione materiais e compare os preços de até 3 fornecedores.</div>
+        <button class="btn btn-primary" onclick="openFormCotacao()">+ Criar primeira cotação</button>
+      </div>
+    </div>`;
+
+  return `
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Cotações — ${APP.cotacoes.length} registro(s)</div></div>
+      <table>
+        <thead><tr><th>Título</th><th>Obra</th><th>Status</th><th>Criada em</th><th>Obs</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${APP.cotacoes.map(c => `<tr>
+            <td><span class="strong">${trunc(c.titulo,30)}</span></td>
+            <td style="color:var(--text3);font-size:12px">${trunc(c.obra_nome||'Geral',20)}</td>
+            <td><span class="badge ${STATUS_COT_COLOR[c.status]||'badge-gray'}">${c.status}</span></td>
+            <td style="font-size:12px;color:var(--text3);font-family:var(--mono)">${c.created_at?c.created_at.substring(0,10):'—'}</td>
+            <td style="font-size:12px;color:var(--text3)">${trunc(c.observacoes||'',25)}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="abrirCotacao('${c.id}')">📊 Ver / Editar</button>
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="gerarPedidoDaCotacao('${c.id}')" title="Gerar Pedido de Compra">🛒</button>
+              <button class="btn btn-danger"  style="padding:3px 8px;font-size:11px" onclick="excluirCotacao('${c.id}')">🗑</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div id="painel-cotacao" style="margin-top:20px"></div>`;
+}
+
+function renderTabPedidos() {
+  if (APP.pedidos.length === 0) return `
+    <div class="table-card">
+      <div style="padding:60px;text-align:center">
+        <div style="font-size:40px;margin-bottom:16px">🛒</div>
+        <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhum pedido de compra ainda</div>
+        <div style="color:var(--text3);font-size:12px;margin-bottom:20px">Gere pedidos a partir de cotações aprovadas ou crie manualmente.</div>
+        <button class="btn btn-primary" onclick="openFormPedido()">+ Criar pedido manual</button>
+      </div>
+    </div>`;
+
+  return `
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Pedidos de Compra — ${APP.pedidos.length} registro(s)</div></div>
+      <table>
+        <thead><tr><th>Título</th><th>Fornecedor</th><th>Obra</th><th>Total</th><th>Status</th><th>Entrega</th><th>Ações</th></tr></thead>
+        <tbody>
+          ${APP.pedidos.map(p => `<tr>
+            <td><span class="strong">${trunc(p.titulo,26)}</span></td>
+            <td style="font-size:12px;color:var(--text2)">${trunc(p.fornecedor,20)}</td>
+            <td style="font-size:12px;color:var(--text3)">${trunc(p.obra_nome||'Geral',18)}</td>
+            <td style="font-family:var(--mono);color:var(--accent)">${fmt(p.total||0)}</td>
+            <td><span class="badge ${STATUS_PED_COLOR[p.status]||'badge-gray'}">${p.status}</span></td>
+            <td style="font-size:12px;color:var(--text3)">${p.data_entrega?fmtDate(p.data_entrega):'—'}</td>
+            <td style="white-space:nowrap">
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="verDetalhesPedido('${p.id}')">👁 Ver</button>
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="atualizarStatusPedido('${p.id}','${p.status}')">✏️ Status</button>
+              <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="imprimirPedido('${p.id}')">🖨️</button>
+              <button class="btn btn-danger"  style="padding:3px 8px;font-size:11px" onclick="excluirPedido('${p.id}')">🗑</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div id="painel-pedido" style="margin-top:20px"></div>`;
+}
+
+// ── Formulário: Nova/Editar Cotação ───────────────────────────────
+function openFormCotacao(id) {
+  const c = id ? APP.cotacoes.find(x => x.id === id) : null;
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">${c ? 'Editar Cotação' : 'Nova Cotação'}</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Título da Cotação *</label>
+        <input type="text" id="f-cot-titulo" value="${c?.titulo||''}" placeholder="Ex: Materiais alvenaria 2° pavimento">
+      </div>
+      <div class="form-group full">
+        <label>Obra (opcional)</label>
+        <select id="f-cot-obra">
+          <option value="">— Cotação geral —</option>
+          ${APP.obras.map(o=>`<option value="${o.id}" ${c?.obra_id===o.id?'selected':''}>${o.nome}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-cot-status">
+          ${['Aberta','Aprovada','Cancelada'].map(s=>`<option value="${s}" ${(c?.status||'Aberta')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <input type="text" id="f-cot-obs" value="${c?.observacoes||''}" placeholder="Prazo, condições...">
+      </div>
+    </div>
+    <div class="form-actions">
+      ${c ? `<button class="btn btn-danger" onclick="excluirCotacao('${c.id}',true)">🗑 Excluir</button><div style="flex:1"></div>` : ''}
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCotacao('${c?.id||''}')">Salvar</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+async function salvarCotacao(id) {
+  const titulo = document.getElementById('f-cot-titulo').value.trim();
+  if (!titulo) return alert('Informe o título da cotação');
+  const payload = {
+    titulo,
+    obra_id:     document.getElementById('f-cot-obra').value || null,
+    status:      document.getElementById('f-cot-status').value,
+    observacoes: document.getElementById('f-cot-obs').value.trim(),
+  };
+  if (id) {
+    await apiPut(`cotacoes/${id}`, payload);
+    const c = APP.cotacoes.find(x => x.id === id);
+    if (c) Object.assign(c, payload);
+  } else {
+    const r = await apiPost('cotacoes', payload);
+    if (r?.id) {
+      const obraNome = APP.obras.find(o=>o.id===payload.obra_id)?.nome || null;
+      APP.cotacoes.unshift({ ...payload, id: r.id, obra_nome: obraNome, created_at: new Date().toISOString() });
+    }
+  }
+  closeForm();
+  navigate('cotacoes');
+}
+
+async function excluirCotacao(id, fromForm) {
+  if (!confirm('Excluir esta cotação e todos os seus itens?')) return;
+  await apiDelete(`cotacoes/${id}`);
+  APP.cotacoes = APP.cotacoes.filter(c => c.id !== id);
+  if (fromForm) closeForm();
+  navigate('cotacoes');
+}
+
+// ── Painel de Itens da Cotação (comparativo de preços) ────────────
+async function abrirCotacao(cotId) {
+  const cot = APP.cotacoes.find(c => c.id === cotId);
+  if (!cot) return;
+
+  // Busca os itens da cotação
+  const itens = await apiGet(`cotacao-itens?cotacao_id=${cotId}`);
+
+  // Calcula totais por fornecedor
+  const totF1 = itens.filter(i=>i.forn1_nome).reduce((a,i)=>a+(i.forn1_preco*i.quantidade),0);
+  const totF2 = itens.filter(i=>i.forn2_nome).reduce((a,i)=>a+(i.forn2_preco*i.quantidade),0);
+  const totF3 = itens.filter(i=>i.forn3_nome).reduce((a,i)=>a+(i.forn3_preco*i.quantidade),0);
+
+  // Nomes únicos dos fornecedores
+  const nF1 = itens.find(i=>i.forn1_nome)?.forn1_nome || 'Fornecedor 1';
+  const nF2 = itens.find(i=>i.forn2_nome)?.forn2_nome || 'Fornecedor 2';
+  const nF3 = itens.find(i=>i.forn3_nome)?.forn3_nome || 'Fornecedor 3';
+
+  const painel = document.getElementById('painel-cotacao');
+  if (!painel) return;
+  painel.innerHTML = `
+    <div class="table-card">
+      <div class="table-header" style="flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="table-title">📊 ${cot.titulo}</div>
+          <div class="table-sub">${cot.obra_nome||'Cotação geral'} · <span class="badge ${STATUS_COT_COLOR[cot.status]||'badge-gray'}" style="font-size:10px">${cot.status}</span></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" style="font-size:12px" onclick="openFormItem('${cotId}')">+ Adicionar Material</button>
+          <button class="btn btn-outline" style="font-size:12px" onclick="imprimirComparativo('${cotId}')">🖨️ Imprimir Comparativo</button>
+          <button class="btn btn-outline" style="font-size:12px" onclick="document.getElementById('painel-cotacao').innerHTML=''">✕ Fechar</button>
+        </div>
+      </div>
+
+      ${itens.length === 0 ? `
+        <div style="padding:40px;text-align:center;color:var(--text3)">
+          <div style="font-size:28px;margin-bottom:12px">📦</div>
+          <div style="margin-bottom:12px">Nenhum material adicionado ainda.</div>
+          <button class="btn btn-primary" onclick="openFormItem('${cotId}')">+ Adicionar primeiro material</button>
+        </div>
+      ` : `
+        <!-- Resumo totais por fornecedor -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:16px 18px;border-bottom:1px solid var(--border)">
+          ${[{n:nF1,t:totF1},{n:nF2,t:totF2},{n:nF3,t:totF3}].filter(f=>f.t>0).map((f,i) => {
+            const menorTotal = Math.min(...[totF1,totF2,totF3].filter(t=>t>0));
+            const isMelhor = f.t === menorTotal && f.t > 0;
+            return `<div style="background:${isMelhor?'rgba(34,197,94,0.07)':'var(--bg3)'};border:1px solid ${isMelhor?'var(--green2)':'var(--border)'};border-radius:var(--radius);padding:12px">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">${f.n}</div>
+              <div style="font-size:18px;font-weight:500;color:${isMelhor?'var(--green)':'var(--accent)'}">${fmt(f.t)}</div>
+              ${isMelhor ? `<div style="font-size:10px;color:var(--green);margin-top:4px">✓ Menor total</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+
+        <!-- Tabela comparativa -->
+        <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>Material</th><th>Qtd/Un</th>
+            <th style="color:#6b9fff">${nF1}</th>
+            <th style="color:#6b9fff">Total F1</th>
+            <th style="color:#a78bfa">${nF2}</th>
+            <th style="color:#a78bfa">Total F2</th>
+            <th style="color:#f0a500">${nF3}</th>
+            <th style="color:#f0a500">Total F3</th>
+            <th>Vencedor</th>
+            <th>Ações</th>
+          </tr></thead>
+          <tbody>
+            ${itens.map(item => {
+              const t1 = item.forn1_preco * item.quantidade;
+              const t2 = item.forn2_preco * item.quantidade;
+              const t3 = item.forn3_preco * item.quantidade;
+              const precos = [item.forn1_preco, item.forn2_preco, item.forn3_preco].filter(p => p > 0);
+              const menorPreco = precos.length ? Math.min(...precos) : 0;
+              const cellStyle = (p) => p > 0 && p === menorPreco ? 'color:var(--green);font-weight:500' : '';
+              const vencNome = item.forn_vencedor === 1 ? item.forn1_nome : item.forn_vencedor === 2 ? item.forn2_nome : item.forn_vencedor === 3 ? item.forn3_nome : '';
+              return `<tr>
+                <td><span class="strong">${item.material}</span></td>
+                <td style="font-size:12px;color:var(--text3)">${item.quantidade} ${item.unidade}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(item.forn1_preco)}">${item.forn1_preco > 0 ? fmt(item.forn1_preco) : '—'}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(t1)}">${t1 > 0 ? fmt(t1) : '—'}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(item.forn2_preco)}">${item.forn2_preco > 0 ? fmt(item.forn2_preco) : '—'}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(t2)}">${t2 > 0 ? fmt(t2) : '—'}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(item.forn3_preco)}">${item.forn3_preco > 0 ? fmt(item.forn3_preco) : '—'}</td>
+                <td style="font-family:var(--mono);font-size:12px;${cellStyle(t3)}">${t3 > 0 ? fmt(t3) : '—'}</td>
+                <td>
+                  ${vencNome
+                    ? `<span class="badge badge-green" style="font-size:10px">✓ ${trunc(vencNome,12)}</span>`
+                    : `<select onchange="escolherVencedor('${item.id}',this.value)" style="font-size:11px;padding:3px 6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);border-radius:4px;font-family:var(--font)">
+                        <option value="0">— escolher —</option>
+                        ${item.forn1_nome ? `<option value="1">${item.forn1_nome}</option>` : ''}
+                        ${item.forn2_nome ? `<option value="2">${item.forn2_nome}</option>` : ''}
+                        ${item.forn3_nome ? `<option value="3">${item.forn3_nome}</option>` : ''}
+                      </select>`}
+                </td>
+                <td style="white-space:nowrap">
+                  <button class="btn btn-outline" style="padding:2px 7px;font-size:11px;margin-right:3px" onclick="openFormItem('${cotId}','${item.id}')">✏️</button>
+                  <button class="btn btn-danger"  style="padding:2px 7px;font-size:11px" onclick="excluirItem('${item.id}','${cotId}')">🗑</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        </div>
+      `}
+    </div>`;
+  painel.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Escolher vencedor do item ──────────────────────────────────────
+async function escolherVencedor(itemId, vencedor) {
+  // Busca o item atual para manter os outros campos
+  const res = await fetch(`${API}/data/cotacao-itens?cotacao_id=dummy`, {
+    headers: { 'Authorization': `Bearer ${await TokenManager.getValid()}` }
+  });
+  // Usa PUT direto com só o campo vencedor passado como update parcial via truque:
+  await apiPut(`cotacao-itens/${itemId}`, { forn_vencedor: parseInt(vencedor) });
+  // Re-abre o painel (precisamos buscar cotacao_id do item)
+  // Busca em cache temporário
+  const cotId = window._cotacaoAberta;
+  if (cotId) abrirCotacao(cotId);
+}
+
+// ── Formulário: Adicionar/Editar Item da Cotação ──────────────────
+function openFormItem(cotId, itemId) {
+  window._cotacaoAberta = cotId;
+  const item = itemId ? null : null; // itens não ficam em cache; formulário começa vazio para edição simples
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">${itemId ? 'Editar Item' : 'Adicionar Material à Cotação'}</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Material / Descrição *</label>
+        <input type="text" id="f-item-mat" placeholder="Ex: Cimento CP-II 50kg, Tijolo 8 furos, Areia grossa m³">
+      </div>
+      <div class="form-group">
+        <label>Quantidade</label>
+        <input type="number" id="f-item-qtd" value="1" min="0.01" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Unidade</label>
+        <select id="f-item-un">
+          ${UNIDADES.map(u=>`<option value="${u}">${u}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="form-group full" style="background:rgba(107,159,255,0.05);border:1px solid rgba(107,159,255,0.15);border-radius:var(--radius);padding:12px;margin-top:4px">
+        <div style="font-size:11px;color:#6b9fff;font-weight:500;margin-bottom:10px;letter-spacing:.5px">FORNECEDOR 1</div>
+        <div class="form-grid" style="gap:10px">
+          <div class="form-group">
+            <label>Nome do Fornecedor</label>
+            <input type="text" id="f-f1-nome" placeholder="Ex: Depósito Central">
+          </div>
+          <div class="form-group">
+            <label>Preço unitário (R$)</label>
+            <input type="number" id="f-f1-preco" value="0" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full" style="background:rgba(167,139,250,0.05);border:1px solid rgba(167,139,250,0.15);border-radius:var(--radius);padding:12px">
+        <div style="font-size:11px;color:#a78bfa;font-weight:500;margin-bottom:10px;letter-spacing:.5px">FORNECEDOR 2 <span style="font-weight:400;color:var(--text3)">(opcional)</span></div>
+        <div class="form-grid" style="gap:10px">
+          <div class="form-group">
+            <label>Nome do Fornecedor</label>
+            <input type="text" id="f-f2-nome" placeholder="Ex: Material Construção Ltda">
+          </div>
+          <div class="form-group">
+            <label>Preço unitário (R$)</label>
+            <input type="number" id="f-f2-preco" value="0" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full" style="background:rgba(240,165,0,0.05);border:1px solid rgba(240,165,0,0.12);border-radius:var(--radius);padding:12px">
+        <div style="font-size:11px;color:var(--accent);font-weight:500;margin-bottom:10px;letter-spacing:.5px">FORNECEDOR 3 <span style="font-weight:400;color:var(--text3)">(opcional)</span></div>
+        <div class="form-grid" style="gap:10px">
+          <div class="form-group">
+            <label>Nome do Fornecedor</label>
+            <input type="text" id="f-f3-nome" placeholder="Ex: Construmat">
+          </div>
+          <div class="form-group">
+            <label>Preço unitário (R$)</label>
+            <input type="number" id="f-f3-preco" value="0" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarItem('${cotId}','${itemId||''}')">Salvar Material</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+async function salvarItem(cotId, itemId) {
+  const material = document.getElementById('f-item-mat').value.trim();
+  if (!material) return alert('Informe o material');
+  const payload = {
+    cotacao_id:   cotId,
+    material,
+    unidade:      document.getElementById('f-item-un').value,
+    quantidade:   parseFloat(document.getElementById('f-item-qtd').value) || 1,
+    forn1_nome:   document.getElementById('f-f1-nome').value.trim(),
+    forn1_preco:  parseFloat(document.getElementById('f-f1-preco').value) || 0,
+    forn2_nome:   document.getElementById('f-f2-nome').value.trim(),
+    forn2_preco:  parseFloat(document.getElementById('f-f2-preco').value) || 0,
+    forn3_nome:   document.getElementById('f-f3-nome').value.trim(),
+    forn3_preco:  parseFloat(document.getElementById('f-f3-preco').value) || 0,
+    forn_vencedor: 0,
+  };
+  if (itemId) {
+    await apiPut(`cotacao-itens/${itemId}`, payload);
+  } else {
+    await apiPost('cotacao-itens', payload);
+  }
+  closeForm();
+  await abrirCotacao(cotId);
+}
+
+async function excluirItem(itemId, cotId) {
+  if (!confirm('Remover este item da cotação?')) return;
+  await apiDelete(`cotacao-itens/${itemId}`);
+  await abrirCotacao(cotId);
+}
+
+// ── Gerar Pedido de Compra a partir de cotação ────────────────────
+async function gerarPedidoDaCotacao(cotId) {
+  const cot = APP.cotacoes.find(c => c.id === cotId);
+  if (!cot) return;
+  const itens = await apiGet(`cotacao-itens?cotacao_id=${cotId}`);
+  if (!itens.length) return alert('Adicione materiais à cotação antes de gerar o pedido.');
+
+  const itensComVencedor = itens.filter(i => i.forn_vencedor > 0);
+  if (!itensComVencedor.length) return alert('Escolha o fornecedor vencedor em pelo menos um item antes de gerar o pedido.');
+
+  // Agrupa por fornecedor vencedor
+  const grupos = {};
+  for (const item of itensComVencedor) {
+    const nF = item.forn_vencedor === 1 ? item.forn1_nome : item.forn_vencedor === 2 ? item.forn2_nome : item.forn3_nome;
+    const pF = item.forn_vencedor === 1 ? item.forn1_preco : item.forn_vencedor === 2 ? item.forn2_preco : item.forn3_preco;
+    if (!grupos[nF]) grupos[nF] = [];
+    grupos[nF].push({ ...item, preco_unit: pF, total: pF * item.quantidade });
+  }
+
+  // Cria um pedido por fornecedor vencedor
+  for (const [forn, itensForn] of Object.entries(grupos)) {
+    const total = itensForn.reduce((a,i) => a + i.total, 0);
+    await apiPost('pedidos', {
+      cotacao_id:  cotId,
+      obra_id:     cot.obra_id || null,
+      fornecedor:  forn,
+      titulo:      `${cot.titulo} — ${forn}`,
+      status:      'Pendente',
+      total,
+      data_pedido: new Date().toISOString().split('T')[0],
+      itens:       itensForn,
+    });
+  }
+
+  // Atualiza status da cotação para Aprovada
+  await apiPut(`cotacoes/${cotId}`, { ...cot, status: 'Aprovada' });
+  cot.status = 'Aprovada';
+
+  alert(`✅ ${Object.keys(grupos).length} pedido(s) gerado(s) com sucesso!`);
+  window.COT_TAB = 'pedidos';
+  // Recarrega pedidos
+  APP.pedidos = await apiGet('pedidos');
+  navigate('cotacoes');
+}
+
+// ── Formulário: Novo Pedido Manual ────────────────────────────────
+function openFormPedido(id) {
+  const p = id ? APP.pedidos.find(x => x.id === id) : null;
+  document.getElementById('form-box').innerHTML = `
+    <div class="form-title">${p ? 'Editar Pedido' : 'Novo Pedido de Compra'}</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Título *</label>
+        <input type="text" id="f-ped-titulo" value="${p?.titulo||''}" placeholder="Ex: Materiais estrutura laje">
+      </div>
+      <div class="form-group">
+        <label>Fornecedor *</label>
+        <input type="text" id="f-ped-forn" value="${p?.fornecedor||''}" placeholder="Nome do fornecedor">
+      </div>
+      <div class="form-group">
+        <label>Obra (opcional)</label>
+        <select id="f-ped-obra">
+          <option value="">— Geral —</option>
+          ${APP.obras.map(o=>`<option value="${o.id}" ${p?.obra_id===o.id?'selected':''}>${o.nome}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="f-ped-status">
+          ${['Pendente','Aprovado','Entregue','Cancelado'].map(s=>`<option value="${s}" ${(p?.status||'Pendente')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Valor Total (R$)</label>
+        <input type="number" id="f-ped-total" value="${p?.total||0}" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Previsão de Entrega</label>
+        <input type="date" id="f-ped-entrega" value="${p?.data_entrega||''}">
+      </div>
+      <div class="form-group full">
+        <label>Observações</label>
+        <textarea rows="2" id="f-ped-obs" placeholder="Condições de pagamento, prazo...">${p?.observacoes||''}</textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      ${p ? `<button class="btn btn-danger" onclick="excluirPedido('${p.id}',true)">🗑 Excluir</button><div style="flex:1"></div>` : ''}
+      <button class="btn btn-outline" onclick="closeForm()">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPedido('${p?.id||''}')">Salvar Pedido</button>
+    </div>`;
+  document.getElementById('form-overlay').classList.add('open');
+}
+
+async function salvarPedido(id) {
+  const titulo    = document.getElementById('f-ped-titulo').value.trim();
+  const fornecedor = document.getElementById('f-ped-forn').value.trim();
+  if (!titulo)     return alert('Informe o título');
+  if (!fornecedor) return alert('Informe o fornecedor');
+  const payload = {
+    titulo, fornecedor,
+    obra_id:     document.getElementById('f-ped-obra').value || null,
+    status:      document.getElementById('f-ped-status').value,
+    total:       parseFloat(document.getElementById('f-ped-total').value) || 0,
+    data_entrega: document.getElementById('f-ped-entrega').value || '',
+    observacoes:  document.getElementById('f-ped-obs').value.trim(),
+  };
+  if (id) {
+    await apiPut(`pedidos/${id}`, payload);
+    const p = APP.pedidos.find(x => x.id === id);
+    if (p) Object.assign(p, payload);
+  } else {
+    const r = await apiPost('pedidos', { ...payload, itens: [] });
+    if (r?.id) APP.pedidos.unshift({ ...payload, id: r.id, obra_nome: APP.obras.find(o=>o.id===payload.obra_id)?.nome || null });
+  }
+  closeForm();
+  navigate('cotacoes');
+}
+
+async function excluirPedido(id, fromForm) {
+  if (!confirm('Excluir este pedido de compra?')) return;
+  await apiDelete(`pedidos/${id}`);
+  APP.pedidos = APP.pedidos.filter(p => p.id !== id);
+  if (fromForm) closeForm();
+  navigate('cotacoes');
+}
+
+async function atualizarStatusPedido(id, statusAtual) {
+  const prox = { 'Pendente':'Aprovado', 'Aprovado':'Entregue', 'Entregue':'Entregue', 'Cancelado':'Cancelado' };
+  const opcoes = ['Pendente','Aprovado','Entregue','Cancelado'];
+  const novo = prompt(`Status atual: ${statusAtual}\nNovo status (${opcoes.join(' / ')}):`, prox[statusAtual]);
+  if (!novo || !opcoes.includes(novo)) return;
+  const p = APP.pedidos.find(x => x.id === id);
+  if (!p) return;
+  await apiPut(`pedidos/${id}`, { ...p, status: novo });
+  p.status = novo;
+  navigate('cotacoes');
+}
+
+async function verDetalhesPedido(id) {
+  const p = APP.pedidos.find(x => x.id === id);
+  if (!p) return;
+  const itens = await apiGet(`pedido-itens?pedido_id=${id}`);
+  const painel = document.getElementById('painel-pedido');
+  if (!painel) return;
+  painel.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">🛒 ${p.titulo}</div>
+          <div class="table-sub">${p.fornecedor} · ${p.obra_nome||'Geral'} · <span class="badge ${STATUS_PED_COLOR[p.status]||'badge-gray'}" style="font-size:10px">${p.status}</span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" style="font-size:12px" onclick="imprimirPedido('${id}')">🖨️ Imprimir</button>
+          <button class="btn btn-outline" style="font-size:12px" onclick="document.getElementById('painel-pedido').innerHTML=''">✕ Fechar</button>
+        </div>
+      </div>
+      <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;gap:32px;flex-wrap:wrap">
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Fornecedor</div><div style="color:var(--text);font-weight:500">${p.fornecedor}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Total</div><div style="color:var(--accent);font-size:18px;font-weight:500">${fmt(p.total||0)}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Pedido em</div><div style="color:var(--text)">${p.data_pedido?fmtDate(p.data_pedido):'—'}</div></div>
+        ${p.data_entrega?`<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Prev. Entrega</div><div style="color:var(--text)">${fmtDate(p.data_entrega)}</div></div>`:''}
+        ${p.observacoes?`<div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Observações</div><div style="color:var(--text2);font-size:12px">${p.observacoes}</div></div>`:''}
+      </div>
+      ${itens.length > 0 ? `
+        <table>
+          <thead><tr><th>Material</th><th>Qtd</th><th>Un</th><th>Preço Unit.</th><th>Total</th></tr></thead>
+          <tbody>
+            ${itens.map(i=>`<tr>
+              <td><span class="strong">${i.material}</span></td>
+              <td style="font-family:var(--mono)">${i.quantidade}</td>
+              <td style="color:var(--text3)">${i.unidade}</td>
+              <td style="font-family:var(--mono);color:var(--text2)">${fmt(i.preco_unit)}</td>
+              <td style="font-family:var(--mono);color:var(--accent)">${fmt(i.total)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>` : `<div style="padding:20px;color:var(--text3);text-align:center">Nenhum item registrado neste pedido.</div>`}
+    </div>`;
+  painel.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Impressão: comparativo de cotação ────────────────────────────
+async function imprimirComparativo(cotId) {
+  const cot  = APP.cotacoes.find(c => c.id === cotId);
+  const itens = await apiGet(`cotacao-itens?cotacao_id=${cotId}`);
+  const janela = window.open('','_blank');
+  const nF1 = itens.find(i=>i.forn1_nome)?.forn1_nome || 'Fornecedor 1';
+  const nF2 = itens.find(i=>i.forn2_nome)?.forn2_nome || 'Fornecedor 2';
+  const nF3 = itens.find(i=>i.forn3_nome)?.forn3_nome || 'Fornecedor 3';
+  const totF1 = itens.reduce((a,i)=>a+(i.forn1_preco*i.quantidade),0);
+  const totF2 = itens.reduce((a,i)=>a+(i.forn2_preco*i.quantidade),0);
+  const totF3 = itens.reduce((a,i)=>a+(i.forn3_preco*i.quantidade),0);
+  const fmtR = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
+  janela.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Comparativo de Preços — ${cot?.titulo||''}</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:28px;color:#222;font-size:13px}
+      h1{font-size:17px;margin-bottom:4px}
+      .sub{color:#666;font-size:12px;margin-bottom:20px}
+      table{width:100%;border-collapse:collapse;font-size:12px}
+      th{background:#f5f5f5;padding:8px 10px;text-align:left;border:1px solid #ddd;font-size:10px;text-transform:uppercase;letter-spacing:.8px}
+      td{padding:8px 10px;border:1px solid #ddd}
+      .best{background:#f0fff4;font-weight:700;color:#166534}
+      .total-row td{background:#fafafa;font-weight:700}
+      .footer{margin-top:32px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:12px}
+    </style>
+  </head><body>
+    <h1>Comparativo de Preços</h1>
+    <div class="sub">${cot?.titulo||''} ${cot?.obra_nome ? '— ' + cot.obra_nome : ''}</div>
+    <table>
+      <thead><tr><th>Material</th><th>Qtd/Un</th><th>${nF1}</th><th>Total F1</th><th>${nF2}</th><th>Total F2</th><th>${nF3}</th><th>Total F3</th><th>Vencedor</th></tr></thead>
+      <tbody>
+        ${itens.map(item => {
+          const t1=item.forn1_preco*item.quantidade, t2=item.forn2_preco*item.quantidade, t3=item.forn3_preco*item.quantidade;
+          const precos=[item.forn1_preco,item.forn2_preco,item.forn3_preco].filter(p=>p>0);
+          const min=precos.length?Math.min(...precos):0;
+          const c = p => p>0&&p===min?'class="best"':'';
+          const vNome = item.forn_vencedor===1?item.forn1_nome:item.forn_vencedor===2?item.forn2_nome:item.forn_vencedor===3?item.forn3_nome:'—';
+          return `<tr>
+            <td>${item.material}</td>
+            <td>${item.quantidade} ${item.unidade}</td>
+            <td ${c(item.forn1_preco)}>${item.forn1_preco>0?fmtR(item.forn1_preco):'—'}</td>
+            <td ${c(t1)}>${t1>0?fmtR(t1):'—'}</td>
+            <td ${c(item.forn2_preco)}>${item.forn2_preco>0?fmtR(item.forn2_preco):'—'}</td>
+            <td ${c(t2)}>${t2>0?fmtR(t2):'—'}</td>
+            <td ${c(item.forn3_preco)}>${item.forn3_preco>0?fmtR(item.forn3_preco):'—'}</td>
+            <td ${c(t3)}>${t3>0?fmtR(t3):'—'}</td>
+            <td>${vNome}</td>
+          </tr>`;
+        }).join('')}
+        <tr class="total-row"><td colspan="2"><strong>TOTAL</strong></td>
+          <td colspan="2">${fmtR(totF1)}</td>
+          <td colspan="2">${fmtR(totF2)}</td>
+          <td colspan="2">${fmtR(totF3)}</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="footer">Gerado pelo ConstruPRO em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  </body></html>`);
+  janela.document.close();
+  janela.print();
+}
+
+// ── Impressão: pedido de compra ───────────────────────────────────
+async function imprimirPedido(id) {
+  const p = APP.pedidos.find(x => x.id === id);
+  if (!p) return;
+  const itens = await apiGet(`pedido-itens?pedido_id=${id}`);
+  const fmtR = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n);
+  const janela = window.open('','_blank');
+  janela.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Pedido de Compra — ${p.titulo}</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:28px;color:#222;font-size:13px}
+      h1{font-size:17px;margin-bottom:4px}
+      .sub{color:#666;font-size:12px;margin-bottom:20px}
+      .row{display:flex;gap:32px;margin-bottom:18px;flex-wrap:wrap}
+      .field{flex:1;min-width:120px}
+      .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:3px}
+      .val{font-size:14px;font-weight:600}
+      table{width:100%;border-collapse:collapse;font-size:12px;margin-top:16px}
+      th{background:#f5f5f5;padding:8px 10px;text-align:left;border:1px solid #ddd;font-size:10px;text-transform:uppercase}
+      td{padding:8px 10px;border:1px solid #ddd}
+      .total-row{font-weight:700;background:#fafafa}
+      .footer{margin-top:40px;border-top:1px solid #eee;padding-top:14px;display:flex;justify-content:space-between}
+      .assinatura{text-align:center;margin-top:32px;border-top:1px solid #999;padding-top:8px;width:220px;font-size:11px;color:#666}
+    </style>
+  </head><body>
+    <h1>Pedido de Compra</h1>
+    <div class="sub">ConstruPRO · ${new Date().toLocaleDateString('pt-BR')}</div>
+    <div class="row">
+      <div class="field"><div class="lbl">Título</div><div class="val">${p.titulo}</div></div>
+      <div class="field"><div class="lbl">Fornecedor</div><div class="val">${p.fornecedor}</div></div>
+      <div class="field"><div class="lbl">Obra</div><div class="val">${p.obra_nome||'Geral'}</div></div>
+      <div class="field"><div class="lbl">Status</div><div class="val">${p.status}</div></div>
+    </div>
+    <div class="row">
+      <div class="field"><div class="lbl">Data do Pedido</div><div class="val">${p.data_pedido||'—'}</div></div>
+      <div class="field"><div class="lbl">Previsão de Entrega</div><div class="val">${p.data_entrega||'—'}</div></div>
+      ${p.observacoes?`<div class="field"><div class="lbl">Observações</div><div class="val" style="font-weight:400;font-size:13px">${p.observacoes}</div></div>`:''}
+    </div>
+    ${itens.length>0?`
+    <table>
+      <thead><tr><th>Material</th><th>Qtd</th><th>Un</th><th>Preço Unit.</th><th>Total</th></tr></thead>
+      <tbody>
+        ${itens.map(i=>`<tr><td>${i.material}</td><td>${i.quantidade}</td><td>${i.unidade}</td><td>${fmtR(i.preco_unit)}</td><td>${fmtR(i.total)}</td></tr>`).join('')}
+        <tr class="total-row"><td colspan="4">TOTAL</td><td>${fmtR(p.total)}</td></tr>
+      </tbody>
+    </table>`:''}
+    <div class="footer">
+      <div class="assinatura">________________________________<br>Solicitante</div>
+      <div class="assinatura">________________________________<br>Aprovador</div>
+    </div>
+    <div style="font-size:10px;color:#aaa;margin-top:24px">Gerado pelo ConstruPRO em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+  </body></html>`);
+  janela.document.close();
+  janela.print();
+}
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('supportToggle');
   const menu   = document.getElementById('supportMenu');
@@ -2521,6 +3686,88 @@ function logout() {
 }
 
 loadAll();
+
+// ── MOBILE NAVIGATION ─────────────────────────────────────────────
+function toggleMobileSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  const isOpen = sidebar.classList.contains('mobile-open');
+  if (isOpen) {
+    closeMobileSidebar();
+  } else {
+    sidebar.classList.add('mobile-open');
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeMobileSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Bottom nav navigate: fecha sidebar, navega e atualiza estado do bottom nav
+function mobileNavigate(page) {
+  closeMobileSidebar();
+  navigate(page);
+  updateBottomNav(page);
+}
+
+// Atualiza item ativo do bottom nav
+function updateBottomNav(page) {
+  const map = {
+    dashboard: 'bn-dashboard',
+    obras:      'bn-obras',
+    colaboradores: 'bn-colaboradores',
+    financeiro: 'bn-financeiro',
+  };
+  document.querySelectorAll('.bottom-nav-item').forEach(el => el.classList.remove('active'));
+  const targetId = map[page];
+  if (targetId) {
+    const el = document.getElementById(targetId);
+    if (el) el.classList.add('active');
+  }
+}
+
+// Interceptar navigate() para sincronizar bottom nav
+const _originalNavigate = navigate;
+// Wrap navigate to also update bottom nav on mobile
+(function wrapNavigate() {
+  const orig = navigate;
+  window.navigate = function(page) {
+    orig(page);
+    updateBottomNav(page);
+    // Fecha sidebar caso esteja aberta no mobile
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar && sidebar.classList.contains('mobile-open')) {
+      closeMobileSidebar();
+    }
+  };
+  // Substituir referências internas
+  window.navigate = navigate;
+})();
+
+// Fechar sidebar com swipe esquerdo
+(function initSwipeClose() {
+  let startX = 0;
+  const sidebar = document.getElementById('sidebar');
+  sidebar.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+  sidebar.addEventListener('touchend', e => {
+    if (startX - e.changedTouches[0].clientX > 60) closeMobileSidebar();
+  }, { passive: true });
+})();
+
+// Detectar se é mobile para mostrar bottom nav
+(function initMobileUI() {
+  function checkMobile() {
+    const isMobile = window.innerWidth <= 768;
+    document.getElementById('bottom-nav').style.display = isMobile ? 'flex' : 'none';
+    document.getElementById('mobile-menu-btn').style.display = isMobile ? 'flex' : 'none';
+  }
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+})();
 </script>
 </body>
 </html>

@@ -131,6 +131,80 @@
       document.getElementById('btn-label').textContent = 'Criar Conta Gratuitamente';
     }
 
+    function showEmailVerificationPending(email) {
+      // Esconde o formulário e mostra o estado de "verifique seu e-mail"
+      document.querySelector('#register-form').style.display = 'none';
+      document.querySelector('.feature-row') && (document.querySelector('.feature-row').style.display = 'none');
+      document.querySelector('.badge-pill') && (document.querySelector('.badge-pill').style.display = 'none');
+
+      const cardBody = document.querySelector('.card-body');
+      const verifyEl = document.createElement('div');
+      verifyEl.id = 'verify-state';
+      verifyEl.style.cssText = 'text-align:center;padding:8px 0 20px';
+      verifyEl.innerHTML = `
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+          <svg width="28" height="28" fill="none" stroke="var(--amber,#f0a500)" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <p style="font-size:15px;color:var(--text-hi,#e8eaf0);font-weight:500;margin-bottom:10px">Confirme seu e-mail</p>
+        <p style="font-size:13px;color:var(--text-md,#8b92a5);line-height:1.65;margin-bottom:8px">
+          Enviamos um e-mail de confirmação para<br>
+          <strong style="color:var(--amber,#f0a500)">${email}</strong>
+        </p>
+        <p style="font-size:12px;color:var(--text-lo,#5a6075);line-height:1.6;margin-bottom:20px">
+          Clique no link do e-mail para ativar sua conta. Verifique também a pasta de <strong>spam</strong>.
+        </p>
+        <div id="resend-area">
+          <button id="resend-btn" onclick="resendVerification('${email}')"
+            style="background:transparent;border:1px solid var(--border2,#343b4a);color:var(--text-md,#8b92a5);padding:8px 18px;border-radius:6px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.15s"
+            onmouseover="this.style.borderColor='var(--amber,#f0a500)';this.style.color='var(--amber,#f0a500)'"
+            onmouseout="this.style.borderColor='';this.style.color=''">
+            Reenviar e-mail de confirmação
+          </button>
+          <p id="resend-msg" style="display:none;font-size:11px;color:#22c55e;margin-top:8px"></p>
+        </div>
+      `;
+      cardBody.appendChild(verifyEl);
+
+      // Atualiza títulos do card-head
+      document.querySelector('.card-title').textContent = 'Verifique seu e-mail';
+      document.querySelector('.card-desc').textContent  = 'Só falta um passo para acessar o painel.';
+    }
+
+    async function resendVerification(email) {
+      const btn = document.getElementById('resend-btn');
+      const msg = document.getElementById('resend-msg');
+      btn.disabled = true;
+      btn.textContent = 'Reenviando...';
+      try {
+        await fetch(`${API_BASE}/auth/resend-verification`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        msg.textContent = '✓ E-mail reenviado! Verifique sua caixa de entrada.';
+        msg.style.display = 'block';
+        // Bloqueia reenvio por 60s
+        let countdown = 60;
+        const interval = setInterval(() => {
+          btn.textContent = `Reenviar em ${--countdown}s`;
+          if (countdown <= 0) {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.textContent = 'Reenviar e-mail de confirmação';
+          }
+        }, 1000);
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Reenviar e-mail de confirmação';
+        msg.textContent = 'Erro ao reenviar. Tente novamente.';
+        msg.style.color = '#ef4444';
+        msg.style.display = 'block';
+      }
+    }
+
     // Slug auto-gerado a partir da Razão Social
     document.getElementById('company-name').addEventListener('input', function () {
       const slugEl = document.getElementById('slug');
@@ -232,9 +306,18 @@
             const user = { ...data.user, name: data.user?.nome || data.user?.name };
             localStorage.setItem('user', JSON.stringify(user));
           }
-          successEl.textContent = '✓ Conta criada! Redirecionando para o painel...';
-          successEl.style.display = 'block';
-          setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
+
+          // Se o worker sinalizar que o e-mail precisa de verificação
+          if (data.email_verification_required) {
+            document.getElementById('error-msg').style.display = 'none';
+            document.getElementById('success-msg').textContent = '';
+            document.getElementById('success-msg').style.display = 'none';
+            showEmailVerificationPending(adminEmail);
+          } else {
+            successEl.textContent = '✓ Conta criada! Redirecionando para o painel...';
+            successEl.style.display = 'block';
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
+          }
         } else {
           showError(data.message || data.error || 'Erro ao criar conta.');
         }

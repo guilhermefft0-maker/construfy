@@ -48,6 +48,9 @@
     <div class="card-body">
       <div class="alert alert-error"   id="error-msg"   role="alert"></div>
       <div class="alert alert-success" id="success-msg" role="status"></div>
+      <div class="alert alert-success" id="reset-msg"   role="status" style="display:none">
+        ✓ Senha redefinida com sucesso! Faça login com a nova senha.
+      </div>
 
       <form id="login-form" novalidate>
         <div class="form-group">
@@ -83,6 +86,23 @@
 
   <script>
     const API_BASE = 'https://construpro-worker.guilhermefft0.workers.dev/api';
+
+    // Detecta retorno da página de reset de senha
+    (function checkResetSuccess() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('reset')) {
+        document.getElementById('reset-msg').style.display = 'block';
+        // Limpa o param da URL sem reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+      // Detecta retorno de e-mail verificado
+      if (params.get('verified') === '1') {
+        const el = document.getElementById('success-msg');
+        el.textContent = '✓ E-mail verificado! Faça seu login.';
+        el.style.display = 'block';
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    })();
 
     document.getElementById('login-form').addEventListener('submit', async (e) => {
       e.preventDefault();
