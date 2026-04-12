@@ -222,7 +222,7 @@
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Relatórios PDF (6 modelos)</li>
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Suporte prioritário</li>
           </ul>
-          <a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-plan-primary">Assinar Pro — R$ 299,99/mês</a>
+          <a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-plan-primary">Assinar Pro — R$ 299,99/mês</a>
         </div>
       </div>
     </div>
@@ -264,11 +264,11 @@
         </div>
         <div><span>WhatsApp</span><span class="support-label">(11) 91518-8474</span></div>
       </a>
-      <a href="mailto:suport@fynext.site" class="support-option">
+      <a href="/cdn-cgi/l/email-protection#c2b1b7b2adb0b682a4bbaca7bab6ecb1abb6a7" class="support-option">
         <div class="support-option-icon em">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        <div><span>E-mail</span><span class="support-label">suport@fynext.site</span></div>
+        <div><span>E-mail</span><span class="support-label"><span class="__cf_email__" data-cfemail="82f1f7f2edf0f6c2e4fbece7faf6acf1ebf6e7">[email&#160;protected]</span></span></div>
       </a>
     </div>
     <button class="support-fab-btn" id="supportToggle" title="Suporte">
@@ -276,7 +276,7 @@
     </button>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     document.getElementById('supportToggle').addEventListener('click', () => {
       const menu = document.getElementById('supportMenu');
       const btn  = document.getElementById('supportToggle');
@@ -286,11 +286,14 @@
         : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
     });
 
+
     document.querySelectorAll('a[href^="#"]').forEach(a => {
       a.addEventListener('click', e => {
-        const id = a.getAttribute('href').slice(1);
-        const el = document.getElementById(id);
-        if (el) { e.preventDefault(); el.scrollIntoView({ behavior:'smooth', block:'start' }); }
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     });
   </script>
