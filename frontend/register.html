@@ -83,8 +83,8 @@
             Senha <span class="req">*</span>
           </label>
           <div class="pass-wrap" style="position:relative">
-            <input class="form-input" type="password" id="admin-password" required minlength="12"
-                   autocomplete="new-password" placeholder="Mín. 12 car., maiúscula, número e símbolo">
+            <input class="form-input" type="password" id="admin-password" required minlength="6"
+                   autocomplete="new-password" placeholder="Mínimo 6 caracteres">
             <button type="button" class="pass-toggle" id="toggle-pass" aria-label="Mostrar senha"
                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-muted,#888)">
               <svg id="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -92,7 +92,7 @@
               </svg>
             </button>
           </div>
-          <span style="font-size:10px;color:var(--text-muted,#888);margin-top:3px">Mínimo 12 caracteres, com maiúscula, número e símbolo (ex: MinhaObra@2025)</span>
+          <span style="font-size:10px;color:var(--text-muted,#888);margin-top:3px">Mínimo 6 caracteres</span>
         </div>
 
         <button type="submit" class="btn-primary" id="submit-btn">
@@ -265,12 +265,7 @@
       if (!/^[a-z0-9-]{3,40}$/.test(slug))          return showError('Subdomínio inválido. Use letras minúsculas, números e hífens (3–40 caracteres).');
       if (!adminNome)                                return showError('Nome do administrador obrigatório.');
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) return showError('E-mail inválido.');
-      if (adminSenha.length < 12)                    return showError('A senha deve ter pelo menos 12 caracteres.');
-      if (!/[A-Z]/.test(adminSenha))                 return showError('A senha precisa de pelo menos uma letra maiúscula.');
-      if (!/[a-z]/.test(adminSenha))                 return showError('A senha precisa de pelo menos uma letra minúscula.');
-      if (!/[0-9]/.test(adminSenha))                 return showError('A senha precisa de pelo menos um número.');
-      if (!/[!@#$%^&*()\-_=+\[\]{};':",.<>/?\\|]/.test(adminSenha))
-                                                     return showError('A senha precisa de pelo menos um símbolo (ex: @, #, !).');
+      if (adminSenha.length < 6)                    return showError('A senha deve ter pelo menos 6 caracteres.');
 
       // Payload exato que o worker.js espera (handleRegister, linha 128)
       const payload = {

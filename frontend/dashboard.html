@@ -404,6 +404,30 @@
     <div class="logo-sub">Gestão Completa</div>
   </div>
 
+  <!-- Banner de upgrade — topo da sidebar, só aparece para Free (PRO: oculto via JS) -->
+  <div id="sidebar-upgrade-banner" style="margin:10px 10px 0;border-radius:var(--radius);overflow:hidden;display:none">
+    <!-- Fundo com gradiente âmbar -->
+    <div style="background:linear-gradient(135deg,#f0a500 0%,#c87e00 100%);padding:12px 14px 10px">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
+        <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" style="color:#000;flex-shrink:0"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span style="font-size:10px;font-weight:700;color:#000;letter-spacing:1.2px;text-transform:uppercase">Plano Free</span>
+      </div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.75);line-height:1.45;margin-bottom:10px">Desbloqueie obras ilimitadas, folha de pagamento, EPIs e relatórios em PDF.</div>
+      <button onclick="navigate('assinatura')" style="display:block;width:100%;background:#000;color:#f0a500;border:none;border-radius:calc(var(--radius) - 2px);padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);letter-spacing:.4px;transition:opacity 0.15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+        Fazer upgrade para PRO →
+      </button>
+    </div>
+  </div>
+
+  <!-- Para PRO: link discreto de assinatura (gerenciar plano) -->
+  <div id="sidebar-pro-link" style="padding:8px 12px 0;display:none">
+    <button onclick="navigate('assinatura')" id="nav-assinatura-btn" style="display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;cursor:pointer;font-family:var(--font);color:var(--text3);font-size:11px;font-weight:500;transition:all 0.15s;text-align:left" onmouseover="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text3)'">
+      <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Gerenciar assinatura
+      <span style="margin-left:auto;background:rgba(34,197,94,0.15);color:var(--green);font-size:9px;font-weight:700;border-radius:100px;padding:2px 6px">PRO</span>
+    </button>
+  </div>
+
   <div class="nav-section">
     <div class="nav-label">Visão Geral</div>
     <div class="nav-item active" onclick="navigate('dashboard')">
@@ -414,20 +438,20 @@
 
   <div class="nav-section">
     <div class="nav-label">Operações</div>
-    <div class="nav-item nav-locked" onclick="showPageLockedModal('Obras','Gerencie obras ilimitadas, acompanhe avanço físico e controle todas as informações do canteiro.')">
+    <div class="nav-item" onclick="navigate('obras')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.5"/></svg>
       Obras
-      <span class="nav-lock-badge">🔒 PRO</span>
+      <span id="nav-obras-badge" class="nav-lock-badge" style="display:none">1 obra</span>
     </div>
-    <div class="nav-item nav-locked" onclick="showPageLockedModal('Medições','Registre e aprove medições por obra, acompanhe histórico e gere relatórios de evolução.')">
+    <div class="nav-item" onclick="navigate('medicoes')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="1.5"/></svg>
       Medições
-      <span class="nav-lock-badge">🔒 PRO</span>
+      <span id="nav-med-badge" class="nav-lock-badge" style="display:none">1 obra</span>
     </div>
-    <div class="nav-item nav-locked" onclick="showPageLockedModal('Faturamento','Emita e acompanhe faturas, controle recebimentos e visualize inadimplências.')">
+    <div class="nav-item" onclick="navigate('faturamento')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14l2 2 4-4M7 4H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2h-2" stroke-width="1.5"/><path d="M9 4h6v4H9z" stroke-width="1.5"/></svg>
       Faturamento
-      <span class="nav-lock-badge">🔒 PRO</span>
+      <span id="nav-fat-badge" class="nav-lock-badge" style="display:none">1 obra</span>
     </div>
     <div class="nav-item nav-locked" onclick="showPageLockedModal('Diário de Obra (RDO)','Registre ocorrências diárias, fotos, efetivo e condições do tempo em cada obra.')">
       <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="1.5"/><polyline points="14 2 14 8 20 8" stroke-width="1.5"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="1.5"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="1.5"/></svg>
@@ -477,21 +501,6 @@
       Relatórios / PDF
       <span class="nav-lock-badge">🔒 PRO</span>
     </div>
-  </div>
-
-  <div class="nav-section">
-    <div class="nav-label">Conta</div>
-    <div class="nav-item" onclick="navigate('assinatura')">
-      <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="1.5"/></svg>
-      Assinatura
-    </div>
-  </div>
-
-  <!-- Banner FREE no sidebar -->
-  <div class="free-sidebar-banner" id="free-sidebar-banner" style="display:none">
-    <div class="free-sidebar-banner-title">Plano Free</div>
-    <div class="free-sidebar-banner-desc">Acesso limitado. Faça upgrade para desbloquear todas as funcionalidades.</div>
-    <button class="free-sidebar-banner-btn" onclick="navigate('assinatura')">⭐ Ver plano PRO</button>
   </div>
 
   <div class="sidebar-footer">
@@ -604,9 +613,9 @@
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.8"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.8"/></svg>
     <span>Início</span>
   </button>
-  <button class="bottom-nav-item" id="bn-obras" onclick="isPro() ? mobileNavigate('obras') : showPageLockedModal('Obras','Cadastre e gerencie obras ilimitadas com avanço físico e controle completo do canteiro.')">
+  <button class="bottom-nav-item" id="bn-obras" onclick="mobileNavigate('obras')">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4" stroke-width="1.8"/></svg>
-    <span>Obras 🔒</span>
+    <span>Obras</span>
   </button>
   <button class="bottom-nav-item" id="bn-colaboradores" onclick="mobileNavigate('colaboradores')">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4" stroke-width="1.8"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke-width="1.8"/></svg>
@@ -680,14 +689,52 @@ function closeUpgradeModal() {
 
 function checkObrasLimit() {
   if (isPro()) return true;
-  // Obras é PRO-only — nunca deve chegar aqui via navigate bloqueado,
-  // mas protegemos caso alguém chame diretamente.
-  showUpgradeModal(
-    '🔒 Obras — Plano PRO',
-    'O cadastro de obras está disponível apenas no plano PRO.',
-    'Faça upgrade para gerenciar obras ilimitadas.'
-  );
-  return false;
+  if (APP.obras.length >= 1) {
+    showUpgradeModal(
+      '🔒 Limite de obras atingido',
+      'O plano Free permite 1 obra cadastrada. Faça upgrade para o PRO e gerencie obras ilimitadas.',
+      `Você já tem ${APP.obras.length} obra(s). Plano Free: limite de 1 obra.`
+    );
+    return false;
+  }
+  return true;
+}
+
+// Verifica se medição pertence à obra do Free (ou se é nova — verifica se tem obra cadastrada)
+function checkMedicoesLimit(obraId) {
+  if (isPro()) return true;
+  if (APP.obras.length === 0) {
+    showUpgradeModal('Sem obra cadastrada', 'Cadastre uma obra primeiro para registrar medições.', null);
+    return false;
+  }
+  // No Free, só pode registrar medição na única obra cadastrada
+  if (obraId && obraId !== APP.obras[0].id) {
+    showUpgradeModal(
+      '🔒 Medições — Plano Free',
+      'No plano Free você só pode registrar medições na sua obra cadastrada. Faça upgrade para medições ilimitadas em obras ilimitadas.',
+      null
+    );
+    return false;
+  }
+  return true;
+}
+
+// Verifica se faturamento pertence à obra do Free
+function checkFaturamentoLimit(obraId) {
+  if (isPro()) return true;
+  if (APP.obras.length === 0) {
+    showUpgradeModal('Sem obra cadastrada', 'Cadastre uma obra primeiro para registrar faturamentos.', null);
+    return false;
+  }
+  if (obraId && obraId !== APP.obras[0].id) {
+    showUpgradeModal(
+      '🔒 Faturamento — Plano Free',
+      'No plano Free você só pode faturar na sua obra cadastrada. Faça upgrade para faturamento ilimitado.',
+      null
+    );
+    return false;
+  }
+  return true;
 }
 
 // Verifica limite de colaboradores no Free (máx. 3)
@@ -875,6 +922,26 @@ async function loadAll() {
     APP.pedidos       = [];
   }
   navigate(APP.currentPage);
+
+  // Fallback: se o usuário veio do checkout Kiwify mas o ?checkout param foi perdido
+  if (sessionStorage.getItem('kiwify_pending') === '1') {
+    sessionStorage.removeItem('kiwify_pending');
+    if (!isPro()) {
+      // Verifica silenciosamente se o plano foi atualizado
+      refreshPlanFromServer().then(plano => {
+        if (plano === 'pro' || plano === 'enterprise') {
+          navigate('dashboard');
+          const toast = document.createElement('div');
+          toast.innerHTML = `<div style="position:fixed;top:20px;right:20px;z-index:9999;background:#22c55e;color:#fff;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(34,197,94,0.4);display:flex;align-items:center;gap:10px">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Plano PRO ativado! Bem-vindo(a)!
+          </div>`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 5000);
+        }
+      });
+    }
+  }
 }
 
 // ── NORMALIZERS (DB snake_case → JS camelCase) ─────────
@@ -972,7 +1039,7 @@ const pageTitles = {
 };
 
 // Pages accessible on FREE plan (with limits enforced inside)
-const FREE_PAGES = new Set(['dashboard', 'assinatura', 'colaboradores', 'ponto', 'financeiro']);
+const FREE_PAGES = new Set(['dashboard', 'assinatura', 'colaboradores', 'ponto', 'financeiro', 'obras', 'medicoes', 'faturamento']);
 
 // Page descriptions for the locked modal
 const PAGE_LOCK_DESCS = {
@@ -1447,45 +1514,66 @@ function exportPontoCSV() {
 }
 
 function renderObras() {
+  const free = !isPro();
+  const atingiuLimite = free && APP.obras.length >= 1;
+
   return `
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${atingiuLimite ? '12px' : '20px'}">
     <div>
       <div style="font-size:20px;font-weight:500;color:var(--text)">Gestão de Obras</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.obras.length} obras · ${APP.obras.filter(o=>o.status==='Em andamento').length} em execução</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.obras.length} obra${APP.obras.length !== 1 ? 's' : ''} · ${APP.obras.filter(o=>o.status==='Em andamento').length} em execução${free ? ' <span style="color:var(--accent)">· Plano Free: 1 obra</span>' : ''}</div>
     </div>
-    <button class="btn btn-primary" onclick="openFormObra()" ${!isPro() && APP.obras.length >= 1 ? 'style="opacity:0.6;position:relative"' : ''}>
-      ${!isPro() && APP.obras.length >= 1 ? '🔒 ' : ''}+ Nova Obra
+    <button class="btn ${atingiuLimite ? 'btn-outline' : 'btn-primary'}" onclick="openFormObra()" title="${atingiuLimite ? 'Faça upgrade para cadastrar mais obras' : 'Nova obra'}">
+      ${atingiuLimite ? '🔒 Limite atingido' : '+ Nova Obra'}
     </button>
   </div>
 
+  ${atingiuLimite ? `
+  <div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.25);border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="15" height="15" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span style="font-size:12px;color:var(--text2)">Plano Free — você tem acesso completo à sua obra. Para cadastrar obras ilimitadas, faça upgrade para o PRO.</span>
+    </div>
+    <button class="btn btn-primary" style="font-size:11px;padding:5px 14px;white-space:nowrap" onclick="navigate('assinatura')">⭐ Ver PRO</button>
+  </div>` : ''}
+
+  ${APP.obras.length === 0 ? `
+  <div class="table-card">
+    <div style="padding:60px;text-align:center">
+      <div style="font-size:40px;margin-bottom:16px">🏗️</div>
+      <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhuma obra cadastrada</div>
+      <div style="color:var(--text3);font-size:12px;margin-bottom:20px">${free ? 'Cadastre sua primeira obra gratuitamente.' : 'Crie sua primeira obra para começar a gerenciar.'}</div>
+      <button class="btn btn-primary" onclick="openFormObra()">+ Cadastrar primeira obra</button>
+    </div>
+  </div>` : `
   <div class="obra-grid">
     ${APP.obras.map(o => `
     <div class="obra-card" onclick="verDetalheObra('${o.id}')">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-        <span class="badge ${o.status==='Em andamento'?'badge-green':'badge-gray'}">${o.status}</span>
+        <span class="badge ${o.status==='Em andamento'?'badge-green':o.status==='Concluída'?'badge-blue':'badge-gray'}">${o.status}</span>
         <span style="font-size:11px;color:var(--text3)">${o.avanco}% concluído</span>
       </div>
       <div class="obra-name">${o.nome}</div>
-      <div class="obra-client">${o.cliente}</div>
+      <div class="obra-client">${o.cliente||'—'}</div>
       <div class="progress-bar" style="margin-bottom:14px">
         <div class="progress-fill ${o.avanco===100?'green':''}" style="width:${o.avanco}%"></div>
       </div>
       <div class="obra-stats">
         <div><div class="obra-stat-val">${fmt(o.valorContrato||0)}</div><div class="obra-stat-label">Contrato</div></div>
-        <div><div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas)}</div><div class="obra-stat-label">Despesas</div></div>
-        <div><div class="obra-stat-val" style="color:var(--green)">${fmt((o.valorContrato||0)-o.despesas)}</div><div class="obra-stat-label">Margem</div></div>
+        <div><div class="obra-stat-val" style="color:var(--red)">${fmt(o.despesas||0)}</div><div class="obra-stat-label">Despesas</div></div>
+        <div><div class="obra-stat-val" style="color:var(--green)">${fmt((o.valorContrato||0)-(o.despesas||0))}</div><div class="obra-stat-label">Margem</div></div>
       </div>
       <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text3)">
-        <span>Nº: <span style="color:var(--text)">${o.contrato||'—'}</span> · ${o.medicoes} medições</span>
+        <span>Nº: <span style="color:var(--text)">${o.contrato||'—'}</span> · ${o.medicoes||0} medições</span>
         <div style="display:flex;gap:6px">
           <button class="btn btn-outline" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();openFormObra('${o.id}')" title="Editar obra">✏️ Editar</button>
           <button class="btn btn-danger" style="padding:3px 9px;font-size:11px" onclick="event.stopPropagation();excluirObra('${o.id}')" title="Excluir obra">🗑</button>
         </div>
       </div>
     </div>`).join('')}
-  </div>
+  </div>`}
 
-  <div class="table-card" id="detalhe-obra-panel" style="display:none">
+  <div class="table-card" id="detalhe-obra-panel" style="display:none;margin-top:20px">
     <div class="table-header">
       <div class="table-title" id="detalhe-obra-title">Detalhes da Obra</div>
       <button class="btn btn-outline" onclick="document.getElementById('detalhe-obra-panel').style.display='none'">Fechar</button>
@@ -1611,26 +1699,51 @@ function verDetalheObra(id) {
 
 // ── MEDIÇÕES ──
 function renderMedicoes() {
+  const free = !isPro();
+  const obraFree = free && APP.obras.length > 0 ? APP.obras[0] : null;
+  const medicoesVisiveis = free && obraFree
+    ? APP.medicoes.filter(m => m.obraId === obraFree.id)
+    : APP.medicoes;
+
   return `
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${free ? '12px' : '20px'}">
     <div>
       <div style="font-size:20px;font-weight:500;color:var(--text)">Medições</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.medicoes.length} medições registradas</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${medicoesVisiveis.length} medições registradas${free ? ' <span style="color:var(--accent)">· Plano Free: 1 obra</span>' : ''}</div>
     </div>
     <button class="btn btn-primary" onclick="openFormMedicao()">+ Nova Medição</button>
   </div>
+
+  ${free ? `
+  <div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.25);border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="15" height="15" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span style="font-size:12px;color:var(--text2)">Plano Free — medições liberadas para${obraFree ? ` <strong style="color:var(--text)">${obraFree.nome}</strong>` : ' sua obra cadastrada'}. Para medições em obras ilimitadas, faça upgrade.</span>
+    </div>
+    <button class="btn btn-primary" style="font-size:11px;padding:5px 14px;white-space:nowrap" onclick="navigate('assinatura')">⭐ Ver PRO</button>
+  </div>` : ''}
+
+  ${medicoesVisiveis.length === 0 ? `
+  <div class="table-card">
+    <div style="padding:60px;text-align:center">
+      <div style="font-size:40px;margin-bottom:16px">📋</div>
+      <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhuma medição registrada</div>
+      <div style="color:var(--text3);font-size:12px;margin-bottom:20px">${free && !obraFree ? 'Cadastre uma obra primeiro para registrar medições.' : 'Registre a primeira medição da obra.'}</div>
+      ${obraFree || !free ? `<button class="btn btn-primary" onclick="openFormMedicao()">+ Nova Medição</button>` : `<button class="btn btn-outline" onclick="navigate('obras')">→ Cadastrar Obra</button>`}
+    </div>
+  </div>` : `
   <div class="table-card">
     <table>
       <thead><tr><th>Nº</th><th>Obra</th><th>Data</th><th>Valor</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
-        ${APP.medicoes.map(m => {
+        ${medicoesVisiveis.map(m => {
           const o = getObra(m.obraId);
           return `<tr>
             <td><span class="strong">${m.numero}</span></td>
             <td>${trunc(o?.nome,25)}</td>
             <td style="font-family:var(--mono);font-size:12px">${fmtDate(m.data)}</td>
             <td style="color:var(--accent);font-family:var(--mono)">${fmt(m.valor)}</td>
-            <td>${m.responsavel}</td>
+            <td>${m.responsavel||'—'}</td>
             <td><span class="badge ${m.status==='Aprovada'?'badge-green':m.status==='Faturada'?'badge-blue':'badge-amber'}">${m.status}</span></td>
             <td style="white-space:nowrap">
               <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormMedicao('${m.id}')">✏️</button>
@@ -1640,18 +1753,27 @@ function renderMedicoes() {
         }).join('')}
       </tbody>
     </table>
-  </div>`;
+  </div>`}`;
 }
 
 function openFormMedicao(id) {
   const m = id ? APP.medicoes.find(x=>x.id==id) : null;
+  const free = !isPro();
+  // No Free: só permite operar na obra cadastrada
+  const obrasDisponiveis = free ? APP.obras.slice(0, 1) : APP.obras;
+  if (free && obrasDisponiveis.length === 0) {
+    showUpgradeModal('Sem obra cadastrada', 'Cadastre uma obra primeiro para registrar medições.', null);
+    return;
+  }
   document.getElementById('form-box').innerHTML = `
     <div class="form-title">${m ? 'Editar Medição' : 'Nova Medição'}</div>
+    ${free ? `<div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.2);border-radius:var(--radius);padding:8px 12px;margin-bottom:14px;font-size:11px;color:var(--accent)">⭐ Plano Free — medição vinculada a <strong>${obrasDisponiveis[0]?.nome}</strong></div>` : ''}
     <div class="form-grid">
       <div class="form-group full"><label>Obra</label>
-        <select id="f-obra">
-          ${APP.obras.map(o=>`<option value="${o.id}" ${m?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}
+        <select id="f-obra" ${free ? 'disabled style="opacity:0.6"' : ''}>
+          ${obrasDisponiveis.map(o=>`<option value="${o.id}" ${(m?.obraId==o.id || (!m && free))?'selected':''}>${o.nome}</option>`).join('')}
         </select>
+        ${free ? `<input type="hidden" id="f-obra-hidden" value="${obrasDisponiveis[0]?.id}">` : ''}
       </div>
       <div class="form-group"><label>Número</label><input id="f-numero" placeholder="MED-009" value="${m?.numero||''}"></div>
       <div class="form-group"><label>Data</label><input type="date" id="f-data" value="${m?.data||''}"></div>
@@ -1674,10 +1796,13 @@ function openFormMedicao(id) {
 }
 
 async function salvarMedicao(id) {
-  const obraId = document.getElementById('f-obra').value;
+  // No Free o select está disabled; usa o campo hidden
+  const obraEl = document.getElementById('f-obra-hidden');
+  const obraId = obraEl ? obraEl.value : document.getElementById('f-obra').value;
   const numero = document.getElementById('f-numero').value.trim();
   const valor = parseFloat(document.getElementById('f-valor').value)||0;
   if (!numero) return alert('Informe o número da medição');
+  if (!obraId) return alert('Selecione uma obra');
   const payload = { obraId, numero, valor, data: document.getElementById('f-data').value, responsavel: document.getElementById('f-resp').value.trim(), status: document.getElementById('f-status').value };
   if (id) {
     await apiPut(`medicoes/${id}`, payload);
@@ -1701,25 +1826,54 @@ async function excluirMedicao(id) {
 
 // ── FATURAMENTO ──
 function renderFaturamento() {
-  const totalRecebido = APP.faturamentos.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
-  const totalPendente = APP.faturamentos.filter(f=>f.status==='Pendente').reduce((a,b)=>a+b.valor,0);
-  const totalVencido  = APP.faturamentos.filter(f=>f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
+  const free = !isPro();
+  const obraFree = free && APP.obras.length > 0 ? APP.obras[0] : null;
+  const fatsVisiveis = free && obraFree
+    ? APP.faturamentos.filter(f => f.obraId === obraFree.id)
+    : APP.faturamentos;
+
+  const totalRecebido = fatsVisiveis.filter(f=>f.status==='Recebida').reduce((a,b)=>a+b.valor,0);
+  const totalPendente = fatsVisiveis.filter(f=>f.status==='Pendente').reduce((a,b)=>a+b.valor,0);
+  const totalVencido  = fatsVisiveis.filter(f=>f.status==='Vencida').reduce((a,b)=>a+b.valor,0);
+
   return `
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-    <div><div style="font-size:20px;font-weight:500;color:var(--text)">Faturamento</div>
-    <div style="font-size:12px;color:var(--text3);margin-top:3px">${APP.faturamentos.length} notas fiscais</div></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${free ? '12px' : '20px'}">
+    <div>
+      <div style="font-size:20px;font-weight:500;color:var(--text)">Faturamento</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:3px">${fatsVisiveis.length} notas fiscais${free ? ' <span style="color:var(--accent)">· Plano Free: 1 obra</span>' : ''}</div>
+    </div>
     <button class="btn btn-primary" onclick="openFormFaturamento()">+ Nova NF</button>
   </div>
+
+  ${free ? `
+  <div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.25);border-radius:var(--radius);padding:10px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <svg width="15" height="15" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span style="font-size:12px;color:var(--text2)">Plano Free — faturamento liberado para${obraFree ? ` <strong style="color:var(--text)">${obraFree.nome}</strong>` : ' sua obra cadastrada'}. Para obras ilimitadas, faça upgrade.</span>
+    </div>
+    <button class="btn btn-primary" style="font-size:11px;padding:5px 14px;white-space:nowrap" onclick="navigate('assinatura')">⭐ Ver PRO</button>
+  </div>` : ''}
+
   <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
     <div class="kpi-card"><div class="kpi-label">Recebido</div><div class="kpi-value green">${fmt(totalRecebido)}</div></div>
     <div class="kpi-card"><div class="kpi-label">A Receber</div><div class="kpi-value amber">${fmt(totalPendente)}</div></div>
     <div class="kpi-card"><div class="kpi-label">Vencido</div><div class="kpi-value red">${fmt(totalVencido)}</div></div>
   </div>
+
+  ${fatsVisiveis.length === 0 ? `
+  <div class="table-card">
+    <div style="padding:60px;text-align:center">
+      <div style="font-size:40px;margin-bottom:16px">🧾</div>
+      <div style="color:var(--text2);font-size:15px;margin-bottom:8px">Nenhuma nota fiscal registrada</div>
+      <div style="color:var(--text3);font-size:12px;margin-bottom:20px">${free && !obraFree ? 'Cadastre uma obra primeiro para registrar faturamentos.' : 'Registre a primeira NF desta obra.'}</div>
+      ${obraFree || !free ? `<button class="btn btn-primary" onclick="openFormFaturamento()">+ Nova NF</button>` : `<button class="btn btn-outline" onclick="navigate('obras')">→ Cadastrar Obra</button>`}
+    </div>
+  </div>` : `
   <div class="table-card">
     <table>
       <thead><tr><th>NF</th><th>Obra</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Forma</th><th>Status</th><th>Ações</th></tr></thead>
       <tbody>
-        ${APP.faturamentos.map(f => {
+        ${fatsVisiveis.map(f => {
           const o = getObra(f.obraId);
           const badgeClass = f.status==='Recebida'?'badge-green':f.status==='Vencida'?'badge-red':'badge-amber';
           return `<tr>
@@ -1728,7 +1882,7 @@ function renderFaturamento() {
             <td style="font-family:var(--mono);font-size:12px">${fmtDate(f.data)}</td>
             <td style="font-family:var(--mono);font-size:12px">${fmtDate(f.vencimento)}</td>
             <td style="color:var(--accent);font-family:var(--mono)">${fmt(f.valor)}</td>
-            <td style="color:var(--text3)">${f.formaPgto}</td>
+            <td style="color:var(--text3)">${f.formaPgto||'—'}</td>
             <td><span class="badge ${badgeClass}">${f.status}</span></td>
             <td style="white-space:nowrap">
               <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;margin-right:4px" onclick="openFormFaturamento('${f.id}')">✏️</button>
@@ -1738,16 +1892,26 @@ function renderFaturamento() {
         }).join('')}
       </tbody>
     </table>
-  </div>`;
+  </div>`}`;
 }
 
 function openFormFaturamento(id) {
   const f = id ? APP.faturamentos.find(x=>x.id==id) : null;
+  const free = !isPro();
+  const obrasDisponiveis = free ? APP.obras.slice(0, 1) : APP.obras;
+  if (free && obrasDisponiveis.length === 0) {
+    showUpgradeModal('Sem obra cadastrada', 'Cadastre uma obra primeiro para registrar faturamentos.', null);
+    return;
+  }
   document.getElementById('form-box').innerHTML = `
     <div class="form-title">${f ? 'Editar Nota Fiscal' : 'Nova Nota Fiscal'}</div>
+    ${free ? `<div style="background:rgba(240,165,0,0.07);border:1px solid rgba(240,165,0,0.2);border-radius:var(--radius);padding:8px 12px;margin-bottom:14px;font-size:11px;color:var(--accent)">⭐ Plano Free — NF vinculada a <strong>${obrasDisponiveis[0]?.nome}</strong></div>` : ''}
     <div class="form-grid">
       <div class="form-group full"><label>Obra</label>
-        <select id="f-obra">${APP.obras.map(o=>`<option value="${o.id}" ${f?.obraId==o.id?'selected':''}>${o.nome}</option>`).join('')}</select>
+        <select id="f-obra" ${free ? 'disabled style="opacity:0.6"' : ''}>
+          ${obrasDisponiveis.map(o=>`<option value="${o.id}" ${(f?.obraId==o.id || (!f && free))?'selected':''}>${o.nome}</option>`).join('')}
+        </select>
+        ${free ? `<input type="hidden" id="f-obra-hidden" value="${obrasDisponiveis[0]?.id}">` : ''}
       </div>
       <div class="form-group"><label>Número NF</label><input id="f-numero" placeholder="NF-0200" value="${f?.numero||''}"></div>
       <div class="form-group"><label>Data Emissão</label><input type="date" id="f-data" value="${f?.data||''}"></div>
@@ -1780,8 +1944,11 @@ function openFormFaturamento(id) {
 async function salvarFaturamento(id) {
   const numero = document.getElementById('f-numero').value.trim();
   if (!numero) return alert('Informe o número da NF');
+  const obraEl = document.getElementById('f-obra-hidden');
+  const obraId = obraEl ? obraEl.value : document.getElementById('f-obra').value;
+  if (!obraId) return alert('Selecione uma obra');
   const payload = {
-    obraId: document.getElementById('f-obra').value,
+    obraId,
     numero,
     data: document.getElementById('f-data').value,
     vencimento: document.getElementById('f-venc').value,
@@ -2627,6 +2794,7 @@ function _addFooter(doc) {
   const pageW  = doc.internal.pageSize.getWidth();
   const pageH  = doc.internal.pageSize.getHeight();
   const nPages = doc.internal.getNumberOfPages();
+  const empresa = _nomeEmpresa();
 
   for (let i = 1; i <= nPages; i++) {
     doc.setPage(i);
@@ -2636,7 +2804,7 @@ function _addFooter(doc) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(180, 180, 180);
-    doc.text('Documento gerado automaticamente pelo sistema de gestão.', 14, pageH - 9);
+    doc.text(`${empresa} — Documento gerado em ${new Date().toLocaleDateString('pt-BR')}.`, 14, pageH - 9);
     doc.text(`Página ${i} de ${nPages}`, pageW - 14, pageH - 9, { align: 'right' });
   }
 }
@@ -2826,15 +2994,17 @@ async function gerarPDFColaboradores() {
 
 // ── ASSINATURA ─────────────────────────────────────────────────────
 function renderAssinatura() {
-  const plano = _user?.plano || 'free';
+  // Lê o plano sempre fresh do localStorage para refletir atualizações pós-login
+  const storedUser = (() => { try { return JSON.parse(localStorage.getItem('user')); } catch { return null; } })();
+  const plano = storedUser?.plano || _user?.plano || 'free';
   const isPro = plano === 'pro' || plano === 'starter' || plano === 'enterprise';
   const obrasUsadas = APP.obras.length;
   const colaboradoresUsados = APP.colaboradores.length;
 
   const obrasMax = isPro ? '∞' : 1;
-  const colaboradoresMax = isPro ? '∞' : 4;
+  const colaboradoresMax = isPro ? '∞' : 3;
   const obrasPercent = isPro ? 0 : Math.min((obrasUsadas / 1) * 100, 100);
-  const colabPercent = isPro ? 0 : Math.min((colaboradoresUsados / 4) * 100, 100);
+  const colabPercent = isPro ? 0 : Math.min((colaboradoresUsados / 3) * 100, 100);
 
   return `
   <div class="plan-page">
@@ -2850,7 +3020,7 @@ function renderAssinatura() {
           <div class="plan-current-desc">${isPro ? 'Acesso completo a todas as funcionalidades.' : 'Gestão de 1 obra e até 4 colaboradores.'}</div>
         </div>
       </div>
-      ${!isPro ? `<a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-kiwify" style="width:auto;padding:10px 24px;white-space:nowrap">
+      ${!isPro ? `<a href="https://pay.kiwify.com.br/ejraIMH?email=${encodeURIComponent(storedUser?.email||_user?.email||'')}&checkout_return=${encodeURIComponent(window.location.origin+window.location.pathname+'?checkout=success')}" target="_self" class="btn-kiwify" style="width:auto;padding:10px 24px;white-space:nowrap" onclick="salvarEmailParaWebhook()">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="2"/></svg>
         Fazer upgrade para PRO
       </a>` : `<div class="badge badge-green" style="font-size:12px;padding:6px 14px">✓ Plano ativo</div>`}
@@ -2919,7 +3089,7 @@ function renderAssinatura() {
         </ul>
         ${isPro
           ? `<button class="btn-current-plan">Plano ativo ✓</button>`
-          : `<a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-kiwify" id="btn-assinar-pro" onclick="salvarEmailParaWebhook()">
+          : `<a href="https://pay.kiwify.com.br/ejraIMH?email=${encodeURIComponent(storedUser?.email||_user?.email||'')}&checkout_return=${encodeURIComponent(window.location.origin+window.location.pathname+'?checkout=success')}" target="_self" class="btn-kiwify" id="btn-assinar-pro" onclick="salvarEmailParaWebhook()">
               <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Assinar via Kiwify — R$ 299,99/mês
             </a>`}
@@ -3191,32 +3361,60 @@ function imprimirRDO(id) {
   janela.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>RDO — ${o?.nome||''} — ${fmtDate(r.data)}</title>
     <style>
-      body{font-family:Arial,sans-serif;padding:32px;color:#222;font-size:14px}
-      h1{font-size:18px;margin-bottom:4px}
-      .sub{color:#666;font-size:12px;margin-bottom:24px}
-      .row{display:flex;gap:32px;margin-bottom:20px}
-      .field{flex:1}
-      .lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:4px}
-      .val{font-size:15px;font-weight:600}
-      .box{border:1px solid #ddd;border-radius:6px;padding:14px;margin-bottom:16px;line-height:1.7;white-space:pre-wrap}
-      .box-red{border-color:#f99;background:#fff8f8}
-      .section-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px}
-      .footer{margin-top:48px;border-top:1px solid #eee;padding-top:16px;font-size:11px;color:#aaa}
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+      *{margin:0;padding:0;box-sizing:border-box}
+      body{font-family:'Inter',Arial,sans-serif;padding:40px 48px;color:#1a1a1a;font-size:13px;background:#fff}
+      .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #1a1a1a}
+      .empresa-nome{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:3px}
+      .empresa-cnpj{font-size:11px;color:#888}
+      .doc-tipo{text-align:right}
+      .doc-titulo{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#555;margin-bottom:3px}
+      .doc-data{font-size:11px;color:#aaa}
+      .meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid #e5e5e5;border-radius:6px;overflow:hidden;margin-bottom:24px}
+      .meta-cell{padding:12px 16px;border-right:1px solid #e5e5e5}
+      .meta-cell:last-child{border-right:none}
+      .meta-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#999;margin-bottom:5px;font-weight:500}
+      .meta-val{font-size:14px;font-weight:600;color:#1a1a1a}
+      .section{margin-bottom:20px}
+      .section-lbl{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:#999;font-weight:600;margin-bottom:8px}
+      .content-box{border:1px solid #e5e5e5;border-radius:6px;padding:14px 16px;font-size:13px;color:#333;line-height:1.7;white-space:pre-wrap}
+      .content-box.alert{border-color:#fca5a5;background:#fff8f8}
+      .footer{margin-top:40px;padding-top:14px;border-top:1px solid #e5e5e5;display:flex;justify-content:space-between;align-items:center}
+      .footer-left{font-size:10px;color:#bbb}
+      .footer-right{font-size:10px;color:#bbb}
     </style>
   </head><body>
-    <h1>Relatório Diário de Obra</h1>
-    <div class="sub">${o?.nome||''} ${o?.cliente ? '— ' + o.cliente : ''}</div>
-    <div class="row">
-      <div class="field"><div class="lbl">Data</div><div class="val">${fmtDate(r.data)}</div></div>
-      <div class="field"><div class="lbl">Clima</div><div class="val">${r.clima||'—'}</div></div>
-      <div class="field"><div class="lbl">Equipe presente</div><div class="val">${r.equipePresente||0} pessoa(s)</div></div>
-      ${r.avanco_dia > 0 ? `<div class="field"><div class="lbl">Avanço do dia</div><div class="val">${r.avanco_dia}%</div></div>` : ''}
+    <div class="header">
+      <div>
+        <div class="empresa-nome">${_nomeEmpresa()}</div>
+        ${_cnpjEmpresa() ? `<div class="empresa-cnpj">CNPJ: ${_cnpjEmpresa()}</div>` : ''}
+      </div>
+      <div class="doc-tipo">
+        <div class="doc-titulo">Relatório Diário de Obra</div>
+        <div class="doc-data">Emitido em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+      </div>
     </div>
-    <div class="section-label">Atividades executadas</div>
-    <div class="box">${(r.descricao||'—')}</div>
-    ${r.ocorrencias ? `<div class="section-label" style="color:#c00">⚠ Ocorrências / Problemas</div><div class="box box-red">${r.ocorrencias}</div>` : ''}
-    ${r.observacoes ? `<div class="section-label">Observações gerais</div><div class="box">${r.observacoes}</div>` : ''}
-    <div class="footer">Gerado pelo ConstruFY em ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}</div>
+
+    <div class="meta-grid">
+      <div class="meta-cell"><div class="meta-lbl">Obra</div><div class="meta-val" style="font-size:12px">${o?.nome||'—'}</div></div>
+      <div class="meta-cell"><div class="meta-lbl">Data</div><div class="meta-val">${fmtDate(r.data)}</div></div>
+      <div class="meta-cell"><div class="meta-lbl">Clima</div><div class="meta-val">${r.clima||'—'}</div></div>
+      <div class="meta-cell"><div class="meta-lbl">Equipe presente</div><div class="meta-val">${r.equipePresente||0} pessoa(s)</div></div>
+    </div>
+
+    ${r.avanco_dia > 0 ? `<div class="section"><div class="section-lbl">Avanço físico do dia</div><div class="content-box" style="font-size:16px;font-weight:600">${r.avanco_dia}%</div></div>` : ''}
+
+    <div class="section">
+      <div class="section-lbl">Atividades executadas</div>
+      <div class="content-box">${r.descricao||'—'}</div>
+    </div>
+    ${r.ocorrencias ? `<div class="section"><div class="section-lbl" style="color:#dc2626">⚠ Ocorrências / Problemas</div><div class="content-box alert">${r.ocorrencias}</div></div>` : ''}
+    ${r.observacoes ? `<div class="section"><div class="section-lbl">Observações gerais</div><div class="content-box">${r.observacoes}</div></div>` : ''}
+
+    <div class="footer">
+      <span class="footer-left">Documento gerado automaticamente pelo sistema de gestão.</span>
+      <span class="footer-right">${o?.nome||''} · ${fmtDate(r.data)}</span>
+    </div>
   </body></html>`);
   janela.document.close();
   janela.print();
@@ -3958,9 +4156,10 @@ document.addEventListener('DOMContentLoaded', () => {
  * encontrar o usuário no D1. Não há integração adicional necessária aqui.
  */
 function salvarEmailParaWebhook() {
-  // O email já está em _user; só garantimos que localStorage está atualizado.
-  // Nada extra é necessário — quando o usuário voltar, o reload abaixo busca o plano atualizado.
+  // Garante que o email está no localStorage atualizado
   console.log('[Kiwify] Redirecionando para checkout. Email do usuário:', _user?.email);
+  // Salva flag para verificar plano quando voltar (fallback caso o checkout_return não funcione)
+  sessionStorage.setItem('kiwify_pending', '1');
 }
 
 /**
@@ -3972,52 +4171,130 @@ function salvarEmailParaWebhook() {
  */
 async function refreshPlanFromServer() {
   try {
-    const res = await authFetch(`${API}/auth/me`);
-    if (!res.ok) return;
+    const token = await TokenManager.getValid();
+    const res = await fetch(`${API}/auth/me`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+      credentials: 'include',
+    });
+    if (!res.ok) return false;
     const data = await res.json();
     const user = data.user || data;
     if (user?.plano) {
       const stored = JSON.parse(localStorage.getItem('user') || '{}');
       stored.plano = user.plano;
       localStorage.setItem('user', JSON.stringify(stored));
+      // Atualiza o objeto _user em memória para o isPro() funcionar imediatamente
+      if (window._user) window._user.plano = user.plano;
+      // Re-aplica a UI do plano (sidebar, badges, desbloqueio de menus)
+      if (typeof applyPlanUI === 'function') applyPlanUI();
+      return user.plano;
     }
+    return false;
   } catch (e) {
     console.warn('[Kiwify] Não foi possível atualizar o plano:', e);
+    return false;
   }
 }
 
-// Verifica se voltou do checkout
+// Verifica se voltou do checkout da Kiwify
 (function checkReturnFromKiwify() {
   const params = new URLSearchParams(window.location.search);
-  if (params.has('checkout')) {
-    // Remove o query param da URL sem recarregar a página
-    window.history.replaceState({}, '', window.location.pathname);
-    // Busca plano atualizado e re-renderiza a página de assinatura
-    refreshPlanFromServer().then(() => navigate('assinatura'));
+  if (!params.has('checkout')) return;
+
+  // Remove o query param da URL sem recarregar
+  window.history.replaceState({}, '', window.location.pathname);
+
+  // Mostra feedback visual imediato
+  const content = document.getElementById('content');
+  if (content) {
+    content.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:300px;gap:16px">
+        <div style="width:36px;height:36px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite"></div>
+        <div style="color:var(--accent);font-size:15px;font-weight:500">Ativando seu plano PRO…</div>
+        <div style="color:var(--text3);font-size:12px">Aguarde, estamos verificando seu pagamento</div>
+      </div>
+      <style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
   }
+
+  // Aguarda um momento para o webhook da Kiwify processar (até 3 tentativas com delay)
+  async function tryActivate(attempts) {
+    const plano = await refreshPlanFromServer();
+    if (plano === 'pro' || plano === 'enterprise') {
+      // Sucesso: navega para o dashboard PRO completo
+      navigate('dashboard');
+      // Mostra toast de confirmação
+      const toast = document.createElement('div');
+      toast.innerHTML = `<div style="position:fixed;top:20px;right:20px;z-index:9999;background:#22c55e;color:#fff;padding:14px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(34,197,94,0.4);display:flex;align-items:center;gap:10px">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Plano PRO ativado com sucesso! Bem-vindo(a)!
+      </div>`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 5000);
+    } else if (attempts > 0) {
+      // Aguarda 2s e tenta novamente (webhook pode ter demorado)
+      setTimeout(() => tryActivate(attempts - 1), 2000);
+    } else {
+      // Esgotou tentativas — navega para assinatura para verificar manualmente
+      navigate('assinatura');
+      const content2 = document.getElementById('content');
+      if (content2) {
+        const banner = document.createElement('div');
+        banner.innerHTML = `<div style="margin:16px;padding:14px 18px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.3);border-radius:8px;font-size:13px;color:var(--accent)">
+          ⏳ Pagamento em processamento. Se você concluiu o pagamento, <a href="javascript:void(0)" onclick="refreshPlanFromServer().then(p => p === 'pro' ? navigate('dashboard') : alert('Pagamento ainda não confirmado. Aguarde alguns minutos.'))" style="color:var(--accent);text-decoration:underline">clique aqui para verificar</a> ou aguarde alguns minutos e recarregue a página.
+        </div>`;
+        content2.prepend(banner.firstChild);
+      }
+    }
+  }
+  tryActivate(3);
 })();
 
-// INICIALIZAR UI DO PLANO FREE
-(function initFreePlanUI() {
-  if (!isPro()) {
-    // Mostrar badge no topbar
-    const badge = document.getElementById('free-plan-badge');
-    if (badge) badge.style.display = '';
-    // Mostrar ícone de lock no botão exportar
-    const exportLock = document.getElementById('export-lock-badge');
-    if (exportLock) exportLock.style.display = '';
-    // Mostrar banner no sidebar
-    const sidebarBanner = document.getElementById('free-sidebar-banner');
-    if (sidebarBanner) sidebarBanner.style.display = '';
-    // Mostrar badges de limite nos itens Free com restrição
-    const colabBadge = document.getElementById('nav-colab-badge');
-    if (colabBadge) colabBadge.style.display = '';
-    const pontoBadge = document.getElementById('nav-ponto-badge');
-    if (pontoBadge) pontoBadge.style.display = '';
-    const finBadge = document.getElementById('nav-fin-badge');
-    if (finBadge) finBadge.style.display = '';
+// INICIALIZAR / ATUALIZAR UI DO PLANO — pode ser chamada a qualquer momento
+function applyPlanUI() {
+  const pro = isPro();
+  // Topbar badge Free
+  const badge = document.getElementById('free-plan-badge');
+  if (badge) badge.style.display = pro ? 'none' : '';
+  // Exportar PDF lock
+  const exportLock = document.getElementById('export-lock-badge');
+  if (exportLock) exportLock.style.display = pro ? 'none' : '';
+  // Banner de upgrade na sidebar
+  const upgradeBanner = document.getElementById('sidebar-upgrade-banner');
+  if (upgradeBanner) upgradeBanner.style.display = pro ? 'none' : '';
+  // Link discreto de gerenciar assinatura (PRO)
+  const proLink = document.getElementById('sidebar-pro-link');
+  if (proLink) proLink.style.display = pro ? '' : 'none';
+  // Badges de limite (Free)
+  const limitBadges = ['nav-colab-badge','nav-ponto-badge','nav-fin-badge','nav-obras-badge','nav-med-badge','nav-fat-badge'];
+  limitBadges.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = pro ? 'none' : ''; });
+  // Itens de sidebar bloqueados (nav-locked) — desbloqueio visual no PRO
+  if (pro) {
+    document.querySelectorAll('.nav-item.nav-locked').forEach(el => {
+      el.classList.remove('nav-locked');
+      // Remove o badge 🔒 PRO do item
+      el.querySelectorAll('.nav-lock-badge').forEach(b => b.remove());
+      // Corrige o onclick para navegar normalmente
+      const text = el.textContent.trim().toLowerCase();
+      const pageMap = {
+        'diário de obra': 'rdo',
+        'cotação / compras': 'cotacoes',
+        'cotação': 'cotacoes',
+        'folha de pagamento': 'folha',
+        'epis': 'epis',
+        'relatórios / pdf': 'relatorios',
+        'relatórios': 'relatorios',
+      };
+      for (const [key, page] of Object.entries(pageMap)) {
+        if (text.includes(key)) {
+          el.setAttribute('onclick', `navigate('${page}')`);
+          break;
+        }
+      }
+    });
   }
-})();
+}
+// Executa na carga
+applyPlanUI();
 
 (function initUser() {
   const u = _user;
