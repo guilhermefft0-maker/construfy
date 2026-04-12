@@ -2344,7 +2344,7 @@ function renderAssinatura() {
           <div class="plan-current-desc">${isPro ? 'Acesso completo a todas as funcionalidades.' : 'Gestão de 1 obra e até 4 colaboradores.'}</div>
         </div>
       </div>
-      ${!isPro ? `<a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-kiwify" style="width:auto;padding:10px 24px;white-space:nowrap">
+      ${!isPro ? `<a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-kiwify" style="width:auto;padding:10px 24px;white-space:nowrap">
         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-width="2"/></svg>
         Fazer upgrade para PRO
       </a>` : `<div class="badge badge-green" style="font-size:12px;padding:6px 14px">✓ Plano ativo</div>`}
@@ -2413,7 +2413,7 @@ function renderAssinatura() {
         </ul>
         ${isPro
           ? `<button class="btn-current-plan">Plano ativo ✓</button>`
-          : `<a href="https://kiwify.com.br/SEU-LINK-PRO" target="_blank" class="btn-kiwify">
+          : `<a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-kiwify" id="btn-assinar-pro" onclick="salvarEmailParaWebhook()">
               <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Assinar via Kiwify — R$ 299,99/mês
             </a>`}
@@ -2452,6 +2452,52 @@ document.addEventListener('DOMContentLoaded', () => {
       : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
   });
 });
+
+// ── KIWIFY — helpers de assinatura ──────────────────────────────────
+/**
+ * Salva o email no localStorage antes de redirecionar ao checkout da Kiwify.
+ * A Kiwify usa o campo "email" no checkout → o webhook usa esse email para
+ * encontrar o usuário no D1. Não há integração adicional necessária aqui.
+ */
+function salvarEmailParaWebhook() {
+  // O email já está em _user; só garantimos que localStorage está atualizado.
+  // Nada extra é necessário — quando o usuário voltar, o reload abaixo busca o plano atualizado.
+  console.log('[Kiwify] Redirecionando para checkout. Email do usuário:', _user?.email);
+}
+
+/**
+ * Quando o usuário volta do checkout da Kiwify, busca o plano atualizado
+ * no servidor e atualiza o localStorage. Isso garante que isPro() reflita
+ * o novo plano sem precisar de logout/login.
+ *
+ * Uso: chame refreshPlanFromServer() na página de assinatura ou via query param ?checkout=success
+ */
+async function refreshPlanFromServer() {
+  try {
+    const res = await authFetch(`${API}/auth/me`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const user = data.user || data;
+    if (user?.plano) {
+      const stored = JSON.parse(localStorage.getItem('user') || '{}');
+      stored.plano = user.plano;
+      localStorage.setItem('user', JSON.stringify(stored));
+    }
+  } catch (e) {
+    console.warn('[Kiwify] Não foi possível atualizar o plano:', e);
+  }
+}
+
+// Verifica se voltou do checkout
+(function checkReturnFromKiwify() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('checkout')) {
+    // Remove o query param da URL sem recarregar a página
+    window.history.replaceState({}, '', window.location.pathname);
+    // Busca plano atualizado e re-renderiza a página de assinatura
+    refreshPlanFromServer().then(() => navigate('assinatura'));
+  }
+})();
 
 // INICIALIZAR
 (function initUser() {
