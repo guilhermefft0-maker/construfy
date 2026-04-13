@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <link rel="icon" href="/img/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/img/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ConstruPRO — Criar Conta</title>
@@ -93,6 +97,21 @@
             </button>
           </div>
           <span style="font-size:10px;color:var(--text-muted,#888);margin-top:3px">Mínimo 6 caracteres</span>
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:12px;color:var(--text-md,#8b92a5);line-height:1.5">
+            <input type="checkbox" id="accept-terms" required
+                   style="margin-top:2px;min-width:15px;height:15px;accent-color:var(--amber,#f0a500);cursor:pointer">
+            <span>
+              Li e concordo com os
+              <a href="/termos.html" target="_blank"
+                 style="color:var(--amber,#f0a500);text-decoration:none;font-weight:500"
+                 onmouseover="this.style.textDecoration='underline'"
+                 onmouseout="this.style.textDecoration='none'">Termos de Uso e Política de Privacidade</a>
+              do ConstruPRO. <span style="color:#ef4444">*</span>
+            </span>
+          </label>
         </div>
 
         <button type="submit" class="btn-primary" id="submit-btn">
@@ -258,6 +277,9 @@
       const adminNome   = document.getElementById('admin-name').value.trim();
       const adminEmail  = document.getElementById('admin-email').value.trim().toLowerCase();
       const adminSenha  = document.getElementById('admin-password').value;
+
+      // Validação de aceite dos termos
+      if (!document.getElementById('accept-terms').checked) return showError('Você precisa aceitar os Termos de Uso e Política de Privacidade para continuar.');
 
       // Validações espelham exatamente o worker.js (strongPassword + slug regex)
       if (!razaoSocial)                              return showError('Razão social obrigatória.');
