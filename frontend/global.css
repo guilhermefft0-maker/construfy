@@ -53,8 +53,25 @@
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
-body { background:var(--bg-0); color:var(--text-hi); font-family:var(--font-body); font-size:14px; line-height:1.6; }
+
+html {
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  /* Impede o iOS de redimensionar fontes automaticamente (causa o zoom estranho) */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background:var(--bg-0);
+  color:var(--text-hi);
+  font-family:var(--font-body);
+  font-size:14px;
+  line-height:1.6;
+  /* Impede overflow horizontal em qualquer página */
+  overflow-x: hidden;
+  max-width: 100vw;
+}
 
 ::-webkit-scrollbar { width:5px; height:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
@@ -81,7 +98,14 @@ body { background:var(--bg-0); color:var(--text-hi); font-family:var(--font-body
 }
 
 /* ── Auth Shell ── */
-.auth-page { min-height:100vh; display:grid; place-items:center; padding:40px 16px; position:relative; }
+.auth-page {
+  min-height: 100vh;
+  min-height: 100dvh; /* dynamic viewport — evita corte pela barra do browser no iOS/Android */
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+  position: relative;
+}
 
 .auth-card {
   position:relative; z-index:1; width:100%; max-width:540px;
@@ -124,8 +148,13 @@ body { background:var(--bg-0); color:var(--text-hi); font-family:var(--font-body
 
 .form-input, .form-select {
   width:100%; padding:11px 14px; background:var(--bg-3); border:1px solid var(--border-hi);
-  color:var(--text-hi); border-radius:var(--r-md); font-size:14px; font-family:var(--font-body);
+  color:var(--text-hi); border-radius:var(--r-md);
+  /* font-size mínimo 16px nos inputs — impede o zoom automático do iOS ao focar */
+  font-size:16px;
+  font-family:var(--font-body);
   outline:none; transition:var(--ease); -webkit-appearance:none; appearance:none;
+  /* tap target confortável */
+  min-height: 48px;
 }
 .form-input::placeholder { color:var(--text-lo); font-weight:300; }
 .form-input:hover, .form-select:hover { background:var(--bg-4); }
@@ -157,7 +186,10 @@ body { background:var(--bg-0); color:var(--text-hi); font-family:var(--font-body
   width:100%; padding:13px 20px; background:var(--amber); color:#090b0e;
   border:none; border-radius:var(--r-md); font-size:14px; font-weight:700;
   font-family:var(--font-display); letter-spacing:0.02em; cursor:pointer;
-  transition:var(--ease); display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px;
+  transition:var(--ease); display:flex; align-items:center; justify-content:center;
+  gap:8px; margin-top:6px;
+  min-height: 48px; /* tap target mínimo */
+  -webkit-tap-highlight-color: transparent;
 }
 .btn-primary:hover { background:var(--amber-dark); transform:translateY(-1px); box-shadow:0 8px 24px rgba(240,165,0,0.22); }
 .btn-primary:active { transform:none; box-shadow:none; }
@@ -198,10 +230,63 @@ body { background:var(--bg-0); color:var(--text-hi); font-family:var(--font-body
 .feature-item { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text-lo); }
 .feature-item svg { flex-shrink:0; color:var(--green); }
 
-@media (max-width:600px) {
-  .auth-page { padding:16px 12px; align-items:flex-start; }
-  .form-grid-2 { grid-template-columns:1fr; }
-  .card-head, .card-body { padding-left:24px; padding-right:24px; }
-  .auth-footer { padding-left:24px; padding-right:24px; }
-  .card-title { font-size:22px; }
+/* ══════════════════════════════════════════
+   RESPONSIVE — Auth pages (login / register)
+   ══════════════════════════════════════════ */
+
+/* ── Mobile (480px) ── */
+@media (max-width: 480px) {
+  /* Auth page: alinha no topo com padding mínimo */
+  .auth-page {
+    padding: 12px;
+    align-items: flex-start;
+  }
+
+  /* Card: sem borda arredondada exagerada, ocupa tela toda */
+  .auth-card {
+    border-radius: var(--r-lg);
+    /* Garante que o card nunca ultrapasse a largura da tela */
+    max-width: 100%;
+  }
+
+  /* Card head e body: padding reduzido */
+  .card-head { padding: 24px 20px 20px; }
+  .card-body { padding: 20px 20px 24px; }
+  .auth-footer { padding-left: 20px; padding-right: 20px; }
+
+  .card-head::after { left: 20px; } /* alinha o underline amber com o padding novo */
+
+  .card-title { font-size: 22px; }
+  .card-desc  { font-size: 13px; }
+
+  /* Grid 2 colunas → 1 coluna */
+  .form-grid-2 { grid-template-columns: 1fr; gap: 0; }
+
+  /* Inputs: garante 16px para não disparar zoom no iOS */
+  .form-input,
+  .form-select { font-size: 16px; min-height: 48px; }
+
+  /* Pass toggle: área de toque maior */
+  .pass-toggle { padding: 10px; right: 6px; }
+
+  /* Logo menor */
+  .logo-text { font-size: 15px; }
+  .logo-icon  { width: 28px; height: 28px; }
+
+  /* Features em coluna */
+  .feature-row { flex-direction: column; gap: 8px; }
+
+  /* Demo box mais compacta */
+  .demo-box { padding: 12px 14px; }
+}
+
+/* ── Mobile muito pequeno (360px) — Galaxy S, iPhone SE ── */
+@media (max-width: 360px) {
+  .auth-page { padding: 8px; }
+  .card-head { padding: 20px 16px 18px; }
+  .card-body { padding: 18px 16px 20px; }
+  .auth-footer { padding-left: 16px; padding-right: 16px; }
+  .card-head::after { left: 16px; }
+  .card-title { font-size: 20px; }
+  .badge-pill { font-size: 9px; padding: 3px 8px; }
 }

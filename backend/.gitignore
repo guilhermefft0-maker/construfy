@@ -9,3 +9,5 @@ src/
 schema.sql
 worker.js
 wrangler.toml
+.vercel
+.env*.local

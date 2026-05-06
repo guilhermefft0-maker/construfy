@@ -1,64 +1,29 @@
 /* ─────────────────────────────────────────────────────────
    ConstruPRO — Login Page CSS
-   Extends: global.css
+   Extends: global.css (que já define card-head, card-body,
+   form-input, btn-primary e o @media mobile)
    ───────────────────────────────────────────────────────── */
-
-/* ── Card Header ── */
-.card-head {
-  padding: 36px 36px 28px;
-  border-bottom: 1px solid var(--border-lo);
-  position: relative;
-}
-
-.card-head::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 36px;
-  width: 48px;
-  height: 2px;
-  background: var(--amber);
-  border-radius: 2px;
-}
-
-.card-title {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  margin-bottom: 8px;
-}
-
-.card-desc {
-  font-size: 14px;
-  color: var(--text-md);
-  font-weight: 300;
-  line-height: 1.6;
-}
-
-/* ── Card Body ── */
-.card-body {
-  padding: 28px 36px 32px;
-}
 
 /* ── Password field with toggle ── */
 .pass-wrap { position: relative; }
-.pass-wrap .form-input { padding-right: 42px; }
+.pass-wrap .form-input { padding-right: 48px; }
 
 .pass-toggle {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: var(--text-lo);
   cursor: pointer;
-  padding: 4px;
+  /* Área de toque mínima — evita erros de tap no mobile */
+  padding: 10px;
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 .pass-toggle:hover { color: var(--text-md); }
 
@@ -68,17 +33,20 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 7px;
+  gap: 8px;
 }
 
 .link-muted {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-lo);
   text-decoration: none;
   transition: color 0.15s;
+  padding: 4px 0;
+  -webkit-tap-highlight-color: transparent;
 }
 .link-muted:hover { color: var(--amber); }
 
-/* ── Divider with text ── */
+/* ── Divider com texto ── */
 .or-divider {
   display: flex;
   align-items: center;
@@ -86,14 +54,13 @@
   margin: 20px 0;
 }
 .or-divider::before,
-.or-divider::after {
-  content: ''; flex: 1; height: 1px; background: var(--border-lo);
-}
+.or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-lo); }
 .or-divider span {
   font-size: 11px;
   color: var(--text-lo);
   font-family: var(--font-mono);
   letter-spacing: 0.8px;
+  white-space: nowrap;
 }
 
 /* ── Demo credentials box ── */
@@ -104,7 +71,6 @@
   padding: 14px 16px;
   margin-bottom: 20px;
 }
-
 .demo-box-label {
   font-size: 9.5px;
   font-family: var(--font-mono);
@@ -114,25 +80,18 @@
   text-transform: uppercase;
   margin-bottom: 8px;
 }
-
 .demo-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 12px;
-  padding: 3px 0;
+  padding: 4px 0;
   color: var(--text-md);
+  gap: 8px;
 }
-
 .demo-val {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-hi);
-}
-
-/* ── Responsive ── */
-@media (max-width: 480px) {
-  .card-head,
-  .card-body { padding-left: 24px; padding-right: 24px; }
-  .auth-footer { padding-left: 24px; padding-right: 24px; }
-  .card-title { font-size: 22px; }
+  word-break: break-all;
 }

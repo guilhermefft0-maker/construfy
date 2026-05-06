@@ -39,6 +39,7 @@ CREATE TABLE companies (
   endereco     TEXT DEFAULT '',
   slug         TEXT NOT NULL UNIQUE,
   plano        TEXT NOT NULL DEFAULT 'free',
+  pro_expires_at DATETIME,
   status       TEXT NOT NULL DEFAULT 'active',
   created_at   TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at   TEXT DEFAULT NULL

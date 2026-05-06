@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ConstruPRO — Plataforma de Gestão para Construtoras</title>
   <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="index.css">
   <style>
     body { overflow-x:hidden; }
     .site-nav { position:sticky; top:0; z-index:50; background:rgba(9,11,14,0.88); backdrop-filter:blur(18px); border-bottom:1px solid var(--border-lo); }
@@ -87,8 +88,9 @@
     .footer-links a { font-size:12px; color:var(--text-lo); text-decoration:none; transition:color 0.15s; }
     .footer-links a:hover { color:var(--text-md); }
     .footer-bottom { max-width:1180px; margin:0 auto; font-size:12px; color:var(--text-lo); border-top:1px solid var(--border-lo); padding-top:20px; }
-    .support-fab { position:fixed; bottom:28px; right:28px; z-index:200; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
-    .support-fab-btn { width:52px; height:52px; border-radius:50%; background:var(--amber); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.35); transition:all 0.2s; }
+    /* ── Botão flutuante de suporte ── */
+    .support-fab { position:fixed; bottom:28px; right:24px; z-index:200; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+    .support-fab-btn { width:52px; height:52px; border-radius:50%; background:var(--amber); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.35); transition:all 0.2s; -webkit-tap-highlight-color:transparent; }
     .support-fab-btn:hover { transform:scale(1.08); }
     .support-menu { display:none; flex-direction:column; gap:8px; align-items:flex-end; }
     .support-menu.open { display:flex; }
@@ -99,8 +101,14 @@
     .support-option-icon.em { background:var(--amber,#f0a500); }
     .support-label { font-size:11px; color:var(--text-lo,#5a6075); display:block; margin-top:1px; }
     @keyframes pls { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
-    @media (max-width:960px) { .features-grid { grid-template-columns:repeat(2,1fr); } .stats-bar-inner { grid-template-columns:repeat(2,1fr); } .stat-item:nth-child(2) { border-right:none; } }
-    @media (max-width:640px) { .nav-links { display:none; } .features-grid { grid-template-columns:1fr; } .pricing-wrap { grid-template-columns:1fr; max-width:420px; } .section { padding:64px 20px; } .hero { padding:60px 20px 80px; } }
+    /* Mobile: FAB menor, não atrapalha navegação */
+    @media (max-width:640px) {
+      .support-fab { bottom:20px; right:16px; gap:8px; max-width:calc(100vw - 32px); }
+      .support-fab-btn { width:46px; height:46px; }
+      .support-menu { max-width:calc(100vw - 32px); }
+      .support-option { padding:8px 14px 8px 10px; font-size:12px; white-space:normal; max-width:calc(100vw - 48px); box-sizing:border-box; }
+      .support-label { font-size:10px; }
+    }
   </style>
 </head>
 <body>
@@ -133,6 +141,9 @@
       <div class="hero-actions">
         <a href="register.html" class="btn-hero-primary">Começar gratuitamente <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         <a href="#funcionalidades" class="btn-hero-ghost">Ver funcionalidades</a>
+      </div>
+      <div class="hero-login-hint">
+        Já tem conta? <a href="login.html">Entrar agora</a>
       </div>
       <div class="hero-note">
         <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>Sem cartão de crédito</span>
@@ -215,7 +226,7 @@
         <div class="price-card featured">
           <span class="featured-tag">Mais popular</span>
           <div class="price-plan">Pro</div>
-          <div class="price-value"><sub>R$</sub>299<sup>,99/mês</sup></div>
+          <div class="price-value"><sub>R$</sub>97<sup>,40/mês</sup></div>
           <p class="price-desc">Tudo ilimitado para sua construtora crescer.</p>
           <ul class="price-features">
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Obras ilimitadas</li>
@@ -226,7 +237,7 @@
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Relatórios PDF (6 modelos)</li>
             <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Suporte prioritário</li>
           </ul>
-          <a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-plan-primary">Assinar Pro — R$ 299,99/mês</a>
+          <a href="https://pay.kiwify.com.br/ejraIMH" target="_blank" class="btn-plan-primary">Assinar Pro — R$ 97,40/mês</a>
         </div>
       </div>
     </div>

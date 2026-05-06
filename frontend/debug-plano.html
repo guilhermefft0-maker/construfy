@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Debug — Plano ConstruPRO</title>
+  <style>
+    body { font-family: monospace; background: #0f0f0f; color: #e0e0e0; padding: 30px; }
+    h2 { color: #f0a500; }
+    .box { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .label { color: #888; font-size: 12px; margin-bottom: 4px; }
+    .value { font-size: 18px; font-weight: bold; padding: 8px 14px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+    .ok { background: #14532d; color: #4ade80; }
+    .bad { background: #7f1d1d; color: #f87171; }
+    .warn { background: #78350f; color: #fbbf24; }
+    pre { background: #111; border: 1px solid #2a2a2a; border-radius: 6px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+    button { background: #f0a500; color: #000; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; font-weight: bold; cursor: pointer; margin-right: 10px; }
+    button:hover { background: #fbbf24; }
+    .fix-btn { background: #16a34a; color: #fff; }
+  </style>
+</head>
+<body>
+  <h2>🔍 Debug — Plano ConstruPRO</h2>
+
+  <div class="box">
+    <div class="label">Valor de <code>user.plano</code> no localStorage:</div>
+    <div id="plano-valor" class="value">—</div>
+  </div>
+
+  <div class="box">
+    <div class="label">isPro() retornaria:</div>
+    <div id="ispro-resultado" class="value">—</div>
+  </div>
+
+  <div class="box">
+    <div class="label">Objeto <code>user</code> completo no localStorage:</div>
+    <pre id="user-json">—</pre>
+  </div>
+
+  <div class="box">
+    <div class="label">Todas as chaves do localStorage:</div>
+    <pre id="ls-keys">—</pre>
+  </div>
+
+  <div style="margin-top: 20px;">
+    <button onclick="runDiag()">🔄 Atualizar diagnóstico</button>
+    <button class="fix-btn" onclick="forcarPro()">🔧 Forçar plano = "pro" (teste)</button>
+    <button style="background:#dc2626;color:#fff" onclick="limparLS()">🗑 Limpar localStorage (logout manual)</button>
+  </div>
+
+  <div id="fix-msg" style="margin-top:16px;color:#4ade80;font-size:14px"></div>
+
+  <script>
+    const PRO_PLANS = new Set(['pro', 'starter', 'enterprise']);
+
+    function isPro() {
+      try {
+        const u = JSON.parse(localStorage.getItem('user'));
+        return PRO_PLANS.has(u?.plano);
+      } catch { return false; }
+    }
+
+    function runDiag() {
+      // Plano
+      let plano = '— NÃO ENCONTRADO —';
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('user'));
+        plano = user?.plano ?? '— CAMPO plano AUSENTE —';
+      } catch(e) {
+        plano = 'ERRO ao parsear: ' + e.message;
+      }
+
+      const planoEl = document.getElementById('plano-valor');
+      planoEl.textContent = String(plano);
+      planoEl.className = 'value ' + (PRO_PLANS.has(plano) ? 'ok' : 'bad');
+
+      const isProEl = document.getElementById('ispro-resultado');
+      const resultado = isPro();
+      isProEl.textContent = resultado ? '✅ true — ACESSO LIBERADO' : '❌ false — BLOQUEADO';
+      isProEl.className = 'value ' + (resultado ? 'ok' : 'bad');
+
+      document.getElementById('user-json').textContent =
+        user ? JSON.stringify(user, null, 2) : localStorage.getItem('user') || '(vazio)';
+
+      const keys = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        keys[k] = localStorage.getItem(k);
+      }
+      document.getElementById('ls-keys').textContent = JSON.stringify(keys, null, 2);
+    }
+
+    function forcarPro() {
+      try {
+        const raw = localStorage.getItem('user');
+        const u = raw ? JSON.parse(raw) : {};
+        u.plano = 'pro';
+        localStorage.setItem('user', JSON.stringify(u));
+        document.getElementById('fix-msg').textContent = '✅ plano forçado para "pro". Recarregue o app principal e teste.';
+        runDiag();
+      } catch(e) {
+        document.getElementById('fix-msg').textContent = 'Erro: ' + e.message;
+      }
+    }
+
+    function limparLS() {
+      if (confirm('Isso vai apagar todos os dados locais (equivale a logout). Confirmar?')) {
+        localStorage.clear();
+        document.getElementById('fix-msg').textContent = '🗑 localStorage limpo.';
+        runDiag();
+      }
+    }
+
+    runDiag();
+  </script>
+</body>
+</html>

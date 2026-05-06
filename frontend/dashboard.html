@@ -224,139 +224,395 @@
       body { height:auto; overflow:visible; }
     }
 
-    /* ── MOBILE NAVIGATION ─────────────────────────────── */
-    @media (max-width: 768px) {
-      body { overflow:hidden; flex-direction:column; }
+    /* ══════════════════════════════════════════════════════════
+       MOBILE — Experiência nativa (Android & iOS)
+       Princípio: tudo cabe na tela, zero scroll horizontal,
+       formulários como bottom-sheet, bottom nav como âncora.
+       ══════════════════════════════════════════════════════════ */
 
-      /* Sidebar vira drawer overlay */
+    /* ── Elementos exclusivos do mobile — ocultos no desktop ── */
+    #mobile-menu-btn   { display:none !important; } /* nunca visível — apenas bottom nav Menu */
+    #bottom-nav        { display:none; }
+    #sidebar-backdrop  { display:none; }
+    #topbar-logo-mobile{ display:none; } /* logo no topbar — só mobile */
+
+    /* ── Desktop: garante que elementos mobile fiquem ocultos ── */
+    @media (min-width: 769px) {
+      #mobile-menu-btn    { display:none !important; }
+      #bottom-nav         { display:none !important; }
+      #sidebar-backdrop   { display:none !important; }
+      #topbar-logo-mobile { display:none !important; }
+      #topbar-export-btn  { display:flex !important; }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       MEDIA QUERY MOBILE
+       ════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* ── Root — viewport fixo como app nativo ── */
+      html, body {
+        height:100%; height:100dvh;
+        overflow:hidden;
+        overscroll-behavior:none;
+        -webkit-text-size-adjust:100%;
+      }
+      body { flex-direction:column; }
+
+      /* ── Layout principal ── */
+      #main {
+        width:100%; height:100%; height:100dvh;
+        overflow:hidden;
+        display:flex; flex-direction:column;
+      }
+
+      /* ── TOPBAR MOBILE ── */
+      #topbar {
+        height:52px; flex-shrink:0;
+        padding:0 14px; gap:10px;
+        background:var(--bg2);
+        border-bottom:1px solid var(--border);
+      }
+      #topbar-logo-mobile {
+        display:flex; align-items:center; flex-shrink:0;
+      }
+      #topbar .topbar-badge   { display:none; }   /* esconde nome empresa */
+      #topbar-export-btn      { display:none; }   /* esconde exportar PDF */
+      /* Badge FREE compacto no topbar mobile */
+      #free-plan-badge .free-plan-topbar {
+        padding:5px 10px; font-size:11px;
+      }
+      #free-plan-badge .free-plan-topbar svg { display:none; } /* remove ícone, só texto */
+
+      /* ── SIDEBAR — drawer deslizável da esquerda ── */
       #sidebar {
-        position:fixed; top:0; left:0; z-index:500;
-        height:100vh; width:280px;
+        position:fixed; top:0; left:0; z-index:600;
+        width:80vw; max-width:290px; height:100%; height:100dvh;
         transform:translateX(-100%);
-        transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
-        box-shadow:4px 0 32px rgba(0,0,0,0.6);
+        transition:transform 0.25s cubic-bezier(0.4,0,0.2,1);
+        box-shadow:8px 0 48px rgba(0,0,0,0.75);
+        overflow-y:auto; -webkit-overflow-scrolling:touch;
+        overscroll-behavior:contain;
       }
       #sidebar.mobile-open { transform:translateX(0); }
 
-      /* Backdrop para fechar sidebar */
+      /* ── BACKDROP do sidebar ── */
       #sidebar-backdrop {
-        display:none; position:fixed; inset:0; z-index:499;
-        background:rgba(0,0,0,0.6); backdrop-filter:blur(2px);
+        display:none; position:fixed; inset:0; z-index:599;
+        background:rgba(0,0,0,0.7); backdrop-filter:blur(2px);
+        -webkit-tap-highlight-color:transparent;
       }
       #sidebar-backdrop.open { display:block; }
 
-      /* Main ocupa tela toda */
-      #main { width:100%; height:100vh; overflow:hidden; }
-
-      /* Topbar mobile */
-      #topbar {
-        padding:0 16px;
-        height:52px;
-      }
-      #topbar .topbar-badge { display:none; }
-      #topbar > div:last-child { display:none; } /* esconde btn exportar */
-
-      /* Botão hamburguer no topbar */
-      #mobile-menu-btn {
-        display:flex; align-items:center; justify-content:center;
-        width:36px; height:36px; border-radius:var(--radius);
-        background:var(--bg3); border:1px solid var(--border2);
-        cursor:pointer; flex-shrink:0; margin-right:10px;
-        color:var(--text2);
+      /* ── CONTEÚDO — área rolável interna ── */
+      #content {
+        flex:1; min-height:0;
+        overflow-y:auto; overflow-x:hidden;
+        -webkit-overflow-scrolling:touch;
+        overscroll-behavior-y:contain;
+        padding:12px 12px;
+        padding-bottom:calc(64px + env(safe-area-inset-bottom, 16px));
       }
 
-      /* Content com padding-bottom para bottom nav */
-      #content { padding:16px; padding-bottom:76px; }
-
-      /* Bottom navigation bar */
+      /* ── BOTTOM NAVIGATION BAR ── */
       #bottom-nav {
-        position:fixed; bottom:0; left:0; right:0; z-index:400;
-        height:60px;
+        display:flex; flex-shrink:0;
+        height:calc(56px + env(safe-area-inset-bottom, 0px));
+        padding-bottom:env(safe-area-inset-bottom, 0px);
         background:var(--bg2);
         border-top:1px solid var(--border);
-        display:flex; align-items:stretch;
-        padding-bottom:env(safe-area-inset-bottom);
+        position:relative; z-index:400;
       }
       .bottom-nav-item {
-        flex:1; display:flex; flex-direction:column; align-items:center;
-        justify-content:center; gap:3px; cursor:pointer;
+        flex:1; min-width:0;
+        display:flex; flex-direction:column;
+        align-items:center; justify-content:center;
+        gap:4px; cursor:pointer;
         color:var(--text3); font-size:9px; font-weight:500;
-        letter-spacing:0.3px; text-transform:uppercase;
+        letter-spacing:0.2px; text-transform:uppercase;
         border:none; background:transparent; font-family:var(--font);
-        transition:color 0.15s;
+        transition:color 0.15s; padding:6px 4px;
         -webkit-tap-highlight-color:transparent;
-        padding:6px 4px;
+        touch-action:manipulation;
       }
-      .bottom-nav-item svg { width:20px; height:20px; opacity:0.55; transition:opacity 0.15s; }
+      .bottom-nav-item svg {
+        width:22px; height:22px;
+        opacity:0.45; transition:opacity 0.15s; flex-shrink:0;
+      }
+      .bottom-nav-item span { font-size:9px; line-height:1; white-space:nowrap; }
       .bottom-nav-item.active { color:var(--accent); }
       .bottom-nav-item.active svg { opacity:1; }
-      .bottom-nav-item span { font-size:9px; line-height:1; }
-
-      /* Botão "Mais" no bottom nav abre sidebar */
+      /* Botão "Menu" no bottom nav — único hamburger do app */
       .bottom-nav-more {
-        width:38px; height:38px; border-radius:50%;
+        width:34px; height:34px; border-radius:10px;
         background:var(--bg4); border:1px solid var(--border2);
         display:flex; align-items:center; justify-content:center;
         margin-bottom:2px;
       }
+      /* Indicador de toque ativo */
+      .bottom-nav-item:active { opacity:0.6; }
 
-      /* KPI grid mobile: 2 cols */
-      .kpi-grid { grid-template-columns:1fr 1fr; gap:10px; }
-      /* Page locked screen mobile */
-      .page-locked-screen { padding:24px 16px; min-height:300px; }
-      .upgrade-features { grid-template-columns:1fr; }
-      .kpi-value { font-size:18px; }
+      /* ══ FORM OVERLAY — bottom sheet nativo ══ */
+      .form-overlay {
+        align-items:flex-end;
+        background:rgba(0,0,0,0.72);
+      }
+      .form-box {
+        width:100%;
+        max-height:90dvh; max-height:90vh;
+        border-radius:20px 20px 0 0;
+        overflow-y:auto; overflow-x:hidden;
+        -webkit-overflow-scrolling:touch;
+        overscroll-behavior:contain;
+        padding:0;
+        padding-bottom:env(safe-area-inset-bottom, 16px);
+        animation:sheetUp 0.22s cubic-bezier(0.4,0,0.2,1) both;
+      }
+      @keyframes sheetUp {
+        from { transform:translateY(40%); opacity:0.4; }
+        to   { transform:translateY(0);   opacity:1; }
+      }
+      /* ── Handle visual de arrastar ── */
+      .form-box::before {
+        content:'';
+        display:block; width:36px; height:4px;
+        background:var(--border2); border-radius:2px;
+        margin:12px auto 0;
+      }
 
-      /* Obra grid mobile: 1 col */
-      .obra-grid { grid-template-columns:1fr; }
-      .two-col { grid-template-columns:1fr; }
-      .three-col { grid-template-columns:1fr; }
+      /* ── Conteúdo interno do bottom sheet ── */
+      .form-title {
+        padding:14px 18px 2px !important;
+        margin-bottom:12px; font-size:16px; font-weight:600;
+      }
+      .form-grid {
+        padding:4px 18px 0 !important;
+        grid-template-columns:1fr !important;
+        gap:12px !important;
+      }
+      .form-group.full { grid-column:1 !important; }
+      .form-actions {
+        padding:16px 18px !important;
+        margin-top:12px !important;
+        flex-direction:column-reverse !important;
+        gap:8px !important;
+        border-top:1px solid var(--border);
+      }
+      .form-actions .btn {
+        width:100% !important; justify-content:center !important;
+        padding:13px 20px !important; font-size:14px !important;
+        min-height:48px;
+      }
+      /* Remove spacer desnecessário */
+      .form-actions > div[style*="flex:1"] { display:none !important; }
 
-      /* Form overlay fullscreen */
-      .form-overlay { align-items:flex-end; }
-      .form-box { width:100%; border-radius:var(--radius2) var(--radius2) 0 0; max-height:90vh; }
+      /* ── Inputs nativos — previne zoom iOS (font-size >= 16px) ── */
+      input, select, textarea {
+        font-size:16px !important;
+        min-height:46px !important;
+        padding:11px 14px !important;
+        border-radius:var(--radius) !important;
+        -webkit-appearance:none; appearance:none;
+        touch-action:manipulation;
+      }
+      textarea { min-height:80px !important; resize:none; }
+      label {
+        font-size:12px !important;
+        margin-bottom:5px !important;
+        display:block;
+      }
 
-      /* Tables: horizontal scroll */
-      .table-card { overflow-x:auto; }
-      table { min-width:600px; }
+      /* ══ KPI CARDS ══ */
+      .kpi-grid {
+        grid-template-columns:1fr 1fr;
+        gap:10px; margin-bottom:14px;
+      }
+      .kpi-card { padding:13px 11px; }
+      .kpi-label { font-size:10px; margin-bottom:4px; }
+      .kpi-value { font-size:20px; }
+      .kpi-change { font-size:10px; margin-top:4px; }
 
-      /* Plan cards: 1 col */
-      .plan-cards-grid { grid-template-columns:1fr; }
-      .plan-current-banner { flex-direction:column; align-items:flex-start; }
-      .support-cta-box { flex-direction:column; }
-      .support-cta-actions { width:100%; }
-      .support-cta-actions .btn { flex:1; justify-content:center; }
+      /* ══ GRID LAYOUTS ══ */
+      .obra-grid   { grid-template-columns:1fr; gap:12px; }
+      .two-col     { grid-template-columns:1fr; gap:12px; }
+      .three-col   { grid-template-columns:1fr; gap:12px; }
 
-      /* Support FAB mais acima por causa do bottom nav */
-      .support-fab { bottom:72px; right:16px; }
+      /* ══ TABELAS — modo card no mobile ══
+         Cada <tr> vira um card. <thead> oculto.
+         Rótulo de cada célula via data-label + ::before.
+      ══════════════════════════════════════════════ */
+      .table-header { padding:11px 13px; flex-wrap:wrap; gap:8px; }
+      .table-title  { font-size:13px; }
+      .table-sub    { font-size:10px; }
 
-      /* Upgrade modal */
-      .upgrade-box { width:calc(100% - 32px); }
+      /* Remove scroll horizontal — cards não precisam */
+      .table-card { overflow:visible !important; }
+
+      /* Oculta cabeçalho */
+      .table-card thead { display:none !important; }
+
+      /* Tabela, tbody, tr, td → block */
+      .table-card table,
+      .table-card tbody { display:block !important; width:100% !important; }
+
+      /* Cada <tr> vira um card */
+      .table-card tr {
+        display:block !important;
+        background:var(--bg3);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        margin-bottom:8px;
+        padding:10px 12px !important;
+      }
+      .table-card tr:hover td { background:transparent !important; }
+      .table-card tr:last-child { margin-bottom:0; }
+
+      /* Cada <td> = linha flexível: rótulo + valor */
+      .table-card td {
+        display:flex !important;
+        align-items:flex-start;
+        gap:8px;
+        padding:3px 0 !important;
+        border-bottom:none !important;
+        font-size:13px !important;
+        color:var(--text2);
+        min-width:0;
+        word-break:break-word;
+        white-space:normal !important;
+      }
+      .table-card td:empty { display:none !important; }
+
+      /* Rótulo via data-label */
+      .table-card td::before {
+        content:attr(data-label);
+        font-size:9px;
+        font-weight:600;
+        letter-spacing:0.8px;
+        text-transform:uppercase;
+        color:var(--text3);
+        white-space:nowrap;
+        min-width:70px;
+        padding-top:2px;
+        flex-shrink:0;
+      }
+
+      /* Botões de ação em linha própria */
+      .table-card td button.btn {
+        width:100% !important;
+        justify-content:center !important;
+        margin-top:4px;
+        min-height:40px;
+      }
+
+      /* ══ CABEÇALHO DE PÁGINAS ══ */
+      /* Título + botão de ação empilham em coluna no mobile */
+      .page > div:first-child {
+        flex-wrap:wrap; gap:10px; margin-bottom:14px !important;
+      }
+      .page > div:first-child > button {
+        width:100%; justify-content:center;
+      }
+
+      /* ══ PLANO / ASSINATURA ══ */
+      .plan-page { padding:0; }
+      .plan-cards-grid { grid-template-columns:1fr; gap:14px; }
+      .plan-current-banner { flex-direction:column; align-items:flex-start; gap:12px; padding:16px; }
+      .support-cta-box { flex-direction:column; gap:10px; padding:16px; }
+      .support-cta-actions { width:100%; flex-direction:column; }
+      .support-cta-actions .btn { justify-content:center; }
+
+      /* ══ MODAL DE UPGRADE ══ */
+      .upgrade-modal { align-items:flex-end; }
+      .upgrade-box {
+        width:100%;
+        border-radius:20px 20px 0 0;
+        padding:24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+        animation:sheetUp 0.22s cubic-bezier(0.4,0,0.2,1) both;
+      }
+      .upgrade-features { grid-template-columns:1fr; gap:8px; }
+
+      /* ══ PÁGINA BLOQUEADA ══ */
+      .page-locked-screen { padding:24px 14px; min-height:auto; }
+      .page-locked-features { width:100%; max-width:none; }
+
+      /* ══ SUPPORT FAB — posição controlada pelo bloco com !important abaixo ══ */
+
+      /* ══ PAINEL COTAÇÃO — também usa cards no mobile ══ */
+      #painel-cotacao .table-card { overflow:visible !important; }
+      #painel-cotacao table { min-width:unset !important; }
+
+      /* ══ UTILITÁRIOS ══ */
+      .strong { word-break:break-word; }
+      /* Botões menores nas tabelas — área de toque mínima */
+      td button.btn { min-height:36px; padding:4px 10px; }
     }
 
-    /* Mobile menu button hidden on desktop */
-    #mobile-menu-btn { display:none; }
-    #bottom-nav { display:none; }
-    #sidebar-backdrop { display:none; }
-
-    @media (min-width: 769px) {
-      #mobile-menu-btn { display:none !important; }
-      #bottom-nav { display:none !important; }
-      #sidebar-backdrop { display:none !important; }
+    /* ══ SUPPORT FAB — bloco único com !important no mobile ══════════════
+       O CSS base (desktop) vem DEPOIS do @media no arquivo, o que normalmente
+       sobrescreveria as regras mobile. Usamos !important para garantir que
+       as regras mobile sempre vençam independente da ordem.
+    ═══════════════════════════════════════════════════════════════════ */
+    .support-fab {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      z-index: 350;
+      display: flex; flex-direction: column;
+      align-items: flex-end; gap: 8px;
+      max-width: calc(100vw - 28px);
     }
+    .support-fab-btn {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(240,165,0,0.4);
+      transition: transform 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation; flex-shrink: 0;
+    }
+    .support-fab-btn:hover { transform: scale(1.1); }
+    .support-menu {
+      display: none; flex-direction: column;
+      gap: 7px; align-items: flex-end;
+      max-width: calc(100vw - 28px);
+    }
+    .support-menu.open { display: flex; }
+    .support-option {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 40px; padding: 9px 16px 9px 12px;
+      text-decoration: none; color: var(--text);
+      font-size: 13px; font-weight: 500; white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5); transition: all 0.15s;
+      max-width: 100%; box-sizing: border-box;
+    }
+    .support-option:hover { border-color: var(--accent); background: var(--bg3); }
+    .support-option-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .support-option-icon.wa { background: #25D366; }
+    .support-option-icon.em { background: var(--accent); }
+    .support-sublabel { font-size: 10px; color: var(--text3); display: block; margin-top: 1px; }
 
-    /* ── SUPPORT FAB ── */
-    .support-fab { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
-    .support-fab-btn { width:48px; height:48px; border-radius:50%; background:var(--accent); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(240,165,0,0.4); transition:all 0.2s; }
-    .support-fab-btn:hover { transform:scale(1.1); }
-    .support-menu { display:none; flex-direction:column; gap:7px; align-items:flex-end; }
-    .support-menu.open { display:flex; }
-    .support-option { display:flex; align-items:center; gap:10px; background:var(--bg2); border:1px solid var(--border2); border-radius:40px; padding:9px 16px 9px 12px; text-decoration:none; color:var(--text); font-size:13px; font-weight:500; white-space:nowrap; box-shadow:0 4px 14px rgba(0,0,0,0.5); transition:all 0.15s; }
-    .support-option:hover { border-color:var(--accent); background:var(--bg3); }
-    .support-option-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .support-option-icon.wa { background:#25D366; }
-    .support-option-icon.em { background:var(--accent); }
-    .support-sublabel { font-size:10px; color:var(--text3); display:block; margin-top:1px; }
+    /* Mobile — !important vence a cascade mesmo declarado depois do @media */
+    @media (max-width: 768px) {
+      .support-fab {
+        /* bottom-nav tem 56px + safe-area; sobe 14px acima dele */
+        bottom: calc(56px + env(safe-area-inset-bottom, 0px) + 14px) !important;
+        right: 16px !important;
+        z-index: 350 !important;
+        max-width: calc(100vw - 24px) !important;
+        gap: 6px !important;
+      }
+      .support-fab-btn { width: 44px !important; height: 44px !important; }
+      .support-menu    { max-width: calc(100vw - 24px) !important; }
+      .support-option  {
+        white-space: normal !important;
+        font-size: 12px !important;
+        padding: 8px 12px 8px 10px !important;
+        max-width: min(260px, calc(100vw - 24px)) !important;
+      }
+    }
 
     /* ── ASSINATURA ── */
     .plan-page { max-width:860px; margin:0 auto; }
@@ -517,20 +773,27 @@
 
 <!-- MAIN -->
 <div id="main">
+  <!-- Elemento hidden mantido por compatibilidade com app.js -->
+  <button id="mobile-menu-btn" style="display:none!important" onclick="toggleMobileSidebar()" aria-label="Abrir menu"></button>
+
   <div id="topbar">
-    <button id="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Abrir menu">
-      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
+    <!-- Logo mobile (visível só no mobile via CSS) -->
+    <div id="topbar-logo-mobile">
+      <div style="width:28px;height:28px;background:var(--accent);border-radius:6px;display:grid;place-items:center;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><path d="M3 21h18M3 7v14M21 7v14M6 21V11M9 21V11M12 21V11M15 21V11M18 21V11M3 7l9-4 9 4"/></svg>
+      </div>
+    </div>
     <div class="topbar-title" id="page-title">Dashboard</div>
     <div class="topbar-badge" id="empresa-badge">Construtora Alfa LTDA</div>
-    <!-- FREE plan badge (shown only for free users) -->
+    <!-- FREE plan badge -->
     <div id="free-plan-badge" style="display:none;margin-left:8px">
-      <button class="free-plan-topbar" onclick="navigate('assinatura')" title="Você está no plano Free — clique para fazer upgrade">
+      <button class="free-plan-topbar" onclick="navigate('assinatura')" title="Upgrade para PRO">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        Upgrade para PRO
+        PRO
       </button>
     </div>
-    <div style="display:flex;gap:8px;margin-left:12px">
+    <!-- Exportar PDF — desktop only -->
+    <div id="topbar-export-btn" style="display:flex;gap:8px;margin-left:12px">
       <button class="btn btn-outline" onclick="isPro() ? navigate('relatorios') : showPageLockedModal('Relatórios / PDF','Gere relatórios completos em PDF: obras, financeiro, folha de pagamento e muito mais.')">
         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke-width="2"/></svg>
         Exportar PDF
@@ -627,9 +890,19 @@
   </button>
   <button class="bottom-nav-item" id="bn-more" onclick="toggleMobileSidebar()">
     <div class="bottom-nav-more">
-      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <svg width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <circle cx="5" cy="5" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="5" r="1.5" fill="currentColor"/>
+        <circle cx="19" cy="5" r="1.5" fill="currentColor"/>
+        <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="5" cy="19" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="19" r="1.5" fill="currentColor"/>
+        <circle cx="19" cy="19" r="1.5" fill="currentColor"/>
+      </svg>
     </div>
-    <span>Menu</span>
+    <span>Mais</span>
   </button>
 </nav>
 
@@ -649,10 +922,92 @@
 <script src="js/epis.js"></script>
 <script src="js/financeiro.js"></script>
 <script src="js/relatorios.js"></script>
-<script src="js/assinatura.js"></script>
+<script src="js/assinatura.js?v=2"></script>
 <script src="js/rdo.js"></script>
 <script src="js/cotacoes.js"></script>
 <script src="js/app.js"></script>
 
 </body>
 </html>
+<script>
+  function showUpgradeModal(title) {
+    const modal = document.getElementById('upgrade-modal');
+    if (!modal) return;
+    if (title) {
+      const el = document.getElementById('upgrade-title');
+      if (el) el.textContent = title;
+    }
+    modal.classList.add('open');
+  }
+
+  function closeUpgradeModal() {
+    const modal = document.getElementById('upgrade-modal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('upgrade-modal');
+    if (modal && modal.classList.contains('open') && e.target === modal) {
+      modal.classList.remove('open');
+    }
+  });
+
+  /* ── Support FAB: abre/fecha menu, fecha ao clicar fora ou ESC ── */
+  (function() {
+    var btn  = document.getElementById('supportToggle');
+    var menu = document.getElementById('supportMenu');
+    if (!btn || !menu) return;
+    var svgChat  = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>';
+    var svgClose = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    btn.innerHTML = svgChat;
+    function openMenu()  { menu.classList.add('open');    btn.innerHTML = svgClose; }
+    function closeMenu() { menu.classList.remove('open'); btn.innerHTML = svgChat;  }
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      menu.classList.contains('open') ? closeMenu() : openMenu();
+    });
+    document.addEventListener('click', function(e) {
+      var fab = document.getElementById('supportFab');
+      if (fab && !fab.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeMenu(); });
+  })();
+
+  /* ── Auto data-label: lê <th> e aplica data-label em cada <td> ── */
+  (function applyTableLabels() {
+    function label() {
+      document.querySelectorAll('.table-card table').forEach(function(table) {
+        var headers = Array.from(table.querySelectorAll('thead th')).map(function(th) {
+          return th.textContent.trim();
+        });
+        if (!headers.length) return;
+        table.querySelectorAll('tbody tr').forEach(function(tr) {
+          tr.querySelectorAll('td').forEach(function(td, i) {
+            if (headers[i] !== undefined) td.setAttribute('data-label', headers[i]);
+          });
+        });
+      });
+    }
+
+    /* Roda na carga inicial */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', label);
+    } else {
+      label();
+    }
+
+    /* MutationObserver: re-aplica sempre que o DOM mudar (navegação SPA) */
+    var observer = new MutationObserver(function(mutations) {
+      var hasTable = mutations.some(function(m) {
+        return Array.from(m.addedNodes).some(function(n) {
+          return n.nodeType === 1 && (n.tagName === 'TABLE' || n.querySelector && n.querySelector('table'));
+        });
+      });
+      if (hasTable) label();
+    });
+    observer.observe(document.getElementById('content') || document.body, {
+      childList: true, subtree: true
+    });
+  })();
+
+</script>

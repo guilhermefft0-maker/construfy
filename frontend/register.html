@@ -47,7 +47,7 @@
 
         <!-- EMPRESA -->
         <div class="form-group">
-          <label class="form-label" for="company-name">Razão Social <span class="req">*</span></label>
+          <label class="form-label" for="company-name">Nome da Empresa <span class="req">*</span></label>
           <input class="form-input" type="text" id="company-name" required maxlength="200"
                  autocomplete="organization" placeholder="Construtora Exemplo Ltda">
         </div>
@@ -96,7 +96,7 @@
               </svg>
             </button>
           </div>
-          <span style="font-size:10px;color:var(--text-muted,#888);margin-top:3px">Mínimo 6 caracteres</span>
+          <span id="pass-hint" style="font-size:10px;color:var(--text-muted,#888);margin-top:3px">Mínimo 6 caracteres</span>
         </div>
 
         <div class="form-group" style="margin-bottom:14px">
@@ -143,10 +143,38 @@
 
     function showError(msg) {
       const el = document.getElementById('error-msg');
-      el.textContent = msg;
+      el.innerHTML = msg;
       el.style.display = 'block';
       document.getElementById('submit-btn').disabled = false;
       document.getElementById('btn-label').textContent = 'Criar Conta Gratuitamente';
+    }
+
+    function showFieldError(fieldId, msg) {
+      const field = document.getElementById(fieldId);
+      if (field) {
+        field.style.borderColor = '#ef4444';
+        field.style.boxShadow = '0 0 0 3px rgba(239,68,68,0.2)';
+        field.addEventListener('input', function clearFieldError() {
+          field.style.borderColor = '';
+          field.style.boxShadow = '';
+        }, { once: true });
+        setTimeout(() => field.focus(), 50);
+      }
+      showError(msg);
+    }
+
+    function getApiErrorMessage(data, adminEmail) {
+      const raw = (data.message || data.error || '').toLowerCase();
+      if (raw.includes('email') && (raw.includes('already') || raw.includes('existe') || raw.includes('cadastrado') || raw.includes('duplicate') || raw.includes('taken') || raw.includes('uso'))) {
+        return 'O e-mail <strong>' + adminEmail + '</strong> já possui uma conta. <a href="login.html" style="color:var(--amber,#f0a500);font-weight:600;text-decoration:underline">Fazer login &rarr;</a>';
+      }
+      if (raw.includes('slug') && (raw.includes('already') || raw.includes('existe') || raw.includes('taken') || raw.includes('uso'))) {
+        return 'Este subdomínio já está em uso. Escolha outro nome para sua construtora.';
+      }
+      if (raw.includes('senha') || raw.includes('password') || raw.includes('short') || raw.includes('curta') || raw.includes('inválida') || raw.includes('invalida')) {
+        return 'A senha deve ter pelo menos 6 caracteres.';
+      }
+      return data.message || data.error || 'Erro ao criar conta. Tente novamente.';
     }
 
     function showEmailVerificationPending(email) {
@@ -259,6 +287,31 @@
         : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
     });
 
+    // Limpa a mensagem de erro ao digitar em qualquer campo
+    document.querySelectorAll('#register-form input').forEach(input => {
+      input.addEventListener('input', () => {
+        if (input.id !== 'admin-password') { // senha já tem handler próprio
+          document.getElementById('error-msg').style.display = 'none';
+        }
+      });
+    });
+
+    document.getElementById('admin-password').addEventListener('input', function () {
+      const hint = document.getElementById('pass-hint');
+      const v = this.value;
+      document.getElementById('error-msg').style.display = 'none';
+      if (v.length === 0) {
+        hint.textContent = 'Mínimo 6 caracteres';
+        hint.style.color = 'var(--text-muted,#888)';
+      } else if (v.length < 6) {
+        hint.textContent = 'Faltam ' + (6 - v.length) + ' caractere(s)';
+        hint.style.color = '#ef4444';
+      } else {
+        hint.textContent = '✓ Senha válida';
+        hint.style.color = '#22c55e';
+      }
+    });
+
     document.getElementById('register-form').addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -281,13 +334,13 @@
       // Validação de aceite dos termos
       if (!document.getElementById('accept-terms').checked) return showError('Você precisa aceitar os Termos de Uso e Política de Privacidade para continuar.');
 
-      // Validações espelham exatamente o worker.js (strongPassword + slug regex)
-      if (!razaoSocial)                              return showError('Razão social obrigatória.');
-      if (!telefone)                                 return showError('Telefone obrigatório.');
-      if (!/^[a-z0-9-]{3,40}$/.test(slug))          return showError('Subdomínio inválido. Use letras minúsculas, números e hífens (3–40 caracteres).');
-      if (!adminNome)                                return showError('Nome do administrador obrigatório.');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) return showError('E-mail inválido.');
-      if (adminSenha.length < 6)                    return showError('A senha deve ter pelo menos 6 caracteres.');
+      // Validações com destaque no campo problemático
+      if (!razaoSocial)                              return showFieldError('company-name', 'Preencha o nome da empresa.');
+      if (!telefone)                                 return showFieldError('phone', 'Preencha o telefone.');
+      if (!/^[a-z0-9-]{3,40}$/.test(slug))          return showFieldError('slug', 'Subdomínio inválido. Use apenas letras minúsculas, números e hífens (3–40 caracteres).');
+      if (!adminNome)                                return showFieldError('admin-name', 'Preencha o nome do administrador.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail)) return showFieldError('admin-email', 'E-mail inválido. Verifique e tente novamente.');
+      if (adminSenha.length < 6) return showFieldError('admin-password', 'Senha muito curta — você digitou ' + adminSenha.length + ' caractere(s), o mínimo é 6.');
 
       // Payload exato que o worker.js espera (handleRegister, linha 128)
       const payload = {
@@ -335,7 +388,7 @@
             setTimeout(() => { window.location.href = 'dashboard.html'; }, 1400);
           }
         } else {
-          showError(data.message || data.error || 'Erro ao criar conta.');
+          showError(getApiErrorMessage(data, adminEmail));
         }
       } catch {
         showError('Erro de conexão. Tente novamente.');
