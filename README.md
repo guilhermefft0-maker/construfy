@@ -49,15 +49,38 @@ Subdomain: construfy.app/demo-alfa/dashboard
 
 ## 📁 Estrutura
 ```
-├── backend/worker.js      ← API completa (auth + CRUD)
-├── backend/schema.sql     ← D1 schema multi-tenant
-├── backend/sample-data.sql← Dados demo (3 obras + folha + EPIs)
+├── backend/
+│   ├── worker.js                  ← API completa (auth + CRUD)
+│   ├── wrangler.toml              ← Cloudflare Workers config
+│   ├── schema.sql                 ← D1 schema multi-tenant
+│   ├── sample-data.sql            ← Dados demo (3 obras + folha + EPIs)
+│   ├── deploy.bat                 ← Deploy local/Cloudflare helper
+│   ├── kiwify-webhook-handler.js  ← Webhook handler
+│   ├── worker.js                  ← API completa (auth + CRUD)
+│   ├── src/                       ← Código adicional do backend
+│   │   └── ...
 ├── frontend/
-│   ├── login.html         ← Auth screens
-│   ├── register.html      ← Multi-step register
-│   └── dashboard.html     ← Real API dashboard (no mock)
-├── package.json           ← npm deploy scripts
-└── README.md              ← Você está aqui ✨
+│   ├── index.html                 ← Página principal do app
+│   ├── login.html                 ← Auth screens
+│   ├── register.html              ← Multi-step register
+│   ├── dashboard.html             ← Dashboard real API
+│   ├── forgot-password.html       ← Recuperação de senha
+│   ├── reset-password.html        ← Formulário de reset
+│   ├── termos.html                ← Política e termos
+│   ├── global.css                 ← Estilos globais
+│   ├── index.css                  ← Estilos do app
+│   ├── login.css                  ← Estilos do login
+│   ├── register.css               ← Estilos do registro
+│   ├── public/
+│   │   ├── img/                   ← Imagens estáticas
+│   │   └── js/                    ← Scripts de frontend
+│   │       ├── api.js
+│   │       ├── app.js
+│   │       ├── router.js
+│   │       └── ...
+├── package.json                   ← npm scripts e dependências
+├── vercel.json                    ← Configuração de deploy
+└── README.md                      ← Você está aqui ✨
 ```
 
 ## 🔐 Security Features
@@ -72,8 +95,7 @@ Subdomain: construfy.app/demo-alfa/dashboard
 ## 💰 Preços (SaaS Ready)
 ```
 FREE     R$  0/mês  → Obras + Medições + 5 colaboradores + Dashboard básico
-Starter  R$197/mês  → 5 obras, 2 users + EPIs básicos
-Pro      R$497/mês  → Ilimitado ⭐ (todas features)
+Pro      R$97/mês  → Ilimitado ⭐ (todas features)
 Enterprise Custom   → SSO + SLA 99.9%
 14 dias free trial
 ```
